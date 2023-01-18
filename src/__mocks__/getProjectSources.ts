@@ -1,0 +1,42 @@
+export default {
+  data: {
+    projectSources: [
+      {
+        id: '3481d0bb-a0b5-49fa-bdea-27a4253cff0a',
+        name: 's2',
+        type: 'csv',
+        dataId: 'fjhdsalfhladhflsajdflksajflkhdsalfhsa',
+        authorId: 'ee98a85a-22ae-475f-9c95-8848bb1b3d5c',
+        updated: '2022-10-27T09:37:23.272488',
+        author: { name: 'Christian', id: 'ee98a85a-22ae-475f-9c95-8848bb1b3d5c' },
+        metaFields: {},
+        interpretation: {},
+        __typename: 'GraphQLProjectSource',
+      },
+      {
+        id: '40339c01-540f-489d-9ff4-34672039d0e9',
+        name: 's5',
+        type: 'csv',
+        dataId: 'fjhdsalfhladhflsajdflksajflkhdsalfhsa',
+        authorId: 'ee98a85a-22ae-475f-9c95-8848bb1b3d5c',
+        author: { name: 'Christian', id: 'ee98a85a-22ae-475f-9c95-8848bb1b3d5c' },
+        updated: '2022-10-27T10:27:09.083359',
+        metaFields: {},
+        interpretation: {},
+        __typename: 'GraphQLProjectSource',
+      },
+      {
+        id: '73a84ea1-c0fb-46fd-bb0f-1c73fbd26aee',
+        name: 's4',
+        type: 'csv',
+        dataId: 'fjhdsalfhladhflsajdflksajflkhdsalfhsa',
+        authorId: 'ee98a85a-22ae-475f-9c95-8848bb1b3d5c',
+        author: { name: 'Christian', id: 'ee98a85a-22ae-475f-9c95-8848bb1b3d5c' },
+        updated: '2022-10-27T10:27:19.087338',
+        metaFields: {},
+        interpretation: {},
+        __typename: 'GraphQLProjectSource',
+      },
+    ],
+  },
+}

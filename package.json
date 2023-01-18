@@ -1,0 +1,89 @@
+{
+  "name": "@lcacollect/documentation",
+  "version": "1.0.1",
+  "description": "A shared library for documentation related components and pages",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "test": "vitest run",
+    "codegen": "graphql-codegen --config codegen.yml",
+    "build": "tsc -p tsconfig.json && tsc -p tsconfig.cjs.json",
+    "build:watch": "tsc --watch",
+    "lint": "eslint src/**/*.{tsx,ts}",
+    "lint:fix": "eslint --fix src/**/*.{tsx,ts}",
+    "format:fix": "prettier --write src/",
+    "format": "prettier --check src/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lcacollect/shared-documentation-frontend.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "Proprietary",
+  "devDependencies": {
+    "@apollo/client": "^3.7.2",
+    "@graphql-codegen/cli": "^2.6.2",
+    "@graphql-codegen/introspection": "^2.2.1",
+    "@graphql-codegen/typescript-operations": "^2.4.2",
+    "@graphql-codegen/typescript-react-apollo": "^3.2.16",
+    "@graphql-codegen/typescript-resolvers": "^2.7.2",
+    "@graphql-tools/mock": "^8.7.6",
+    "@graphql-tools/schema": "^9.0.4",
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^13.4.0",
+    "@tsconfig/create-react-app": "^1.0.2",
+    "@types/node": "^18.11.9",
+    "@types/react": "^18.0.24",
+    "@typescript-eslint/eslint-plugin": "^5.42.0",
+    "@typescript-eslint/parser": "^5.42.0",
+    "@vitejs/plugin-react": "^3.0.0",
+    "eslint": "^8.26.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-react": "^7.31.10",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "husky": "^8.0.1",
+    "jest-environment-jsdom": "^29.2.2",
+    "pre-commit": "^1.2.2",
+    "prettier": "^2.7.1",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.8.4",
+    "vitest": "^0.25.8"
+  },
+  "peerDependencies": {
+    "@azure/msal-browser": "^2.30.0",
+    "@azure/msal-react": "^1.4.9",
+    "@lcacollect/components": "^1.0.0",
+    "@lcacollect/core": "^1.0.0",
+    "@mui/material": "^5.10.12",
+    "react": "^18.2.0",
+    "react-google-charts": "^4.0.0",
+    "react-router-dom": "^6.4.3",
+    "semver": "^7.3.8"
+  },
+  "pre-commit": [
+    "lint",
+    "format"
+  ],
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.+(ts|tsx)": [
+      "eslint --fix",
+      "prettier --write",
+      "git add"
+    ],
+    "*.+(json|css|md)": [
+      "prettier --write",
+      "git add"
+    ]
+  }
+}

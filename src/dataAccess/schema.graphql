@@ -1,0 +1,483 @@
+input FilterOptionInput {
+  equal: String
+  contains: String
+  startsWith: String
+  endsWith: String
+  isEmpty: Boolean
+  isNotEmpty: Boolean
+  isAnyOf: [String]
+}
+
+input SchemaCategoryFilters {
+  id: FilterOptionInput = null
+  name: FilterOptionInput = null
+  description: FilterOptionInput = null
+  #path: FilterOptionInput = null
+}
+
+query getSchemaTemplates {
+  schemaTemplates {
+    id
+    name
+    schema {
+      name
+      id
+      templateId
+    }
+  }
+}
+
+mutation deleteSchemaTemplate($id: String!) {
+  deleteSchemaTemplate(id: $id)
+}
+
+mutation addSchemaTemplate($name: String!) {
+  addSchemaTemplate(name: $name) {
+    id
+    name
+    schema {
+      id
+      name
+      templateId
+    }
+  }
+}
+
+mutation updateSchemaTemplate($id: String!, $name: String!) {
+  updateSchemaTemplate(id: $id, name: $name) {
+    id
+    name
+    schema {
+      id
+      name
+      templateId
+    }
+  }
+}
+
+query getProjectSchemas($projectId: String!) {
+  reportingSchemas(projectId: $projectId) {
+    id
+    name
+  }
+}
+
+query getProjectSchemasWithCategories($projectId: String!) {
+  reportingSchemas(projectId: $projectId) {
+    id
+    name
+    categories {
+      id
+      name
+      path
+      depth
+    }
+  }
+}
+
+query getSchemaCategories($reportingSchemaId: String!, $filters: SchemaCategoryFilters = null) {
+  schemaCategories(reportingSchemaId: $reportingSchemaId, filters: $filters) {
+    id
+    name
+    depth
+  }
+}
+
+query getSchemaElements($schemaCategoryIds: [String!]!) {
+  schemaElements(schemaCategoryIds: $schemaCategoryIds) {
+    id
+    name
+    quantity
+    unit
+    description
+    schemaCategory {
+      id
+      name
+      path
+    }
+    source {
+      name
+      type
+    }
+  }
+}
+
+enum Unit {
+  M
+  M2
+  M3
+  KG
+  PCS
+  NONE
+}
+
+mutation addSchemaElement(
+  $schemaCategoryId: String!
+  $name: String!
+  $quantity: Float!
+  $unit: Unit!
+  $description: String!
+) {
+  addSchemaElement(
+    schemaCategoryId: $schemaCategoryId
+    name: $name
+    quantity: $quantity
+    unit: $unit
+    description: $description
+  ) {
+    id
+    name
+    quantity
+    unit
+    description
+    schemaCategory {
+      id
+      name
+    }
+  }
+}
+
+query getSingleSchemaElement($schemaCategoryIds: [String!]!, $schemaElementId: String!) {
+  schemaElements(schemaCategoryIds: $schemaCategoryIds, filters: { id: { equal: $schemaElementId } }) {
+    id
+    name
+    quantity
+    unit
+    description
+    schemaCategory {
+      id
+      name
+      description
+      reportingSchemaId
+      path
+    }
+  }
+}
+
+mutation updateSchemaElement(
+  $id: String!
+  $name: String
+  $schemaCategory: String
+  $quantity: Float
+  $unit: Unit
+  $description: String
+) {
+  updateSchemaElement(
+    id: $id
+    name: $name
+    schemaCategoryId: $schemaCategory
+    quantity: $quantity
+    unit: $unit
+    description: $description
+  ) {
+    id
+    schemaCategory {
+      id
+      name
+    }
+  }
+}
+
+mutation deleteSchemaElement($id: String!) {
+  deleteSchemaElement(id: $id)
+}
+
+mutation addReportingSchema($templateId: String!, $name: String, $projectId: String!) {
+  addReportingSchema(templateId: $templateId, name: $name, projectId: $projectId) {
+    id
+    name
+    projectId
+  }
+}
+
+query ExportReportingSchema($reportingSchemaId: String!, $exportFormat: exportFormat!) {
+  exportReportingSchema(reportingSchemaId: $reportingSchemaId, exportFormat: $exportFormat)
+}
+
+mutation addReportingSchemaFromTemplate($templateId: String!, $name: String, $projectId: String!) {
+  addReportingSchemaFromTemplate(templateId: $templateId, name: $name, projectId: $projectId) {
+    id
+    name
+  }
+}
+
+query getProjectSources($projectId: String!) {
+  projectSources(projectId: $projectId) {
+    id
+    name
+    type
+    author {
+      name
+    }
+    authorId
+    dataId
+    updated
+    metaFields
+    interpretation
+  }
+}
+
+mutation addProjectSource($projectId: String!, $type: ProjectSourceType!, $name: String!, $file: String) {
+  addProjectSource(projectId: $projectId, type: $type, name: $name, file: $file) {
+    id
+    name
+    type
+    dataId
+  }
+}
+
+mutation updateProjectSource($id: String!, $type: ProjectSourceType, $name: String, $file: String) {
+  updateProjectSource(id: $id, type: $type, name: $name, file: $file) {
+    projectId
+    id
+    name
+    type
+    dataId
+  }
+}
+
+mutation updateProjectSourceInterpretation($id: String!, $type: ProjectSourceType, $interpretation: JSON) {
+  updateProjectSource(id: $id, type: $type, interpretation: $interpretation) {
+    id
+    interpretation
+  }
+}
+
+mutation deleteProjectSource($id: String!) {
+  deleteProjectSource(id: $id)
+}
+
+query getTasks($reportingSchemaId: String!) {
+  tasks(reportingSchemaId: $reportingSchemaId) {
+    id
+    name
+    description
+    dueDate
+    authorId
+    status
+    item {
+      ... on GraphQLSchemaCategory {
+        __typename
+        id
+        name
+      }
+      ... on GraphQLSchemaElement {
+        __typename
+        id
+        name
+      }
+    }
+  }
+}
+
+query getTasksForTasksPage($reportingSchemaId: String!) {
+  tasks(reportingSchemaId: $reportingSchemaId) {
+    id
+    name
+    description
+    author {
+      id
+      name
+    }
+    status
+    assignee {
+      ... on GraphQLProjectMember {
+        __typename
+        name
+        id
+      }
+      ... on GraphQLProjectGroup {
+        __typename
+        name
+        id
+      }
+    }
+    item {
+      ... on GraphQLSchemaCategory {
+        __typename
+        id
+        name
+      }
+      ... on GraphQLSchemaElement {
+        __typename
+        id
+        name
+      }
+    }
+    comments {
+      id
+    }
+  }
+}
+
+mutation addTask(
+  $reportingSchemaId: String!
+  $name: String!
+  $dueDate: Date!
+  $item: taskItem!
+  $description: String!
+  $status: TaskStatus!
+  $assignee: GraphQLAssignee
+) {
+  addTask(
+    reportingSchemaId: $reportingSchemaId
+    name: $name
+    dueDate: $dueDate
+    description: $description
+    status: $status
+    item: $item
+    assignee: $assignee
+  ) {
+    id
+  }
+}
+
+mutation updateTask(
+  $taskId: String!
+  $name: String
+  $dueDate: Date
+  $description: String
+  $status: TaskStatus
+  $assignee: GraphQLAssignee
+) {
+  updateTask(
+    id: $taskId
+    name: $name
+    dueDate: $dueDate
+    description: $description
+    status: $status
+    assignee: $assignee
+  ) {
+    id
+  }
+}
+
+mutation addComment($taskId: String!, $text: String!) {
+  addComment(taskId: $taskId, text: $text) {
+    id
+    added
+    text
+    authorId
+  }
+}
+
+query getSingleTask($reportingSchemaId: String!, $taskId: String!) {
+  tasks(reportingSchemaId: $reportingSchemaId, filters: { id: { equal: $taskId } }) {
+    id
+    name
+    reportingSchemaId
+    description
+    author {
+      name
+      id
+    }
+    status
+    assignee {
+      ... on GraphQLProjectMember {
+        __typename
+        name
+        id
+      }
+      ... on GraphQLProjectGroup {
+        __typename
+        name
+        id
+      }
+    }
+    item {
+      ... on GraphQLSchemaCategory {
+        __typename
+        id
+        name
+      }
+      ... on GraphQLSchemaElement {
+        __typename
+        id
+        name
+      }
+    }
+  }
+}
+
+query getProjectMembers($projectId: String!) {
+  projectMembers(projectId: $projectId) {
+    id
+    userId
+    name
+    userId
+    email
+    company
+    lastLogin
+    projectId
+    projectGroups {
+      id
+      name
+    }
+  }
+}
+
+query getProjectGroups($projectId: String!) {
+  projectGroups(projectId: $projectId) {
+    id
+    name
+  }
+}
+
+query getProjectName($projectId: String!) {
+  projects(filters: { id: { equal: $projectId } }) {
+    name
+  }
+}
+
+query getCommentsForTask($taskId: String!) {
+  comments(taskId: $taskId) {
+    id
+    added
+    text
+    author {
+      name
+      id
+    }
+  }
+}
+
+query getProjectSourceFiles($dataIds: [String!]) {
+  projectSourceFiles(dataIds: $dataIds) {
+    dataId
+    headers
+    rows
+  }
+}
+
+query getAccount {
+  account {
+    name
+  }
+}
+
+mutation addSchemaElementFromSource(
+  $schemaCategoryId: String!
+  $sourceId: String!
+  $objectIds: [String!]!
+  $quantities: [String!]
+  $units: [Unit!]
+) {
+  addSchemaElementFromSource(
+    schemaCategoryId: $schemaCategoryId
+    sourceId: $sourceId
+    objectIds: $objectIds
+    quantities: $quantities
+    units: $units
+  ) {
+    source {
+      id
+      dataId
+    }
+    id
+    name
+    quantity
+    schemaCategory {
+      id
+    }
+  }
+}
