@@ -22,7 +22,7 @@
     "url": "https://github.com/lcacollect/shared-documentation-frontend.git"
   },
   "keywords": [],
-  "author": "",
+  "author": "Christian Kongsgaard <chrk@arkitema.com>",
   "license": "Proprietary",
   "devDependencies": {
     "@apollo/client": "^3.7.2",
