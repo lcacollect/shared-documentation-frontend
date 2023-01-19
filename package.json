@@ -58,7 +58,7 @@
   "peerDependencies": {
     "@azure/msal-browser": "^2.30.0",
     "@azure/msal-react": "^1.4.9",
-    "@lcacollect/components": "^1.0.0",
+    "@lcacollect/components": "^1.0.5",
     "@lcacollect/core": "^1.0.0",
     "@mui/material": "^5.10.12",
     "react": "^18.2.0",
