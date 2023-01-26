@@ -1,6 +1,6 @@
 {
   "name": "@lcacollect/documentation",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "A shared library for documentation related components and pages",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
@@ -58,7 +58,7 @@
   "peerDependencies": {
     "@azure/msal-browser": "^2.30.0",
     "@azure/msal-react": "^1.4.9",
-    "@lcacollect/components": "^1.1.0",
+    "@lcacollect/components": "^1.1.1",
     "@lcacollect/core": "^1.0.1",
     "@mui/material": "^5.10.12",
     "react": "^18.2.0",
