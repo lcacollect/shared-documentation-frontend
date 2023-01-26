@@ -2,11 +2,13 @@ import { CardTitle, LcaButton } from '@lcacollect/components'
 import {
   Alert,
   AlertProps,
+  Box,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
   Snackbar,
+  Tooltip,
   Typography,
 } from '@mui/material'
 import { ProjectSource } from 'components'
@@ -15,6 +17,8 @@ import {
   GetProjectSourcesDocument,
   ProjectSourceType,
   useAddProjectSourceMutation,
+  useGetAccountQuery,
+  useGetProjectMembersQuery,
   useUpdateProjectSourceMutation,
 } from '../../dataAccess'
 import { SourceForm } from './sourceForm'
@@ -32,6 +36,15 @@ export const SourceDialog: React.FC<SelectionDialogProps> = (props) => {
   const [type, setType] = useState<ProjectSourceType | null | undefined>(editRow?.type || null)
   const [name, setName] = useState('')
   const [file, setFile] = useState<File | null>()
+  const [isMemberOfProject, setIsMemberOfProject] = useState<boolean>()
+  const { data: accountData } = useGetAccountQuery()
+  const { data: projectMemberData } = useGetProjectMembersQuery({
+    variables: {
+      projectId: projectId as string,
+    },
+    skip: !projectId,
+  })
+
   const [addProjectSourceMutation] = useAddProjectSourceMutation({
     refetchQueries: [{ query: GetProjectSourcesDocument, variables: { projectId } }],
   })
@@ -44,6 +57,15 @@ export const SourceDialog: React.FC<SelectionDialogProps> = (props) => {
     setType(editRow?.type || null)
     setName(editRow?.name || '')
   }, [editRow])
+
+  useEffect(() => {
+    if (accountData && projectMemberData) {
+      const isMemberOfProject = projectMemberData?.projectMembers.find(
+        (member) => member.email === accountData?.account.email,
+      )
+      setIsMemberOfProject(!!isMemberOfProject)
+    }
+  }, [accountData, projectMemberData])
 
   // if fileToBase64 is imported from @lca/shared-core-frontend it won't run, perhaps due to issues with using FileReader async
   const fileToBase64 = (file: File) => {
@@ -116,9 +138,26 @@ export const SourceDialog: React.FC<SelectionDialogProps> = (props) => {
         <LcaButton onClick={handleClose} data-testid='cancel-project-source-button'>
           <Typography>Cancel</Typography>
         </LcaButton>
-        <LcaButton onClick={handleDialogAdd} data-testid='add-project-source-button'>
-          <Typography>Add</Typography>
-        </LcaButton>
+        <Tooltip
+          placement='top-end'
+          title={
+            !name || !file
+              ? 'Complete the form to upload file'
+              : !isMemberOfProject
+              ? 'Only project members can add files'
+              : ''
+          }
+        >
+          <Box sx={{ ml: 1 }}>
+            <LcaButton
+              disabled={!name || !file || !isMemberOfProject}
+              onClick={handleDialogAdd}
+              data-testid='add-project-source-button'
+            >
+              <Typography>Add</Typography>
+            </LcaButton>
+          </Box>
+        </Tooltip>
       </DialogActions>
       {!!snackbar && (
         <Snackbar
