@@ -75,10 +75,10 @@ export const ImportExportPage = () => {
 
   return (
     <PaperPage>
-      <CardTitle title={'Export Project'} size={'large'} />
+      <CardTitle title='Export Project' size='large' />
       <InnerPaper sx={sxInner}>
         <Stack direction='column' justifyContent='space-between' sx={{ height: '100%' }}>
-          <CardTitle title={'Export Project'} size={'medium'} />
+          <CardTitle title='Choose format' size='medium' />
           <DropDown inputLabel='Format' options={options} setSelected={handleChangeExportFormat} />
           <LcaButton
             onClick={() => setClicked(true)}
