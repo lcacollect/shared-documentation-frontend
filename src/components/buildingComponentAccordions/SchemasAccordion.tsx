@@ -60,15 +60,18 @@ const sortCategoriesByPath = (categories: GraphQlSchemaCategory[] | undefined | 
 
   categories
     .filter((category) => category.depth === 0)
+    .sort((prev, next) => (prev.name < next.name ? -1 : 1))
     .forEach((category) => (groupedData[category.id] = { ...category, children: {} }))
   categories
     .filter((category) => category.depth === 1)
+    .sort((prev, next) => (prev.name < next.name ? -1 : 1))
     .forEach((category) => {
       const key = category.path.substring(1)
       groupedData[key].children[category.id] = { ...category, children: {} }
     })
   categories
     .filter((category) => category.depth === 2)
+    .sort((prev, next) => (prev.name < next.name ? -1 : 1))
     .forEach((category) => {
       const keys = category.path.substring(1).split('/')
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment

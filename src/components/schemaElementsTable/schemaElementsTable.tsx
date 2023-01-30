@@ -23,8 +23,9 @@ import {
   GridValueFormatterParams,
   MuiEvent,
 } from '@mui/x-data-grid-pro'
-import { ChangeEvent, Dispatch, SetStateAction, SyntheticEvent, useCallback, useEffect, useState } from 'react'
+import { ChangeEvent, Dispatch, SetStateAction, SyntheticEvent, useCallback, useEffect, useMemo, useState } from 'react'
 import {
+  GetSchemaElementsDocument,
   GraphQlSchemaCategory,
   GraphQlSchemaElement,
   Unit,
@@ -68,8 +69,10 @@ export const SchemaElementsTable = (props: SchemaElementsTableProps) => {
   const [rows, setRows] = useState<GridRowModel<SchemaElement[]>>([])
   const [snackbar, setSnackbar] = useState<Pick<AlertProps, 'children' | 'severity'> | null>(null)
   const [openElementsFromSourceDialogId, setOpenElementsFromSourceDialogId] = useState('')
+
+  const schemaCategories = useMemo(() => Object.values(category.children), [category.children])
   const { data, error, loading } = useGetSchemaElementsQuery({
-    variables: { schemaCategoryIds: Object.values(category.children).map((child) => child.id) as string[] },
+    variables: { schemaCategoryIds: schemaCategories.map((child) => child.id) as string[] },
   })
 
   useEffect(() => {
@@ -79,11 +82,17 @@ export const SchemaElementsTable = (props: SchemaElementsTableProps) => {
     setRows(data?.schemaElements as SchemaElement[])
   }, [data, error, loading])
 
-  const [addSchemaElement] = useAddSchemaElementMutation()
+  const refetchUpdateQueries = [
+    {
+      query: GetSchemaElementsDocument,
+      variables: { schemaCategoryIds: schemaCategories.map((child) => child.id) as string[] },
+    },
+  ]
+  const [addSchemaElement] = useAddSchemaElementMutation({ refetchQueries: refetchUpdateQueries })
 
-  const [updateSchemaElementMutation] = useUpdateSchemaElementMutation()
+  const [updateSchemaElementMutation] = useUpdateSchemaElementMutation({ refetchQueries: refetchUpdateQueries })
 
-  const [deleteSchemaElementMutation] = useDeleteSchemaElementMutation()
+  const [deleteSchemaElementMutation] = useDeleteSchemaElementMutation({ refetchQueries: refetchUpdateQueries })
 
   const handleAddRow = () => {
     if (rows.find((row) => row.id === '' && row.name === '')) {
@@ -96,7 +105,7 @@ export const SchemaElementsTable = (props: SchemaElementsTableProps) => {
         id: '',
         name: '',
         unit: Unit.M,
-        schemaCategory: Object.values(category.children).find((child) => child.name.includes('x')),
+        schemaCategory: schemaCategories.find((child) => child.name.includes('x')),
         description: '',
         source: null,
         quantity: 0,
@@ -244,8 +253,13 @@ export const SchemaElementsTable = (props: SchemaElementsTableProps) => {
       flex: 1,
       editable: true,
       type: 'singleSelect',
-      valueOptions: Object.values(category.children).map((child) => ({ value: child.id, label: child.name as string })),
-      valueFormatter: (params) => params.value.name,
+      valueOptions: schemaCategories.map((child) => ({ value: child.id, label: child.name as string })),
+      valueGetter: (param) => {
+        return param.value.id
+      },
+      valueFormatter: (params) => {
+        return schemaCategories.find((category) => category.id == params.value)?.name
+      },
     },
     {
       field: 'name',

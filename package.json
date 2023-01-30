@@ -1,6 +1,6 @@
 {
   "name": "@lcacollect/documentation",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "A shared library for documentation related components and pages",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
@@ -15,7 +15,8 @@
     "lint": "eslint src/**/*.{tsx,ts}",
     "lint:fix": "eslint --fix src/**/*.{tsx,ts}",
     "format:fix": "prettier --write src/",
-    "format": "prettier --check src/"
+    "format": "prettier --check src/",
+    "fix": "npm run lint:fix && npm run format:fix"
   },
   "repository": {
     "type": "git",
