@@ -1,6 +1,6 @@
 {
   "name": "@lcacollect/documentation",
-  "version": "1.0.3",
+  "version": "1.0.5",
   "description": "A shared library for documentation related components and pages",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
