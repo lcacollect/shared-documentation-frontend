@@ -2635,7 +2635,10 @@ export type GetProjectSourceFilesQuery = {
 
 export type GetAccountQueryVariables = Exact<{ [key: string]: never }>
 
-export type GetAccountQuery = { __typename?: 'Query'; account: { __typename?: 'GraphQLUserAccount'; name: string } }
+export type GetAccountQuery = {
+  __typename?: 'Query'
+  account: { __typename?: 'GraphQLUserAccount'; name: string; email: string }
+}
 
 export type AddSchemaElementFromSourceMutationVariables = Exact<{
   schemaCategoryId: Scalars['String']
@@ -4287,6 +4290,7 @@ export const GetAccountDocument = gql`
   query getAccount {
     account {
       name
+      email
     }
   }
 `
