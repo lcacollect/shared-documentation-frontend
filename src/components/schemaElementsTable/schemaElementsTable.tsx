@@ -374,15 +374,20 @@ export const SchemaElementsTable = (props: SchemaElementsTableProps) => {
       headerName: '',
       flex: 0.1,
       editable: false,
-      renderCell: (params) => (
-        <Radio
-          name='select-ref-to-add-task-to'
-          checked={params.id === refToAddTaskTo?.id}
-          value={params.id}
-          onChange={handleChangeSelectedTask}
-          size='small'
-        />
-      ),
+      renderCell: (params) => {
+        if (params.id === '') {
+          return null
+        }
+        return (
+          <Radio
+            name='select-ref-to-add-task-to'
+            checked={params.id === refToAddTaskTo?.id}
+            value={params.id}
+            onChange={handleChangeSelectedTask}
+            size='small'
+          />
+        )
+      },
     },
   ]
 
