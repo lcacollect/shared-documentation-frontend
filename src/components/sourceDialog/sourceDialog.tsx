@@ -61,7 +61,7 @@ export const SourceDialog: React.FC<SelectionDialogProps> = (props) => {
   useEffect(() => {
     if (accountData && projectMemberData) {
       const isMemberOfProject = projectMemberData?.projectMembers.find(
-        (member) => member.email === accountData?.account.email,
+        (member) => member.userId === accountData?.account.id,
       )
       setIsMemberOfProject(!!isMemberOfProject)
     }
