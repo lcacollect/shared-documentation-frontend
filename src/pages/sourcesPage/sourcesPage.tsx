@@ -1,6 +1,5 @@
-import { CardTitle, DataFetchWrapper, PaperPage } from '@lcacollect/components'
+import { CardTitle, PaperPage } from '@lcacollect/components'
 import { Stack } from '@mui/material'
-import { useGetProjectSourcesQuery } from '../../dataAccess'
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { ProjectSource, SourceDialog, SourceInterpretationTable, SourceTable } from '../../components'
@@ -9,12 +8,6 @@ export const SourcesPage = () => {
   const { projectId = '' } = useParams()
   const [openSourceDialog, setOpenSourceDialog] = useState(false)
   const [editRow, setEditRow] = useState<ProjectSource | null | undefined>()
-
-  const { data, error, loading } = useGetProjectSourcesQuery({
-    variables: { projectId: projectId as string },
-    skip: !projectId,
-  })
-  const projectSources = data?.projectSources
 
   const handleAddSource = () => {
     setOpenSourceDialog(true)
@@ -28,9 +21,7 @@ export const SourcesPage = () => {
     <Stack spacing={2} alignItems='stretch' width='100%'>
       <PaperPage>
         <CardTitle title={'Sources'} size={'large'} onClickHandler={handleAddSource} data-testid='sources-title' />
-        <DataFetchWrapper error={error}>
-          <SourceTable projectSources={projectSources} loading={loading} />
-        </DataFetchWrapper>
+        <SourceTable />
         <SourceDialog
           openDialog={openSourceDialog}
           handleDialogClose={handleSourceDialogClose}
@@ -41,9 +32,7 @@ export const SourcesPage = () => {
       </PaperPage>
       <PaperPage>
         <CardTitle title={'Source Interpretation'} size={'large'} />
-        <DataFetchWrapper error={error}>
-          <SourceInterpretationTable setEditRow={setEditRow} projectSources={projectSources} loading={loading} />
-        </DataFetchWrapper>
+        <SourceInterpretationTable />
       </PaperPage>
     </Stack>
   )
