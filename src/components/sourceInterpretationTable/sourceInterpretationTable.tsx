@@ -9,50 +9,39 @@ import {
   GridRowId,
   GridRowParams,
 } from '@mui/x-data-grid-pro'
-import { Dispatch, SetStateAction, useState } from 'react'
-import { ProjectSource, SourceInterpretationDialog } from '../../components'
-import { GraphQlProjectSourceFile, Unit, useGetProjectSourceFilesQuery } from '../../dataAccess'
-import { NoRowsOverlay } from '@lcacollect/components'
+import { useState } from 'react'
+import { SourceInterpretationDialog } from '../../components'
+import { Unit, useGetProjectSourceDataQuery } from '../../dataAccess'
+import { DataFetchWrapper, NoRowsOverlay } from '@lcacollect/components'
+import { useParams } from 'react-router-dom'
+import { SourceData } from '../sourceInterpretationDialog/types'
 
-interface SourceInterpretationTableProps {
-  setEditRow: Dispatch<SetStateAction<ProjectSource | null | undefined>>
-  projectSources?: ProjectSource[]
-  loading?: boolean
-}
-
-export const SourceInterpretationTable = (props: SourceInterpretationTableProps) => {
-  const { projectSources, loading } = props
+export const SourceInterpretationTable = () => {
+  const { projectId = '' } = useParams()
   const [snackbar, setSnackbar] = useState<Pick<AlertProps, 'children' | 'severity'> | null>(null)
   const [openInterpretationDialogId, setOpenInterpretationDialogId] = useState('')
-  const [editRow, setEditRow] = useState<GraphQlProjectSourceFile | null | undefined>()
+  const [editRow, setEditRow] = useState<SourceData | null | undefined>()
 
   const handleCloseSnackbar = () => setSnackbar(null)
-  const dataIds = projectSources?.map((source) => source.dataId ?? '')
 
-  const { data: sourceFilesData, loading: sourceFilesLoading } = useGetProjectSourceFilesQuery({
-    variables: {
-      dataIds: dataIds,
-    },
-    skip: !dataIds?.length,
+  const {
+    data: sourceData,
+    loading: sourceDataLoading,
+    error: sourceDataError,
+  } = useGetProjectSourceDataQuery({
+    variables: { projectId: projectId as string },
+    skip: !projectId,
   })
-  const sourceFiles = sourceFilesData?.projectSourceFiles
-
-  const rows = projectSources
+  const sourceFiles = sourceData?.projectSources
 
   const handleRowClick = (params: GridRowParams) => {
     setOpenInterpretationDialogId(params.row.id)
-    const activeProjectSource = projectSources?.find((source) => source.id === params.id)
-    if (activeProjectSource) {
-      setEditRow(sourceFiles?.find((sourceFile) => sourceFile.dataId === activeProjectSource.dataId))
-    }
+    setEditRow(sourceFiles?.find((sourceFile) => sourceFile.id === params.id))
   }
 
   const handleEditClick = (id: GridRowId) => () => {
     setOpenInterpretationDialogId(id.toString())
-    const activeProjectSource = projectSources?.find((source) => source.id === id)
-    if (activeProjectSource) {
-      setEditRow(sourceFiles?.find((sourceFile) => sourceFile.dataId === activeProjectSource.dataId))
-    }
+    setEditRow(sourceFiles?.find((sourceFile) => sourceFile.id === id))
   }
 
   const handleInterpretationDialogClose = () => {
@@ -111,42 +100,43 @@ export const SourceInterpretationTable = (props: SourceInterpretationTableProps)
 
   return (
     <div style={{ height: 400 }} data-testid='source-interpretation-table'>
-      <DataGridPro
-        loading={loading || sourceFilesLoading}
-        rows={rows || []}
-        rowHeight={35}
-        sx={{
-          border: 0,
-          '.MuiDataGrid-row': {
-            cursor: 'pointer',
-          },
-        }}
-        columns={columns}
-        pageSize={5}
-        rowsPerPageOptions={[5]}
-        components={{ LoadingOverlay: LinearProgress, NoRowsOverlay: NoRowsOverlay }}
-        componentsProps={{
-          noRowsOverlay: { text: 'No sources added' },
-        }}
-        onRowClick={handleRowClick}
-      />
-      <SourceInterpretationDialog
-        openDialog={openInterpretationDialogId !== '' && !!editRow}
-        handleDialogClose={handleInterpretationDialogClose}
-        editRow={editRow}
-        setEditRow={setEditRow}
-        projectSources={projectSources}
-      />
-      {!!snackbar && (
-        <Snackbar
-          open
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-          onClose={handleCloseSnackbar}
-          autoHideDuration={6000}
-        >
-          <Alert {...snackbar} onClose={handleCloseSnackbar} />
-        </Snackbar>
-      )}
+      <DataFetchWrapper error={sourceDataError}>
+        <DataGridPro
+          loading={sourceDataLoading}
+          rows={sourceFiles || []}
+          rowHeight={35}
+          sx={{
+            border: 0,
+            '.MuiDataGrid-row': {
+              cursor: 'pointer',
+            },
+          }}
+          columns={columns}
+          pageSize={5}
+          rowsPerPageOptions={[5]}
+          components={{ LoadingOverlay: LinearProgress, NoRowsOverlay: NoRowsOverlay }}
+          componentsProps={{
+            noRowsOverlay: { text: 'No sources added' },
+          }}
+          onRowClick={handleRowClick}
+        />
+        <SourceInterpretationDialog
+          openDialog={openInterpretationDialogId !== '' && !!editRow}
+          handleDialogClose={handleInterpretationDialogClose}
+          editRow={editRow}
+          setEditRow={setEditRow}
+        />
+        {!!snackbar && (
+          <Snackbar
+            open
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+            onClose={handleCloseSnackbar}
+            autoHideDuration={6000}
+          >
+            <Alert {...snackbar} onClose={handleCloseSnackbar} />
+          </Snackbar>
+        )}
+      </DataFetchWrapper>
     </div>
   )
 }

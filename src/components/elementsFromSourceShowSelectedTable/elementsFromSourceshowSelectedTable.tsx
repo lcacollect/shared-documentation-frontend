@@ -7,17 +7,17 @@ import {
   useGridApiContext,
 } from '@mui/x-data-grid-pro'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
-import { GraphQlProjectSourceFile, Unit } from '../../dataAccess'
+import { Unit } from '../../dataAccess'
 import { SourceRow } from '../addElementFromSourceDialog'
 import { UnitOptions } from '../schemaElementsTable'
-import { ProjectSource } from '../sourceTable'
+import { SourceData } from '../sourceInterpretationDialog/types'
 
 type ElementsFromSourceShowSelectedTableProps = {
   selectedRows: SourceRow[]
   handleChangeSelectedRow: (rowId: string) => void
   handleChangeAllSelectedRows: () => void
-  selectedSourceFile: GraphQlProjectSourceFile
-  selectedSource: ProjectSource | undefined
+  selectedSourceFile: SourceData
+  selectedSource: SourceData | undefined
   unitOptions: UnitOptions
   setSelectedInterpretationRows: Dispatch<SetStateAction<SourceInterpretationRow[]>>
 }
@@ -30,8 +30,7 @@ export type SourceInterpretationRow = {
 }
 
 export function decorateRow(row: SourceRow, unitValue?: string, quantityValue?: string): SourceInterpretationRow {
-  const decoratedRow = { ...row, unit: (unitValue as Unit) ?? Unit.None, quantity: quantityValue ?? '' }
-  return decoratedRow
+  return { ...row, unit: (unitValue as Unit) ?? Unit.None, quantity: quantityValue ?? '' }
 }
 
 export const ElementsFromSourceShowSelectedTable = ({
@@ -58,8 +57,7 @@ export const ElementsFromSourceShowSelectedTable = ({
           if (!decoratedRow) {
             // No default values for selectedRow exists, let's decorate it
             const { unitValue, quantityValue } = getDefaultInterpretationRowValues(selectedRow)
-            const decoratedRow = decorateRow(selectedRow, unitValue, quantityValue)
-            return decoratedRow
+            return decorateRow(selectedRow, unitValue, quantityValue)
           } else {
             return decorateRow(selectedRow, decoratedRow?.unit, decoratedRow?.quantity)
           }
@@ -79,8 +77,7 @@ export const ElementsFromSourceShowSelectedTable = ({
   function getInitialRows(): SourceInterpretationRow[] {
     return selectedRows.map((row) => {
       const { unitValue, quantityValue } = getDefaultInterpretationRowValues(row)
-      const decoratedRow = decorateRow(row, unitValue, quantityValue)
-      return decoratedRow
+      return decorateRow(row, unitValue, quantityValue)
     })
   }
 
@@ -114,10 +111,10 @@ export const ElementsFromSourceShowSelectedTable = ({
           />
         )
       },
-      renderHeader: (params) => {
+      renderHeader: () => {
         const isRowSelected = !!selectedRows.length
-        const isAllRowsSelected = selectedRows.length === selectedSourceFile.rows.length
-        const isSomeRowsSelected = isRowSelected && selectedRows.length !== selectedSourceFile.rows.length
+        const isAllRowsSelected = selectedRows.length === selectedSourceFile.data?.rows.length
+        const isSomeRowsSelected = isRowSelected && selectedRows.length !== selectedSourceFile.data?.rows.length
         return isRowSelected ? (
           <Checkbox
             checked={isAllRowsSelected}
@@ -156,7 +153,7 @@ export const ElementsFromSourceShowSelectedTable = ({
       flex: 1,
       editable: true,
 
-      valueOptions: (params) => {
+      valueOptions: () => {
         return Object.entries(unitOptions)
           .map(([key, value]) => {
             // Filter out units, which have falsy value in source interpretation
@@ -181,7 +178,7 @@ export const ElementsFromSourceShowSelectedTable = ({
     {
       field: 'source',
       headerName: 'Source',
-      renderCell: (params) => {
+      renderCell: () => {
         return (
           <Typography>
             {selectedSource?.type}: {selectedSource?.name}
@@ -208,7 +205,7 @@ export const ElementsFromSourceShowSelectedTable = ({
 
 export interface UnitEditComponentProps extends GridEditSingleSelectCellProps {
   sourceInterpretationRows: SourceInterpretationRow[]
-  selectedSource: ProjectSource | undefined
+  selectedSource: SourceData | undefined
   setRows: Dispatch<SetStateAction<SourceInterpretationRow[]>>
 }
 
