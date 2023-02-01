@@ -1,9 +1,10 @@
 import '@testing-library/jest-dom'
 import { render, screen } from '@testing-library/react'
-import { expect, describe, it } from 'vitest'
-import projectSourceData from '../../__mocks__/getProjectSources'
-import { ProjectSource, SourceTable } from './sourceTable'
+import { describe, expect, it } from 'vitest'
+import { SourceTable } from './sourceTable'
 import { MockedProvider } from '@apollo/client/testing'
+import { sourcesPageMock } from '../../__mocks__'
+import { MemoryRouter, Route, Routes } from 'react-router-dom'
 
 describe('Source Table', () => {
   it('should render no rows', async () => {
@@ -20,9 +21,13 @@ describe('Source Table', () => {
 
   it('should render rows', async () => {
     const { baseElement } = render(
-      <MockedProvider>
-        <SourceTable projectSources={projectSourceData.data.projectSources as ProjectSource[]} />
-      </MockedProvider>,
+      <MemoryRouter initialEntries={['/projects/741dfc36-23fa-4582-8746-1879fddab9c7/sources']}>
+        <MockedProvider mocks={sourcesPageMock}>
+          <Routes>
+            <Route path={'/projects/:projectId/sources'} element={<SourceTable />} />
+          </Routes>
+        </MockedProvider>
+      </MemoryRouter>,
     )
 
     expect(baseElement).toBeDefined()

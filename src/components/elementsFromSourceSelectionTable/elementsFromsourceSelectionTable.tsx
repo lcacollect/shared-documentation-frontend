@@ -1,15 +1,15 @@
 import { DataGridPro, GridColumns } from '@mui/x-data-grid-pro'
-import { Dispatch, SetStateAction, useEffect, useState } from 'react'
-import { GraphQlProjectSourceFile } from '../../dataAccess'
+import { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react'
 import Checkbox from '@mui/material/Checkbox'
 import { SourceRow } from '../addElementFromSourceDialog'
+import { SourceData } from '../sourceInterpretationDialog/types'
 
 type ElementsFromSourceSelectionTableProps = {
   selectedRows: SourceRow[]
   handleChangeSelectedRow: (rowId: string) => void
   handleChangeAllSelectedRows: () => void
-  selectedSourceFile: GraphQlProjectSourceFile
-  setSelectedSourceFile: Dispatch<SetStateAction<GraphQlProjectSourceFile | undefined>>
+  selectedSourceFile?: SourceData
+  setSelectedSourceFile: Dispatch<SetStateAction<SourceData | undefined>>
 }
 
 export const ElementsFromSourceSelectionTable = ({
@@ -18,10 +18,10 @@ export const ElementsFromSourceSelectionTable = ({
   handleChangeAllSelectedRows,
   selectedSourceFile,
 }: ElementsFromSourceSelectionTableProps) => {
-  const [rows, setRows] = useState<SourceRow[]>(selectedSourceFile.rows)
+  const [rows, setRows] = useState<SourceRow[]>([])
 
   useEffect(() => {
-    setRows(selectedSourceFile.rows)
+    setRows(selectedSourceFile?.data?.rows || [])
   }, [selectedSourceFile])
 
   const handleOnChangeCheckbox = (rowId: string) => {
@@ -37,7 +37,7 @@ export const ElementsFromSourceSelectionTable = ({
       disableReorder: true,
       disableColumnMenu: true,
       renderCell: (params) => {
-        const isRowSelected = !!selectedRows.find((row) => row.id == params.row.id)
+        const isRowSelected = !!selectedRows.find((row) => row?.id == params.row.id)
         return (
           <Checkbox
             checked={isRowSelected}
@@ -46,9 +46,10 @@ export const ElementsFromSourceSelectionTable = ({
           />
         )
       },
-      renderHeader: (params) => {
-        const isAllRowsSelected = selectedRows.length === selectedSourceFile.rows.length
-        const isSomeRowsSelected = !!selectedRows.length && selectedRows.length !== selectedSourceFile.rows.length
+      renderHeader: () => {
+        const isAllRowsSelected = selectedRows.length === selectedSourceFile?.data?.rows.length
+        const isSomeRowsSelected =
+          !!selectedRows.length && selectedRows.length !== selectedSourceFile?.data?.rows.length
         return (
           <Checkbox
             checked={isAllRowsSelected}
@@ -60,13 +61,15 @@ export const ElementsFromSourceSelectionTable = ({
       },
     },
   ]
-  const headerColumns: GridColumns = selectedSourceFile?.headers.map((header: string, idx: number) => {
-    return {
-      field: header,
-      headerName: header,
-      flex: 1,
-    }
-  })
+  const headerColumns: GridColumns = useMemo(
+    () =>
+      selectedSourceFile?.data?.headers.map((header: string) => ({
+        field: header,
+        headerName: header,
+        flex: 1,
+      })) || [],
+    [selectedSourceFile],
+  )
   const columns = checkboxColumn.concat(headerColumns)
 
   return (

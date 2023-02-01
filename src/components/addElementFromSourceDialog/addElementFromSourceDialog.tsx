@@ -1,4 +1,4 @@
-import { LcaButton, Loading } from '@lcacollect/components'
+import { ErrorBoundary, LcaButton, Loading } from '@lcacollect/components'
 import {
   Alert,
   AlertProps,
@@ -17,15 +17,14 @@ import { MouseEvent, useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import {
   GetSchemaElementsDocument,
-  GraphQlProjectSourceFile,
   useAddSchemaElementFromSourceMutation,
-  useGetProjectSourceFilesQuery,
-  useGetProjectSourcesQuery,
+  useGetProjectSourceDataQuery,
 } from '../../dataAccess'
 import { NestedCategory } from '../buildingComponentAccordions'
 import { ElementsFromSourceSelectionTable } from '../elementsFromSourceSelectionTable'
 import { ElementsFromSourceShowSelectedTable, SourceInterpretationRow } from '../elementsFromSourceShowSelectedTable'
 import { UnitOptions } from '../schemaElementsTable'
+import { SourceData } from '../sourceInterpretationDialog/types'
 
 type AddElementsFromSourceProps = {
   open: boolean
@@ -50,7 +49,7 @@ export const AddElementsFromSourceDialog = ({
 
   const [selectedRows, setSelectedRows] = useState<SourceRow[]>([])
   const [selectedInterpretationRows, setSelectedInterpretationRows] = useState<SourceInterpretationRow[]>([])
-  const [selectedSourceFile, setSelectedSourceFile] = useState<GraphQlProjectSourceFile>()
+  const [selectedSourceFile, setSelectedSourceFile] = useState<SourceData>()
   const [isInterpretationEmpty, setIsInterpretationEmpty] = useState<boolean>()
   const [snackbar, setSnackbar] = useState<Pick<AlertProps, 'children' | 'severity'> | null>(null)
 
@@ -62,21 +61,13 @@ export const AddElementsFromSourceDialog = ({
       },
     ],
   })
-  const { data, error, loading } = useGetProjectSourcesQuery({
+
+  const { data: sourceFilesData } = useGetProjectSourceDataQuery({
     variables: { projectId: projectId as string },
     skip: !projectId,
   })
-  const projectSources = data?.projectSources.filter((source) => source.dataId)
-  const dataIds = projectSources?.map((source) => source.dataId ?? '')
-
-  const { data: sourceFilesData, loading: sourceFilesLoading } = useGetProjectSourceFilesQuery({
-    variables: {
-      dataIds: dataIds,
-    },
-    skip: !dataIds?.length,
-  })
-  const sourceFiles = sourceFilesData?.projectSourceFiles
-  const selectedSource = projectSources?.find((source) => source.dataId === selectedSourceFile?.dataId)
+  const sourceFiles = sourceFilesData?.projectSources
+  const selectedSource = sourceFiles?.find((source) => source.id === selectedSourceFile?.id)
 
   useEffect(() => {
     if (sourceFiles?.length) {
@@ -133,11 +124,12 @@ export const AddElementsFromSourceDialog = ({
   }
 
   const handleChangeSelectedRow = (rowId: string) => {
+    // debugger
     const selectedRow = selectedRows.find((row) => row.id === rowId)
     if (selectedRow) {
       setSelectedRows(selectedRows.filter((row) => row.id !== rowId))
     } else {
-      const rowToSelect = selectedSourceFile?.rows.find((row: SourceRow) => row.id === rowId)
+      const rowToSelect = selectedSourceFile?.data?.rows[rowId]
       setSelectedRows((prevState) => [...prevState, rowToSelect])
     }
   }
@@ -146,12 +138,12 @@ export const AddElementsFromSourceDialog = ({
     if (selectedRows.length) {
       setSelectedRows([])
     } else {
-      setSelectedRows(selectedSourceFile?.rows)
+      setSelectedRows(selectedSourceFile?.data?.rows)
     }
   }
 
   const handleChangeFile = (event: MouseEvent<HTMLElement>, selectedDataId: string) => {
-    const sourceFile = sourceFiles?.find((sourceFile) => sourceFile.dataId === selectedDataId)
+    const sourceFile = sourceFiles?.find((sourceFile) => sourceFile.id === selectedDataId)
     if (!sourceFile) {
       console.log('No source file for selectedDataId:', selectedDataId)
       return
@@ -175,12 +167,12 @@ export const AddElementsFromSourceDialog = ({
                 <>
                   <ToggleButtonGroup
                     exclusive
-                    value={selectedSourceFile.dataId}
+                    value={selectedSourceFile.id}
                     onChange={handleChangeFile}
                     aria-label='text button group'
                   >
-                    {projectSources?.map((source) => (
-                      <ToggleButton key={source.dataId} value={source.dataId}>
+                    {sourceFiles?.map((source) => (
+                      <ToggleButton key={source.id} value={source.id}>
                         {source.name}
                       </ToggleButton>
                     ))}
@@ -196,13 +188,15 @@ export const AddElementsFromSourceDialog = ({
                       </Typography>
                     </Grid>
                   ) : (
-                    <ElementsFromSourceSelectionTable
-                      selectedRows={selectedRows}
-                      handleChangeSelectedRow={handleChangeSelectedRow}
-                      handleChangeAllSelectedRows={handleChangeAllSelectedRows}
-                      selectedSourceFile={selectedSourceFile}
-                      setSelectedSourceFile={setSelectedSourceFile}
-                    />
+                    <ErrorBoundary>
+                      <ElementsFromSourceSelectionTable
+                        selectedRows={selectedRows}
+                        handleChangeSelectedRow={handleChangeSelectedRow}
+                        handleChangeAllSelectedRows={handleChangeAllSelectedRows}
+                        selectedSourceFile={selectedSourceFile}
+                        setSelectedSourceFile={setSelectedSourceFile}
+                      />
+                    </ErrorBoundary>
                   )}
                 </>
               ) : (
@@ -219,15 +213,17 @@ export const AddElementsFromSourceDialog = ({
                   inputProps={{ style: { fontSize: 20 } }}
                 />
                 {selectedSourceFile ? (
-                  <ElementsFromSourceShowSelectedTable
-                    selectedRows={selectedRows}
-                    handleChangeSelectedRow={handleChangeSelectedRow}
-                    handleChangeAllSelectedRows={handleChangeAllSelectedRows}
-                    selectedSourceFile={selectedSourceFile}
-                    selectedSource={selectedSource}
-                    unitOptions={unitOptions}
-                    setSelectedInterpretationRows={setSelectedInterpretationRows}
-                  />
+                  <ErrorBoundary>
+                    <ElementsFromSourceShowSelectedTable
+                      selectedRows={selectedRows}
+                      handleChangeSelectedRow={handleChangeSelectedRow}
+                      handleChangeAllSelectedRows={handleChangeAllSelectedRows}
+                      selectedSourceFile={selectedSourceFile}
+                      selectedSource={selectedSource}
+                      unitOptions={unitOptions}
+                      setSelectedInterpretationRows={setSelectedInterpretationRows}
+                    />
+                  </ErrorBoundary>
                 ) : (
                   <Loading />
                 )}

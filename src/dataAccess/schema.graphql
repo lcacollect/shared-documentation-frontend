@@ -441,16 +441,22 @@ query getCommentsForTask($taskId: String!) {
   }
 }
 
-query getProjectSourceFiles($dataIds: [String!]) {
-  projectSourceFiles(dataIds: $dataIds) {
-    dataId
-    headers
-    rows
+query getProjectSourceData($projectId: String!) {
+  projectSources(projectId: $projectId) {
+    id
+    name
+    type
+    data {
+      headers
+      rows
+    }
+    interpretation
   }
 }
 
 query getAccount {
   account {
+    id
     name
     email
   }

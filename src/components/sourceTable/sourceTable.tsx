@@ -3,20 +3,28 @@ import DeleteIcon from '@mui/icons-material/DeleteOutlined'
 import { Alert, AlertProps, LinearProgress, Snackbar } from '@mui/material'
 import { DataGridPro, GridActionsCellItem, GridRowId, GridValueFormatterParams } from '@mui/x-data-grid-pro'
 import { useState } from 'react'
-import { GetProjectSourcesDocument, GraphQlProjectSource, useDeleteProjectSourceMutation } from '../../dataAccess'
-import { NoRowsOverlay } from '@lcacollect/components'
+import {
+  GetProjectSourcesDocument,
+  GraphQlProjectSource,
+  useDeleteProjectSourceMutation,
+  useGetProjectSourcesQuery,
+} from '../../dataAccess'
+import { DataFetchWrapper, NoRowsOverlay } from '@lcacollect/components'
+import { useParams } from 'react-router-dom'
 
 export interface ProjectSource extends Omit<GraphQlProjectSource, 'projectId' | 'authorId' | 'author'> {
   author: { name: string }
 }
 
-interface SourceTableProps {
-  projectSources?: ProjectSource[] | undefined
-  loading?: boolean
-}
-
-export const SourceTable = ({ projectSources, loading }: SourceTableProps) => {
+export const SourceTable = () => {
+  const { projectId = '' } = useParams()
   const [snackbar, setSnackbar] = useState<Pick<AlertProps, 'children' | 'severity'> | null>(null)
+  const { data, error, loading } = useGetProjectSourcesQuery({
+    variables: { projectId: projectId as string },
+    skip: !projectId,
+  })
+  const projectSources = data?.projectSources
+
   const [deleteProjectSource] = useDeleteProjectSourceMutation()
   const handleCloseSnackbar = () => setSnackbar(null)
 
@@ -71,29 +79,31 @@ export const SourceTable = ({ projectSources, loading }: SourceTableProps) => {
 
   return (
     <div style={{ height: 400 }} data-testid='sources-table'>
-      <DataGridPro
-        loading={loading}
-        rows={projectSources || []}
-        sx={{ border: 0 }}
-        columnVisibilityModel={{ id: false }}
-        columns={columns}
-        pageSize={5}
-        rowsPerPageOptions={[5]}
-        components={{ LoadingOverlay: LinearProgress, NoRowsOverlay: NoRowsOverlay }}
-        componentsProps={{
-          noRowsOverlay: { text: 'No sources added' },
-        }}
-      />
-      {!!snackbar && (
-        <Snackbar
-          open
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-          onClose={handleCloseSnackbar}
-          autoHideDuration={6000}
-        >
-          <Alert {...snackbar} onClose={handleCloseSnackbar} />
-        </Snackbar>
-      )}
+      <DataFetchWrapper error={error}>
+        <DataGridPro
+          loading={loading}
+          rows={projectSources || []}
+          sx={{ border: 0 }}
+          columnVisibilityModel={{ id: false }}
+          columns={columns}
+          pageSize={5}
+          rowsPerPageOptions={[5]}
+          components={{ LoadingOverlay: LinearProgress, NoRowsOverlay: NoRowsOverlay }}
+          componentsProps={{
+            noRowsOverlay: { text: 'No sources added' },
+          }}
+        />
+        {!!snackbar && (
+          <Snackbar
+            open
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+            onClose={handleCloseSnackbar}
+            autoHideDuration={6000}
+          >
+            <Alert {...snackbar} onClose={handleCloseSnackbar} />
+          </Snackbar>
+        )}
+      </DataFetchWrapper>
     </div>
   )
 }

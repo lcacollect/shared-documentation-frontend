@@ -1,13 +1,13 @@
 import { Alert, AlertProps, Checkbox, LinearProgress, Snackbar } from '@mui/material'
 import { DataGridPro, GridColumnHeaderParams, GridColumns } from '@mui/x-data-grid-pro'
 import { ParameterColumnMapping } from 'components/sourceInterpretationDialog'
-import { Dispatch, SetStateAction, useState } from 'react'
-import { GraphQlProjectSourceFile } from '../../dataAccess'
+import { Dispatch, SetStateAction, useMemo, useState } from 'react'
 import { NoRowsOverlay } from '@lcacollect/components'
+import { SourceData } from '../sourceInterpretationDialog/types'
 
 interface SourceElementsTableProps {
-  setEditRow: Dispatch<SetStateAction<GraphQlProjectSourceFile | null | undefined>>
-  editRow: GraphQlProjectSourceFile
+  setEditRow: Dispatch<SetStateAction<SourceData | null | undefined>>
+  editRow: SourceData
   handleUpdateSelectedColumn: (newColumn: string) => void
   selectedParameter: string
   parameterColumnMapping: ParameterColumnMapping
@@ -22,7 +22,7 @@ export const SourceElementsTable = ({
   const [snackbar, setSnackbar] = useState<Pick<AlertProps, 'children' | 'severity'> | null>(null)
   const handleCloseSnackbar = () => setSnackbar(null)
 
-  const rows = editRow?.rows || []
+  const rows = useMemo(() => editRow?.data?.rows || [], [editRow])
 
   const isColumnSelected = (columnName: string) => Object.values(parameterColumnMapping).includes(columnName)
 
@@ -58,9 +58,14 @@ export const SourceElementsTable = ({
     )
   }
 
-  const columns: GridColumns = editRow.headers.map((header: string) => {
-    return { field: header, headerName: header, flex: 1, sortable: false, renderHeader: Header }
-  })
+  const columns: GridColumns =
+    editRow.data?.headers.map((header: string) => ({
+      field: header,
+      headerName: header,
+      flex: 1,
+      sortable: false,
+      renderHeader: Header,
+    })) || []
 
   return (
     <div style={{ height: 400 }} data-testid='sources-elements-table'>
