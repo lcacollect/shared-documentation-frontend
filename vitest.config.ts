@@ -13,6 +13,6 @@ export default defineConfig({
     //   inline: ['**/@lcacollect/**'],
     // },
     setupFiles: './vitest.setup.ts',
-    css: false
+    css: false,
   },
 })

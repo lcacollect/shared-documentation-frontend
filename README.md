@@ -38,6 +38,7 @@ You can use `npm link` to set up live reloading of the other `@lcacollect` packa
   the changes will available here.
 
 ## Folder Structure and Naming
+
 ```python
 src/ # Contains the source code
     __mocks__/ # Contains the mock data and functions for unit tests

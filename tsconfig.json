@@ -9,7 +9,7 @@
     "importHelpers": true,
     "target": "esnext",
     "module": "ESNext",
-    "lib": ["es5","es2017", "dom"],
+    "lib": ["es5", "es2017", "dom"],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "resolveJsonModule": true,
@@ -24,7 +24,5 @@
     "esModuleInterop": true
   },
   "exclude": ["node_modules", "**/*.spec.tsx", "**/__mocks__/*.*"],
-  "include": [
-    "src/**/*"
-  ]
+  "include": ["src/**/*"]
 }

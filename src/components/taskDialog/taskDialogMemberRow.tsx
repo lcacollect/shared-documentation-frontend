@@ -1,5 +1,5 @@
 import { Autocomplete, Avatar, Grid, TextField, Typography } from '@mui/material'
-import { CardTitle, DataFetchWrapper } from '@lcacollect/components'
+import { CardTitle, DataFetchWrapper, ProfileAvatar } from '@lcacollect/components'
 import React, { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react'
 import {
   AssigneeType,
@@ -145,7 +145,8 @@ const OwnerField = (props: OwnerFieldProps) => {
       <Grid item xs={12} sm={6}>
         <CardTitle title={'Owner'} size={'medium'} />
         <Grid display='inline-flex' alignItems='center' paddingTop={2}>
-          <Avatar {...stringAvatar(ownerName)} />
+          <ProfileAvatar ownerName={ownerName} />
+          {/* <Avatar {...stringAvatar(ownerName)} /> */}
           <Typography paddingLeft={1}>{ownerName}</Typography>
         </Grid>
       </Grid>
