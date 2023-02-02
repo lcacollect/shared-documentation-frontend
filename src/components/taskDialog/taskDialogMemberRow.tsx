@@ -10,7 +10,6 @@ import {
 } from '../../dataAccess'
 import { SimplifiedProjectMember, Task } from '../tasksTable'
 import { useParams } from 'react-router-dom'
-import { stringAvatar } from './stringAvatar'
 import { AssigneeTypeMap } from './taskDialog'
 
 interface TaskDialogMemberRowProps {
@@ -146,7 +145,6 @@ const OwnerField = (props: OwnerFieldProps) => {
         <CardTitle title={'Owner'} size={'medium'} />
         <Grid display='inline-flex' alignItems='center' paddingTop={2}>
           <ProfileAvatar ownerName={ownerName} />
-          {/* <Avatar {...stringAvatar(ownerName)} /> */}
           <Typography paddingLeft={1}>{ownerName}</Typography>
         </Grid>
       </Grid>
