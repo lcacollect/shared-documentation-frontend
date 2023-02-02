@@ -11,23 +11,17 @@ import {
   ToggleButtonGroup,
   Typography,
 } from '@mui/material'
-import { ProjectSource } from 'components/sourceTable'
 import { Dispatch, MouseEvent, SetStateAction, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { SourceElementsTable } from '../../components'
-import {
-  GetProjectSourcesDocument,
-  GraphQlProjectSourceFile,
-  Unit,
-  useUpdateProjectSourceInterpretationMutation,
-} from '../../dataAccess'
+import { GetProjectSourcesDocument, Unit, useUpdateProjectSourceInterpretationMutation } from '../../dataAccess'
+import { SourceData } from './types'
 
 interface InterpretationSelectionDialogProps {
   openDialog: boolean
   handleDialogClose: () => void
-  editRow?: GraphQlProjectSourceFile | null
-  setEditRow: Dispatch<SetStateAction<GraphQlProjectSourceFile | null | undefined>>
-  projectSources?: ProjectSource[]
+  editRow?: SourceData | null
+  setEditRow: Dispatch<SetStateAction<SourceData | null | undefined>>
 }
 
 export interface ParameterColumnMapping {
@@ -36,8 +30,8 @@ export interface ParameterColumnMapping {
 
 export const SourceInterpretationDialog = (props: InterpretationSelectionDialogProps) => {
   const { projectId = '' } = useParams()
-  const { openDialog, handleDialogClose, editRow, setEditRow, projectSources } = props
-  // TODO: Add units (except None) by looping thru Enum. Should we make it possible to update units through global admin settings?
+  const { openDialog, handleDialogClose, editRow, setEditRow } = props
+
   const initialParameterOptions = [
     { value: 'interpretationName', label: 'Name' },
     { value: 'description', label: 'Description' },
@@ -51,7 +45,6 @@ export const SourceInterpretationDialog = (props: InterpretationSelectionDialogP
     (prev, cur) => ({ ...prev, [cur.value]: '' }),
     {},
   )
-  const selectedSource = projectSources?.find((source) => source.dataId === editRow?.dataId)
   const [parameterOptions, setParameterOptions] = useState(initialParameterOptions)
   const [selectedParameter, setSelectedParameter] = useState('interpretationName')
   const [selectedColumn, setSelectedColumn] = useState('')
@@ -62,9 +55,9 @@ export const SourceInterpretationDialog = (props: InterpretationSelectionDialogP
   })
 
   useEffect(() => {
-    setParameterColumnMapping(selectedSource?.interpretation || initialParameterValues)
-    setSelectedColumn(selectedSource?.interpretation.interpretationName || '')
-  }, [selectedSource])
+    setParameterColumnMapping(editRow?.interpretation || initialParameterValues)
+    setSelectedColumn(editRow?.interpretation.interpretationName || '')
+  }, [editRow])
 
   useEffect(() => {
     updateMapping()
@@ -93,7 +86,7 @@ export const SourceInterpretationDialog = (props: InterpretationSelectionDialogP
   }
 
   const handleDone = async () => {
-    if (!selectedSource?.id) {
+    if (!editRow?.id) {
       return
     }
     if (!parameterColumnMapping.interpretationName) {
@@ -101,7 +94,7 @@ export const SourceInterpretationDialog = (props: InterpretationSelectionDialogP
       return
     }
     const response = await updateProjectSourceInterpretationMutation({
-      variables: { id: selectedSource.id, interpretation: parameterColumnMapping },
+      variables: { id: editRow.id, interpretation: parameterColumnMapping },
     })
 
     if (response.errors) {
