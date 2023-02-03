@@ -117,6 +117,9 @@ export const SourceInterpretationDialog = (props: InterpretationSelectionDialogP
       <DialogTitle>
         <CardTitle title='Add Source Interpretation' size='medium' />
       </DialogTitle>
+      <DialogTitle>
+        <CardTitle title='Parameter to import' size='small' />
+      </DialogTitle>
       <DialogContent>
         <ToggleButtonGroup
           exclusive
@@ -130,6 +133,9 @@ export const SourceInterpretationDialog = (props: InterpretationSelectionDialogP
             </ToggleButton>
           ))}
         </ToggleButtonGroup>
+        <div style={{ marginTop: '40px' }}>
+          <CardTitle title='Choose a column for the parameter' size='small' />
+        </div>
         {editRow ? (
           <SourceElementsTable
             setEditRow={setEditRow}
