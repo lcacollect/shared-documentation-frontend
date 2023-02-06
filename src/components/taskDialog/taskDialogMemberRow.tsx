@@ -1,4 +1,4 @@
-import { Autocomplete, Avatar, Grid, TextField, Typography } from '@mui/material'
+import { Autocomplete, Grid, TextField, Typography } from '@mui/material'
 import { CardTitle, DataFetchWrapper, ProfileAvatar } from '@lcacollect/components'
 import React, { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react'
 import {

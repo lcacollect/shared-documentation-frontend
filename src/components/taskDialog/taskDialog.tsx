@@ -190,11 +190,7 @@ export const TaskDialog = (props: TaskDialogProps) => {
           </LcaButton>
           <Tooltip
             placement='top-end'
-            title={
-              !name || !description || !assignee?.id
-                ? 'Complete the form to submit task'
-                : 'Only project members can add tasks'
-            }
+            title={!name || !description || !assignee?.id ? 'Complete the form to submit task' : null}
           >
             <Box sx={{ ml: 1 }}>
               <LcaButton
