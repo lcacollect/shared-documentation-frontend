@@ -1,8 +1,7 @@
 import { Box, Grid, Typography } from '@mui/material'
-import { theme, ProfileAvatar } from '@lcacollect/components'
+import { ProfileAvatar, theme } from '@lcacollect/components'
 import React from 'react'
 import { useMsal } from '@azure/msal-react'
-import { stringAvatar } from '../taskDialog/stringAvatar'
 import { IComment } from './taskComments'
 
 interface CommentProps {
