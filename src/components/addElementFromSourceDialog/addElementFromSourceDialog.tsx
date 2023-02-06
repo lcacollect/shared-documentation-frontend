@@ -92,7 +92,7 @@ export const AddElementsFromSourceDialog = ({
     handleClose()
   }
 
-  const handleAdd = () => {
+  const handleAdd = async () => {
     resetValue()
     setSnackbar({ children: 'Adding schema element from source...', severity: 'info' })
 
@@ -107,7 +107,7 @@ export const AddElementsFromSourceDialog = ({
       return
     }
 
-    addSchemaElementFromSourceMutation({
+    const { errors } = await addSchemaElementFromSourceMutation({
       variables: {
         schemaCategoryId: schemaCategoryId,
         sourceId: sourceId,
@@ -116,7 +116,14 @@ export const AddElementsFromSourceDialog = ({
         units: units,
       },
     })
-    handleClose()
+    if (errors) {
+      errors.forEach((error) => {
+        console.error(error)
+        setSnackbar({ children: error.message, severity: 'error' })
+      })
+    } else {
+      handleClose()
+    }
   }
 
   const handleFormIncomplete = () => {
