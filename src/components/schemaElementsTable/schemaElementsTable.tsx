@@ -145,13 +145,22 @@ export const SchemaElementsTable = (props: SchemaElementsTableProps) => {
   )
 
   const handleCancelClick = useCallback(
-    (id: GridRowId) => () => {
+    (id: GridRowId) => async () => {
+      if (id === '') {
+        setRows(rows?.filter((row: GridRowModel) => row.id !== id))
+        const { errors } = await deleteSchemaElementMutation({ variables: { id: id.toString() } })
+        errors?.forEach((error) => {
+          console.error(error)
+          setSnackbar({ children: error.message, severity: 'error' })
+        })
+        return
+      }
       setRowModesModel({
         ...rowModesModel,
         [id]: { mode: GridRowModes.View, ignoreModifications: true },
       })
     },
-    [rowModesModel],
+    [rowModesModel, rows, deleteSchemaElementMutation],
   )
 
   const processRowUpdate = async (newRow: GridRowModel, oldRow: GridRowModel) => {
