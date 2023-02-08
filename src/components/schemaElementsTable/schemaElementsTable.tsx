@@ -149,10 +149,10 @@ export const SchemaElementsTable = (props: SchemaElementsTableProps) => {
       if (id === '') {
         setRows(rows?.filter((row: GridRowModel) => row.id !== id))
         const { errors } = await deleteSchemaElementMutation({ variables: { id: id.toString() } })
-        if (errors) {
-          errors.forEach((error) => console.error(error))
-          setSnackbar({ children: errors[0].message, severity: 'error' })
-        }
+        errors?.forEach((error) => {
+          console.error(error)
+          setSnackbar({ children: error.message, severity: 'error' })
+        })
         return
       }
       setRowModesModel({
@@ -162,11 +162,6 @@ export const SchemaElementsTable = (props: SchemaElementsTableProps) => {
     },
     [rowModesModel, rows, deleteSchemaElementMutation],
   )
-
-  useEffect(() => {
-    console.log('rowmodes: ', rowModesModel)
-    console.log('rows: ', rows)
-  }, [rowModesModel, rows])
 
   const processRowUpdate = async (newRow: GridRowModel, oldRow: GridRowModel) => {
     if (newRow.id === '') {
