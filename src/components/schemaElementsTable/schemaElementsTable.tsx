@@ -6,6 +6,7 @@ import ControlPointDuplicateOutlinedIcon from '@mui/icons-material/ControlPointD
 import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
 import SaveIcon from '@mui/icons-material/Save'
+import Tooltip from '@mui/material/Tooltip'
 import { Alert, AlertProps, IconButton, LinearProgress, Radio, Snackbar } from '@mui/material'
 import {
   DataGridPro,
@@ -457,13 +458,17 @@ const ElementToolbar = ({ handleAddRow, handleOpenMultipleElementsDialog }: Elem
         }}
       />
       <GridToolbarFilterButton sx={{ color, fontWeight }} />
-      <IconButton aria-label='addSource' onClick={handleAddRow} sx={{ color }}>
-        <AddCircleOutlineOutlinedIcon />
-      </IconButton>
-      <IconButton aria-label='addMultipleSourceElements' onClick={handleOpenMultipleElementsDialog} sx={{ color }}>
-        {/* TODO - rotate 180 degrees */}
-        <ControlPointDuplicateOutlinedIcon />
-      </IconButton>
+      <Tooltip title='Add new building component'>
+        <IconButton aria-label='addSource' onClick={handleAddRow} sx={{ color }}>
+          <AddCircleOutlineOutlinedIcon />
+        </IconButton>
+      </Tooltip>
+      <Tooltip title='Add building components from a source'>
+        <IconButton aria-label='addMultipleSourceElements' onClick={handleOpenMultipleElementsDialog} sx={{ color }}>
+          {/* TODO - rotate 180 degrees */}
+          <ControlPointDuplicateOutlinedIcon />
+        </IconButton>
+      </Tooltip>
     </GridToolbarContainer>
   )
 }
