@@ -1,4 +1,4 @@
-import { ErrorBoundary, LcaButton, Loading } from '@lcacollect/components'
+import { ErrorBoundary, LcaButton, Loading, Unit } from '@lcacollect/components'
 import {
   Alert,
   AlertProps,
@@ -98,7 +98,13 @@ export const AddElementsFromSourceDialog = ({
 
     const objectIds = selectedInterpretationRows.map((row) => row.id.toString())
     const quantities = selectedInterpretationRows.map((row) => row.quantity)
-    const units = selectedInterpretationRows.map((row) => row.unit)
+    const units = selectedInterpretationRows.map((row) => {
+      if (row.unit === 'NONE') {
+        return Unit.M
+      } else {
+        return row.unit
+      }
+    })
     const schemaCategoryId = Object.keys(category.children)[0] // Add elements to first child
     const sourceId = selectedSource?.id
 
@@ -131,7 +137,6 @@ export const AddElementsFromSourceDialog = ({
   }
 
   const handleChangeSelectedRow = (rowId: string) => {
-    // debugger
     const selectedRow = selectedRows.find((row) => row.id === rowId)
     if (selectedRow) {
       setSelectedRows(selectedRows.filter((row) => row.id !== rowId))
