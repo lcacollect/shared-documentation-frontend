@@ -22,6 +22,7 @@ interface InterpretationSelectionDialogProps {
   handleDialogClose: () => void
   editRow?: SourceData | null
   setEditRow: Dispatch<SetStateAction<SourceData | null | undefined>>
+  setSourceId?: Dispatch<SetStateAction<string | undefined>>
 }
 
 export interface ParameterColumnMapping {
@@ -30,7 +31,7 @@ export interface ParameterColumnMapping {
 
 export const SourceInterpretationDialog = (props: InterpretationSelectionDialogProps) => {
   const { projectId = '' } = useParams()
-  const { openDialog, handleDialogClose, editRow, setEditRow } = props
+  const { openDialog, handleDialogClose, editRow, setEditRow, setSourceId } = props
 
   const initialParameterOptions = [
     { value: 'interpretationName', label: 'Name' },
@@ -57,6 +58,7 @@ export const SourceInterpretationDialog = (props: InterpretationSelectionDialogP
   useEffect(() => {
     setParameterColumnMapping(editRow?.interpretation || initialParameterValues)
     setSelectedColumn(editRow?.interpretation.interpretationName || '')
+    console.log('edit row', editRow)
   }, [editRow])
 
   useEffect(() => {
@@ -79,10 +81,11 @@ export const SourceInterpretationDialog = (props: InterpretationSelectionDialogP
 
   const handleClose = () => {
     // Reset states
+    if (setSourceId) setSourceId(undefined)
+    handleDialogClose()
     setSelectedParameter('interpretationName')
     setSelectedColumn('')
     setParameterColumnMapping(initialParameterValues)
-    handleDialogClose()
   }
 
   const handleDone = async () => {
