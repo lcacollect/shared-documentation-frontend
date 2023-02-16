@@ -29,10 +29,11 @@ interface SelectionDialogProps {
   projectId: string
   editRow?: ProjectSource | null
   setEditRow: Dispatch<SetStateAction<ProjectSource | null | undefined>>
+  setSourceId?: Dispatch<SetStateAction<string | undefined>>
 }
 
 export const SourceDialog: React.FC<SelectionDialogProps> = (props) => {
-  const { openDialog, handleDialogClose, projectId, editRow, setEditRow } = props
+  const { openDialog, handleDialogClose, projectId, editRow, setEditRow, setSourceId } = props
   const [type, setType] = useState<ProjectSourceType | null | undefined>(editRow?.type || null)
   const [name, setName] = useState('')
   const [file, setFile] = useState<File | null>()
@@ -93,6 +94,7 @@ export const SourceDialog: React.FC<SelectionDialogProps> = (props) => {
           file: encodedFile,
         },
       })
+      if (setSourceId) setSourceId(response.data?.addProjectSource.id)
     } else {
       response = await updateProjectSourceMutation({
         variables: {
@@ -102,6 +104,7 @@ export const SourceDialog: React.FC<SelectionDialogProps> = (props) => {
           file: encodedFile,
         },
       })
+      if (setSourceId) setSourceId(response.data?.updateProjectSource.id)
     }
 
     if (response.errors) {

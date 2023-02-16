@@ -12,6 +12,7 @@ import {
   ToggleButton,
   ToggleButtonGroup,
   Typography,
+  IconButton,
 } from '@mui/material'
 import { MouseEvent, useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -25,12 +26,14 @@ import { ElementsFromSourceSelectionTable } from '../elementsFromSourceSelection
 import { ElementsFromSourceShowSelectedTable, SourceInterpretationRow } from '../elementsFromSourceShowSelectedTable'
 import { UnitOptions } from '../schemaElementsTable'
 import { SourceData } from '../sourceInterpretationDialog/types'
+import AddIcon from '@mui/icons-material/Add'
 
 type AddElementsFromSourceProps = {
   open: boolean
   handleClose: () => void
   category: NestedCategory
   unitOptions: UnitOptions
+  addSource: () => void
 }
 
 export type SourceRow = {
@@ -43,6 +46,7 @@ export const AddElementsFromSourceDialog = ({
   handleClose,
   category,
   unitOptions,
+  addSource,
 }: AddElementsFromSourceProps) => {
   const { projectId = '' } = useParams()
   const navigate = useNavigate()
@@ -189,6 +193,27 @@ export const AddElementsFromSourceDialog = ({
                       </ToggleButton>
                     ))}
                   </ToggleButtonGroup>
+                  <IconButton
+                    data-testid='add-source-icon-button'
+                    onClick={addSource}
+                    sx={{
+                      padding: 'unset',
+                      marginLeft: '10px',
+                      width: `${11 * 1.5}px`,
+                      height: `${11 * 1.5}px`,
+                    }}
+                  >
+                    <AddIcon
+                      sx={{
+                        boxShadow: '0px 1px 2px #00000061',
+                        fill: '#333',
+                        borderRadius: '100%',
+                        height: `${11}px`,
+                        width: `${11}px`,
+                        padding: `${11 / 4}px`,
+                      }}
+                    />
+                  </IconButton>
                   {isInterpretationEmpty ? (
                     <Grid container sx={{ paddingTop: '1rem' }}>
                       <Typography>

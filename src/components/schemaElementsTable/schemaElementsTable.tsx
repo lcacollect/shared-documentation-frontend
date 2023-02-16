@@ -1,4 +1,5 @@
 import { DataFetchWrapper, NoRowsOverlay } from '@lcacollect/components'
+import { SourceDialog, SourceInterpretationDialog } from '../../components'
 import { getDifference } from '@lcacollect/core'
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined'
 import CancelIcon from '@mui/icons-material/Close'
@@ -34,6 +35,7 @@ import {
   useDeleteSchemaElementMutation,
   useGetSchemaElementsQuery,
   useUpdateSchemaElementMutation,
+  useGetProjectSourceDataQuery,
 } from '../../dataAccess'
 import { AddElementsFromSourceDialog } from '../addElementFromSourceDialog'
 import { NestedCategory } from '../buildingComponentAccordions'
@@ -41,6 +43,8 @@ import { ProjectSource } from '../sourceTable'
 import { TaskBubbles } from '../taskBubbles'
 import { Task } from '../tasksTable'
 import { EditTextArea } from './multilineTextEdit'
+import { useParams } from 'react-router-dom'
+import { SourceData } from '../sourceInterpretationDialog/types'
 
 interface SchemaElementsTableProps {
   category: NestedCategory
@@ -70,11 +74,41 @@ export const SchemaElementsTable = (props: SchemaElementsTableProps) => {
   const [rows, setRows] = useState<GridRowModel<SchemaElement[]>>([])
   const [snackbar, setSnackbar] = useState<Pick<AlertProps, 'children' | 'severity'> | null>(null)
   const [openElementsFromSourceDialogId, setOpenElementsFromSourceDialogId] = useState('')
-
+  const { projectId = '' } = useParams()
   const schemaCategories = useMemo(() => Object.values(category.children), [category.children])
   const { data, error, loading } = useGetSchemaElementsQuery({
     variables: { schemaCategoryIds: schemaCategories.map((child) => child.id) as string[] },
   })
+  const [sourceId, setSourceId] = useState<string | undefined>('') // set to null again once finished
+  const [openInterpretationDialogId, setOpenInterpretationDialogId] = useState('')
+  const [openSourceDialog, setOpenSourceDialog] = useState(false)
+  const [editRow, setEditRow] = useState<ProjectSource | null | undefined>()
+  const [editInterpretationRow, setEditInterpretationRow] = useState<SourceData | null | undefined>()
+
+  const handleInterpretationDialogClose = () => {
+    setOpenInterpretationDialogId('')
+    setEditInterpretationRow(undefined)
+    handleOpenMultipleElementsDialog()
+  }
+
+  const handleAddSource = () => {
+    setOpenSourceDialog(true)
+  }
+
+  const {
+    data: sourceData,
+    loading: sourceDataLoading,
+    error: sourceDataError,
+  } = useGetProjectSourceDataQuery({
+    variables: { projectId: projectId as string },
+    skip: !projectId,
+  })
+  const sourceFiles = sourceData?.projectSources
+
+  const handleSourceDialogClose = () => {
+    setOpenSourceDialog(false)
+    sourceId ? handleOpenMultipleElementsDialog() : setOpenElementsFromSourceDialogId(projectId)
+  }
 
   useEffect(() => {
     if (error || loading) {
@@ -240,6 +274,23 @@ export const SchemaElementsTable = (props: SchemaElementsTableProps) => {
   const handleCloseElementsFromSourceDialog = () => {
     setOpenElementsFromSourceDialogId('')
   }
+
+  const openSourceInterpretationDialog = (id: GridRowId) => {
+    setOpenInterpretationDialogId(id.toString())
+    setEditInterpretationRow(sourceFiles?.find((sourceFile) => sourceFile.id === id))
+  }
+
+  const addSource = () => {
+    handleCloseElementsFromSourceDialog()
+    handleAddSource()
+  }
+
+  useEffect(() => {
+    if (sourceId) {
+      const id: GridRowId = sourceId
+      openSourceInterpretationDialog(id)
+    }
+  }, [sourceData, sourceId])
 
   const unitOptions: UnitOptions = {
     [Unit.M]: 'm',
@@ -440,8 +491,24 @@ export const SchemaElementsTable = (props: SchemaElementsTableProps) => {
         <AddElementsFromSourceDialog
           open={!!openElementsFromSourceDialogId}
           handleClose={handleCloseElementsFromSourceDialog}
+          addSource={addSource}
           category={category}
           unitOptions={unitOptions}
+        />
+        <SourceDialog
+          openDialog={openSourceDialog}
+          handleDialogClose={handleSourceDialogClose}
+          projectId={projectId}
+          editRow={editRow}
+          setEditRow={setEditRow}
+          setSourceId={setSourceId}
+        />
+        <SourceInterpretationDialog
+          openDialog={openInterpretationDialogId !== '' && !!editInterpretationRow}
+          handleDialogClose={handleInterpretationDialogClose}
+          editRow={editInterpretationRow}
+          setEditRow={setEditInterpretationRow}
+          setSourceId={setSourceId}
         />
       </DataFetchWrapper>
     </div>
@@ -473,7 +540,12 @@ const ElementToolbar = ({ handleAddRow, handleOpenMultipleElementsDialog }: Elem
         </IconButton>
       </Tooltip>
       <Tooltip title='Add building components from a source'>
-        <IconButton aria-label='addMultipleSourceElements' onClick={handleOpenMultipleElementsDialog} sx={{ color }}>
+        <IconButton
+          aria-label='addMultipleSourceElements'
+          onClick={handleOpenMultipleElementsDialog}
+          sx={{ color }}
+          data-testid='addMultipleSourceElementsButton'
+        >
           {/* TODO - rotate 180 degrees */}
           <ControlPointDuplicateOutlinedIcon />
         </IconButton>
