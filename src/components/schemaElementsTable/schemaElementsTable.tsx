@@ -107,7 +107,7 @@ export const SchemaElementsTable = (props: SchemaElementsTableProps) => {
 
   const handleSourceDialogClose = () => {
     setOpenSourceDialog(false)
-    if (sourceId) handleOpenMultipleElementsDialog()
+    sourceId ? handleOpenMultipleElementsDialog() : setOpenElementsFromSourceDialogId(projectId)
   }
 
   useEffect(() => {
@@ -540,7 +540,12 @@ const ElementToolbar = ({ handleAddRow, handleOpenMultipleElementsDialog }: Elem
         </IconButton>
       </Tooltip>
       <Tooltip title='Add building components from a source'>
-        <IconButton aria-label='addMultipleSourceElements' onClick={handleOpenMultipleElementsDialog} sx={{ color }}>
+        <IconButton
+          aria-label='addMultipleSourceElements'
+          onClick={handleOpenMultipleElementsDialog}
+          sx={{ color }}
+          data-testid='addMultipleSourceElementsButton'
+        >
           {/* TODO - rotate 180 degrees */}
           <ControlPointDuplicateOutlinedIcon />
         </IconButton>

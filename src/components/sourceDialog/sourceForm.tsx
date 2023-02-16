@@ -32,24 +32,27 @@ export const SourceForm: React.FC<SourceFormProps> = (props) => {
         />
       </Grid>
       <Grid item xs={true}>
-        <FormControl fullWidth>
+        <FormControl fullWidth data-testid='form-control-select' data-cy={'form-control-cy'}>
           <InputLabel id='type-select-label'>Type</InputLabel>
           <Select
             labelId='type-select-label'
             data-testid='source-type'
+            data-cy={'source-type-cy'}
             value={type}
             label='Type'
             onChange={(event) => setType(event.target.value as ProjectSourceType)}
           >
             {/* <MenuItem value='speckle'>Speckle</MenuItem> */}
-            <MenuItem value={ProjectSourceType.Csv}>*.CSV</MenuItem>
+            <MenuItem value={ProjectSourceType.Csv} data-testid='csv-option' data-cy={'csv-option-cy'}>
+              *.CSV
+            </MenuItem>
           </Select>
         </FormControl>
       </Grid>
 
       <SpeckleField show={false} />
 
-      <CsvField show={type === ProjectSourceType.Csv} handleSetFile={handleSetFile} />
+      <CsvField show={type === ProjectSourceType.Csv} handleSetFile={handleSetFile} data-testid='csv-field' />
     </Grid>
   )
 }

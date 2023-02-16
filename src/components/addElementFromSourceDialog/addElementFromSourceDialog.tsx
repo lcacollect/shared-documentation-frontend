@@ -194,7 +194,7 @@ export const AddElementsFromSourceDialog = ({
                     ))}
                   </ToggleButtonGroup>
                   <IconButton
-                    data-testid='add-icon-button'
+                    data-testid='add-source-icon-button'
                     onClick={addSource}
                     sx={{
                       padding: 'unset',

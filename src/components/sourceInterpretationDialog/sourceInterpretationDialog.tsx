@@ -58,7 +58,6 @@ export const SourceInterpretationDialog = (props: InterpretationSelectionDialogP
   useEffect(() => {
     setParameterColumnMapping(editRow?.interpretation || initialParameterValues)
     setSelectedColumn(editRow?.interpretation.interpretationName || '')
-    console.log('edit row', editRow)
   }, [editRow])
 
   useEffect(() => {
