@@ -466,7 +466,7 @@ mutation addSchemaElementFromSource(
   $schemaCategoryId: String!
   $sourceId: String!
   $objectIds: [String!]!
-  $quantities: [String!]
+  $quantities: [Float!]
   $units: [Unit!]
 ) {
   addSchemaElementFromSource(

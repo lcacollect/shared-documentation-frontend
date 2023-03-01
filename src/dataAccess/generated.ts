@@ -421,7 +421,7 @@ export type MutationAddSchemaElementArgs = {
 
 export type MutationAddSchemaElementFromSourceArgs = {
   objectIds: Array<Scalars['String']>
-  quantities?: InputMaybe<Array<Scalars['String']>>
+  quantities?: InputMaybe<Array<Scalars['Float']>>
   schemaCategoryId: Scalars['String']
   sourceId: Scalars['String']
   units?: InputMaybe<Array<Unit>>
@@ -614,11 +614,7 @@ export type ProjectMemberFilters = {
 }
 
 export type ProjectMemberInput = {
-  company: Scalars['String']
-  email: Scalars['String']
-  id?: InputMaybe<Scalars['String']>
-  lastLogin?: InputMaybe<Scalars['Date']>
-  name: Scalars['String']
+  userId: Scalars['String']
 }
 
 export type ProjectSourceFilters = {
@@ -630,6 +626,7 @@ export type ProjectSourceFilters = {
 export enum ProjectSourceType {
   Csv = 'CSV',
   Speckle = 'SPECKLE',
+  Xlsx = 'XLSX',
 }
 
 export type ProjectStageInput = {
@@ -1015,6 +1012,18 @@ export type ResolversParentTypes = {
   TaskFilters: TaskFilters
   taskItem: TaskItem
 }
+
+export type DeferDirectiveArgs = {
+  if?: Scalars['Boolean']
+  label?: Maybe<Scalars['String']>
+}
+
+export type DeferDirectiveResolver<Result, Parent, ContextType = any, Args = DeferDirectiveArgs> = DirectiveResolverFn<
+  Result,
+  Parent,
+  ContextType,
+  Args
+>
 
 export interface DateScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Date'], any> {
   name: 'Date'
@@ -1650,6 +1659,10 @@ export type Resolvers<ContextType = any> = {
   Query?: QueryResolvers<ContextType>
 }
 
+export type DirectiveResolvers<ContextType = any> = {
+  defer?: DeferDirectiveResolver<any, any, ContextType>
+}
+
 export type GetSchemaTemplatesQueryVariables = Exact<{ [key: string]: never }>
 
 export type GetSchemaTemplatesQuery = {
@@ -2111,7 +2124,7 @@ export type AddSchemaElementFromSourceMutationVariables = Exact<{
   schemaCategoryId: Scalars['String']
   sourceId: Scalars['String']
   objectIds: Array<Scalars['String']> | Scalars['String']
-  quantities?: InputMaybe<Array<Scalars['String']> | Scalars['String']>
+  quantities?: InputMaybe<Array<Scalars['Float']> | Scalars['Float']>
   units?: InputMaybe<Array<Unit> | Unit>
 }>
 
@@ -3801,7 +3814,7 @@ export const AddSchemaElementFromSourceDocument = gql`
     $schemaCategoryId: String!
     $sourceId: String!
     $objectIds: [String!]!
-    $quantities: [String!]
+    $quantities: [Float!]
     $units: [Unit!]
   ) {
     addSchemaElementFromSource(

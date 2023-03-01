@@ -46,26 +46,39 @@ export const SourceForm: React.FC<SourceFormProps> = (props) => {
             <MenuItem value={ProjectSourceType.Csv} data-testid='csv-option' data-cy={'csv-option-cy'}>
               *.CSV
             </MenuItem>
+            <MenuItem value={ProjectSourceType.Xlsx} data-testid='xlsx-option' data-cy={'xlsx-option-cy'}>
+              *.XLSX
+            </MenuItem>
           </Select>
         </FormControl>
       </Grid>
 
-      <SpeckleField show={false} />
+      {!type ? null : (
+        <>
+          <SpeckleField show={false} />
 
-      <CsvField show={type === ProjectSourceType.Csv} handleSetFile={handleSetFile} data-testid='csv-field' />
+          <FileField
+            show={[ProjectSourceType.Csv, ProjectSourceType.Xlsx].indexOf(type) > -1}
+            handleSetFile={handleSetFile}
+            fileType={type}
+            data-testid='file-field'
+          />
+        </>
+      )}
     </Grid>
   )
 }
 
-export interface CsvFieldProps {
+export interface FileFieldProps {
   show: boolean
+  fileType: ProjectSourceType
   handleSetFile: (event: React.ChangeEvent<HTMLInputElement>) => void
 }
 
-export const CsvField: React.FC<CsvFieldProps> = (props) => {
+export const FileField: React.FC<FileFieldProps> = (props) => {
   const uploadRef = useRef<HTMLInputElement>(null)
   const [fileName, setFileName] = useState<string | undefined>('')
-  const { show, handleSetFile } = props
+  const { show, handleSetFile, fileType } = props
 
   const handleFieldClick = () => {
     uploadRef.current?.click()
@@ -83,22 +96,22 @@ export const CsvField: React.FC<CsvFieldProps> = (props) => {
     return null
   }
 
+  const toolTipText =
+    fileType === ProjectSourceType.Csv ? (
+      <>
+        Make sure your CSV file is:
+        <ul>
+          <li>utf-8 formatted</li>
+          <li>comma (,) separated</li>
+          <li>dot (.) decimal divided</li>
+          <li>using double quoted (&quot;) strings</li>
+        </ul>
+      </>
+    ) : null
+
   return (
     <Grid item xs={true}>
-      <Tooltip
-        placement='top'
-        title={
-          <React.Fragment>
-            Make sure your CSV file is:
-            <ul>
-              <li>utf-8 formatted</li>
-              <li>comma (,) separated</li>
-              <li>dot (.) decimal divided</li>
-              <li>using double quoted (&quot;) strings</li>
-            </ul>
-          </React.Fragment>
-        }
-      >
+      <Tooltip placement='top' title={toolTipText}>
         <TextField
           data-testid='source-csv-file'
           onClick={handleFieldClick}
@@ -108,7 +121,7 @@ export const CsvField: React.FC<CsvFieldProps> = (props) => {
           variant='outlined'
         />
       </Tooltip>
-      <input type='file' hidden ref={uploadRef} accept='.csv' onChange={handleFileChange} />
+      <input type='file' hidden ref={uploadRef} accept={`.${fileType.toLowerCase()}`} onChange={handleFileChange} />
     </Grid>
   )
 }
