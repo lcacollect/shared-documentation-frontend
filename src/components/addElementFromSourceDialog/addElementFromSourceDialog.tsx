@@ -13,6 +13,10 @@ import {
   ToggleButtonGroup,
   Typography,
   IconButton,
+  MenuItem,
+  Select,
+  FormControl,
+  InputLabel,
 } from '@mui/material'
 import { MouseEvent, useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -20,6 +24,7 @@ import {
   GetSchemaElementsDocument,
   useAddSchemaElementFromSourceMutation,
   useGetProjectSourceDataQuery,
+  GraphQlSchemaCategory,
 } from '../../dataAccess'
 import { NestedCategory } from '../buildingComponentAccordions'
 import { ElementsFromSourceSelectionTable } from '../elementsFromSourceSelectionTable'
@@ -31,7 +36,7 @@ import AddIcon from '@mui/icons-material/Add'
 type AddElementsFromSourceProps = {
   open: boolean
   handleClose: () => void
-  category: NestedCategory
+  category: NestedCategory | GraphQlSchemaCategory[]
   unitOptions: UnitOptions
   addSource: () => void
 }
@@ -56,12 +61,21 @@ export const AddElementsFromSourceDialog = ({
   const [selectedSourceFile, setSelectedSourceFile] = useState<SourceData>()
   const [isInterpretationEmpty, setIsInterpretationEmpty] = useState<boolean>()
   const [snackbar, setSnackbar] = useState<Pick<AlertProps, 'children' | 'severity'> | null>(null)
+  const [categoryID, setCategoryID] = useState<string>('')
+
+  const getCategoriesId = (): string[] => {
+    if (Array.isArray(category)) {
+      return category.map((child) => child.id)
+    } else {
+      return Object.values(category.children).map((child) => child.id)
+    }
+  }
 
   const [addSchemaElementFromSourceMutation] = useAddSchemaElementFromSourceMutation({
     refetchQueries: [
       {
         query: GetSchemaElementsDocument,
-        variables: { schemaCategoryIds: Object.values(category.children).map((child) => child.id) as string[] },
+        variables: { schemaCategoryIds: getCategoriesId() as string[] },
       },
     ],
   })
@@ -97,8 +111,11 @@ export const AddElementsFromSourceDialog = ({
   }
 
   const handleAdd = async () => {
+    if (selectedRows.length === 0) {
+      setSnackbar({ children: 'Select some rows!', severity: 'warning' })
+      return
+    }
     resetValue()
-    setSnackbar({ children: 'Adding schema element from source...', severity: 'info' })
 
     const objectIds = selectedInterpretationRows.map((row) => row.id.toString())
     const quantities = selectedInterpretationRows.map((row) => row.quantity)
@@ -109,13 +126,20 @@ export const AddElementsFromSourceDialog = ({
         return row.unit
       }
     })
-    const schemaCategoryId = Object.keys(category.children)[0] // Add elements to first child
+    const schemaCategoryId = Array.isArray(category) ? categoryID : Object.keys(category.children)[0]
     const sourceId = selectedSource?.id
+
+    if (!schemaCategoryId) {
+      setSnackbar({ children: 'Please select category!', severity: 'warning' })
+      return
+    }
 
     if (!sourceId) {
       console.log('sourceId is falsy | value is:', sourceId)
       return
     }
+
+    setSnackbar({ children: 'Adding schema element from source...', severity: 'info' })
 
     const { errors } = await addSchemaElementFromSourceMutation({
       variables: {
@@ -165,6 +189,17 @@ export const AddElementsFromSourceDialog = ({
       return
     }
     setSelectedSourceFile(sourceFile)
+  }
+
+  const getMeniuCategories = () => {
+    if (Array.isArray(category)) {
+      const menuItems = category.map((child) => (
+        <MenuItem value={child.id} key={child.id}>
+          {child.name}
+        </MenuItem>
+      ))
+      return menuItems
+    }
   }
 
   return (
@@ -242,13 +277,27 @@ export const AddElementsFromSourceDialog = ({
             </Grid>
             {isInterpretationEmpty ? null : (
               <Grid item sx={{ width: '50%' }}>
-                <TextField
-                  fullWidth
-                  label='Category Name'
-                  value={category.name}
-                  variant='standard'
-                  inputProps={{ style: { fontSize: 20 } }}
-                />
+                {!Array.isArray(category) ? (
+                  <TextField
+                    fullWidth
+                    label='Category Name'
+                    value={category.name}
+                    variant='standard'
+                    inputProps={{ style: { fontSize: 20 } }}
+                  />
+                ) : (
+                  <FormControl fullWidth>
+                    <InputLabel id='category'>Select Category</InputLabel>
+                    <Select
+                      labelId='category'
+                      value={categoryID}
+                      label='Category'
+                      onChange={(event) => setCategoryID(event.target.value as string)}
+                    >
+                      {getMeniuCategories()}
+                    </Select>
+                  </FormControl>
+                )}
                 {selectedSourceFile ? (
                   <ErrorBoundary>
                     <ElementsFromSourceShowSelectedTable

@@ -1,4 +1,4 @@
-import { DataFetchWrapper, NoRowsOverlay } from '@lcacollect/components'
+import { NoRowsOverlay } from '@lcacollect/components'
 import { SourceDialog, SourceInterpretationDialog } from '../../components'
 import { getDifference } from '@lcacollect/core'
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined'
@@ -25,7 +25,7 @@ import {
   GridValueFormatterParams,
   MuiEvent,
 } from '@mui/x-data-grid-pro'
-import { ChangeEvent, Dispatch, SetStateAction, SyntheticEvent, useCallback, useEffect, useMemo, useState } from 'react'
+import { ChangeEvent, Dispatch, SetStateAction, SyntheticEvent, useCallback, useEffect, useState } from 'react'
 import {
   GetSchemaElementsDocument,
   GraphQlSchemaCategory,
@@ -33,7 +33,6 @@ import {
   Unit,
   useAddSchemaElementMutation,
   useDeleteSchemaElementMutation,
-  useGetSchemaElementsQuery,
   useUpdateSchemaElementMutation,
   useGetProjectSourceDataQuery,
 } from '../../dataAccess'
@@ -47,10 +46,11 @@ import { useParams } from 'react-router-dom'
 import { SourceData } from '../sourceInterpretationDialog/types'
 
 interface SchemaElementsTableProps {
-  category: NestedCategory
+  category: NestedCategory | GraphQlSchemaCategory[]
   tasks: Task[] | undefined // GraphQlTask[];
+  elements: SchemaElement[]
   isAddingTasks: boolean
-  schemaId: string | null | undefined
+  categoriesId: string[]
   refToAddTaskTo: GraphQlSchemaCategory | SchemaElement | undefined
   setRefToAddTaskTo: Dispatch<SetStateAction<GraphQlSchemaCategory | SchemaElement | undefined>>
   setSelectedTask: Dispatch<SetStateAction<Task | undefined>>
@@ -68,22 +68,38 @@ export type UnitOptions = {
 }
 
 export const SchemaElementsTable = (props: SchemaElementsTableProps) => {
-  const { category, tasks, isAddingTasks, refToAddTaskTo, setRefToAddTaskTo, setSelectedTask, setIsAddTaskDialogOpen } =
-    props
+  const {
+    categoriesId,
+    elements,
+    category,
+    tasks,
+    isAddingTasks,
+    refToAddTaskTo,
+    setRefToAddTaskTo,
+    setSelectedTask,
+    setIsAddTaskDialogOpen,
+  } = props
   const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({})
   const [rows, setRows] = useState<GridRowModel<SchemaElement[]>>([])
   const [snackbar, setSnackbar] = useState<Pick<AlertProps, 'children' | 'severity'> | null>(null)
   const [openElementsFromSourceDialogId, setOpenElementsFromSourceDialogId] = useState('')
-  const { projectId = '' } = useParams()
-  const schemaCategories = useMemo(() => Object.values(category.children), [category.children])
-  const { data, error, loading } = useGetSchemaElementsQuery({
-    variables: { schemaCategoryIds: schemaCategories.map((child) => child.id) as string[] },
-  })
   const [sourceId, setSourceId] = useState<string | undefined>('') // set to null again once finished
   const [openInterpretationDialogId, setOpenInterpretationDialogId] = useState('')
   const [openSourceDialog, setOpenSourceDialog] = useState(false)
   const [editRow, setEditRow] = useState<ProjectSource | null | undefined>()
   const [editInterpretationRow, setEditInterpretationRow] = useState<SourceData | null | undefined>()
+
+  const { projectId = '' } = useParams()
+
+  const getSchemaCategories = () => {
+    if (Array.isArray(category)) {
+      return category.filter((child) => child.depth === 2)
+    } else {
+      return Object.values(category.children)
+    }
+  }
+
+  const schemaCategories = getSchemaCategories()
 
   const handleInterpretationDialogClose = () => {
     setOpenInterpretationDialogId('')
@@ -95,11 +111,7 @@ export const SchemaElementsTable = (props: SchemaElementsTableProps) => {
     setOpenSourceDialog(true)
   }
 
-  const {
-    data: sourceData,
-    loading: sourceDataLoading,
-    error: sourceDataError,
-  } = useGetProjectSourceDataQuery({
+  const { data: sourceData } = useGetProjectSourceDataQuery({
     variables: { projectId: projectId as string },
     skip: !projectId,
   })
@@ -111,16 +123,13 @@ export const SchemaElementsTable = (props: SchemaElementsTableProps) => {
   }
 
   useEffect(() => {
-    if (error || loading) {
-      return
-    }
-    setRows(data?.schemaElements as SchemaElement[])
-  }, [data, error, loading])
+    setRows(elements as SchemaElement[])
+  }, [elements])
 
   const refetchUpdateQueries = [
     {
       query: GetSchemaElementsDocument,
-      variables: { schemaCategoryIds: schemaCategories.map((child) => child.id) as string[] },
+      variables: { schemaCategoryIds: categoriesId },
     },
   ]
   const [addSchemaElement] = useAddSchemaElementMutation({ refetchQueries: refetchUpdateQueries })
@@ -182,11 +191,6 @@ export const SchemaElementsTable = (props: SchemaElementsTableProps) => {
     (id: GridRowId) => async () => {
       if (id === '') {
         setRows(rows?.filter((row: GridRowModel) => row.id !== id))
-        const { errors } = await deleteSchemaElementMutation({ variables: { id: id.toString() } })
-        errors?.forEach((error) => {
-          console.error(error)
-          setSnackbar({ children: error.message, severity: 'error' })
-        })
         return
       }
       setRowModesModel({
@@ -268,7 +272,7 @@ export const SchemaElementsTable = (props: SchemaElementsTableProps) => {
   }
 
   const handleOpenMultipleElementsDialog = () => {
-    setOpenElementsFromSourceDialogId(category.id)
+    setOpenElementsFromSourceDialogId('open')
   }
 
   const handleCloseElementsFromSourceDialog = () => {
@@ -303,12 +307,6 @@ export const SchemaElementsTable = (props: SchemaElementsTableProps) => {
   const columns: GridColumns = [
     { field: 'id', headerName: 'ID', flex: 0.5, editable: false },
     {
-      field: 'classification',
-      headerName: 'Class',
-      flex: 1,
-      valueFormatter: () => category.name,
-    },
-    {
       field: 'schemaCategory',
       headerName: 'Subclass',
       flex: 1,
@@ -319,7 +317,7 @@ export const SchemaElementsTable = (props: SchemaElementsTableProps) => {
         return param.value.id
       },
       valueFormatter: (params) => {
-        return schemaCategories.find((category) => category.id == params.value)?.name
+        return elements.find((child) => child.id == params.id)?.schemaCategory.name
       },
     },
     {
@@ -452,65 +450,72 @@ export const SchemaElementsTable = (props: SchemaElementsTableProps) => {
     },
   ]
 
+  if (!Array.isArray(category)) {
+    columns.splice(1, 0, {
+      field: 'classification',
+      headerName: 'Class',
+      flex: 1,
+      valueFormatter: () => category.name,
+    })
+  }
+
   return (
     <div style={{ height: 400, width: '100%' }}>
-      <DataFetchWrapper error={error}>
-        <DataGridPro
-          columns={columns}
-          rows={rows}
-          editMode='row'
-          loading={loading}
-          columnVisibilityModel={{
-            id: false,
-            selectRow: isAddingTasks,
-          }}
-          components={{ Toolbar: ElementToolbar, LoadingOverlay: LinearProgress, NoRowsOverlay: NoRowsOverlay }}
-          componentsProps={{
-            toolbar: { handleAddRow, handleOpenMultipleElementsDialog },
-            noRowsOverlay: { text: 'No building components added' },
-          }}
-          experimentalFeatures={{ newEditingApi: true }}
-          onRowEditStart={handleRowEditStart}
-          onRowEditStop={handleRowEditStop}
-          processRowUpdate={processRowUpdate}
-          rowModesModel={rowModesModel}
-          sx={{ border: 0 }}
-          onProcessRowUpdateError={handleProcessRowUpdateError}
-          getRowHeight={(params) => (rowModesModel[params.id]?.mode === GridRowModes.Edit ? 'auto' : null)}
-        />
-        {!!snackbar && (
-          <Snackbar
-            open
-            anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-            onClose={() => setSnackbar(null)}
-            autoHideDuration={6000}
-          >
-            <Alert {...snackbar} onClose={() => setSnackbar(null)} />
-          </Snackbar>
-        )}
-        <AddElementsFromSourceDialog
-          open={!!openElementsFromSourceDialogId}
-          handleClose={handleCloseElementsFromSourceDialog}
-          addSource={addSource}
-          category={category}
-          unitOptions={unitOptions}
-        />
-        <SourceDialog
-          openDialog={openSourceDialog}
-          handleDialogClose={handleSourceDialogClose}
-          projectId={projectId}
-          editRow={editRow}
-          setEditRow={setEditRow}
-          setSourceId={setSourceId}
-        />
-        <SourceInterpretationDialog
-          openDialog={openInterpretationDialogId !== '' && !!editInterpretationRow}
-          handleDialogClose={handleInterpretationDialogClose}
-          editRow={editInterpretationRow}
-          setEditRow={setEditInterpretationRow}
-          setSourceId={setSourceId}
-        />
-      </DataFetchWrapper>
+      <DataGridPro
+        columns={columns}
+        rows={rows}
+        editMode='row'
+        loading={false}
+        columnVisibilityModel={{
+          id: false,
+          selectRow: isAddingTasks,
+        }}
+        components={{ Toolbar: ElementToolbar, LoadingOverlay: LinearProgress, NoRowsOverlay: NoRowsOverlay }}
+        componentsProps={{
+          toolbar: { handleAddRow, handleOpenMultipleElementsDialog },
+          noRowsOverlay: { text: 'No building components added' },
+        }}
+        experimentalFeatures={{ newEditingApi: true }}
+        onRowEditStart={handleRowEditStart}
+        onRowEditStop={handleRowEditStop}
+        processRowUpdate={processRowUpdate}
+        rowModesModel={rowModesModel}
+        sx={{ border: 0 }}
+        onProcessRowUpdateError={handleProcessRowUpdateError}
+        getRowHeight={(params) => (rowModesModel[params.id]?.mode === GridRowModes.Edit ? 'auto' : null)}
+      />
+      {!!snackbar && (
+        <Snackbar
+          open
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+          onClose={() => setSnackbar(null)}
+          autoHideDuration={6000}
+        >
+          <Alert {...snackbar} onClose={() => setSnackbar(null)} />
+        </Snackbar>
+      )}
+      <AddElementsFromSourceDialog
+        open={!!openElementsFromSourceDialogId}
+        handleClose={handleCloseElementsFromSourceDialog}
+        addSource={addSource}
+        category={category}
+        unitOptions={unitOptions}
+      />
+      <SourceDialog
+        openDialog={openSourceDialog}
+        handleDialogClose={handleSourceDialogClose}
+        projectId={projectId}
+        editRow={editRow}
+        setEditRow={setEditRow}
+        setSourceId={setSourceId}
+      />
+      <SourceInterpretationDialog
+        openDialog={openInterpretationDialogId !== '' && !!editInterpretationRow}
+        handleDialogClose={handleInterpretationDialogClose}
+        editRow={editInterpretationRow}
+        setEditRow={setEditInterpretationRow}
+        setSourceId={setSourceId}
+      />
     </div>
   )
 }
