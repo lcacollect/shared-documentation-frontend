@@ -1,6 +1,6 @@
 import { CardTitle, DataFetchWrapper, PaperPage, theme } from '@lcacollect/components'
 import AddTaskIcon from '@mui/icons-material/AddTask'
-import { Box, Grid, IconButton, Paper, styled, Tooltip } from '@mui/material'
+import { Box, Grid, IconButton, Paper, styled, Tooltip, alpha } from '@mui/material'
 import { tooltipClasses, TooltipProps } from '@mui/material/Tooltip'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import Switch from '@mui/material/Switch'
@@ -24,13 +24,25 @@ const CustomWidthTooltip = styled(({ className, ...props }: TooltipProps) => (
   },
 })
 
+const StyledSwitch = styled(Switch)(({ theme }) => ({
+  '& .MuiSwitch-switchBase.Mui-checked': {
+    color: '#97A6B4',
+    '&:hover': {
+      backgroundColor: alpha('#97A6B4', theme.palette.action.hoverOpacity),
+    },
+  },
+  '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+    backgroundColor: '#97A6B4',
+  },
+}))
+
 export const BuildingComponentsPage = () => {
   const { projectId } = useParams()
   const [isAddingTasks, setIsAddingTasks] = useState(false)
   const [refToAddTaskTo, setRefToAddTaskTo] = useState<GraphQlSchemaCategory | SchemaElement>()
   const [isAddTaskDialogOpen, setIsAddTaskDialogOpen] = useState(false)
   const [selectedTask, setSelectedTask] = useState<Task>()
-  const [isTreeView, setIsTreeView] = useState(false)
+  const [isTableView, setIsTableView] = useState(false)
 
   const { data, loading, error } = useGetProjectSchemasWithCategoriesQuery({
     variables: { projectId: projectId as string },
@@ -74,7 +86,7 @@ export const BuildingComponentsPage = () => {
   }
 
   const handleChangeView = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setIsTreeView(event.target.checked)
+    setIsTableView(event.target.checked)
   }
 
   return (
@@ -85,11 +97,11 @@ export const BuildingComponentsPage = () => {
             <CardTitle title='Building Components' size='large' />
           </Box>
         </Grid>
-        <Grid item>
+        <Grid item sx={{ marginLeft: 'auto', marginRight: '2%' }}>
           <FormControlLabel
-            control={<Switch checked={isTreeView} onChange={handleChangeView} />}
-            label={isTreeView ? 'Table' : 'Tree'}
-            labelPlacement={isTreeView ? 'start' : 'end'}
+            control={<StyledSwitch checked={isTableView} onChange={handleChangeView} />}
+            label={isTableView ? 'Grouped' : 'Table'}
+            labelPlacement={isTableView ? 'start' : 'end'}
           />
         </Grid>
         <Grid item>
@@ -110,7 +122,7 @@ export const BuildingComponentsPage = () => {
       <DataFetchWrapper error={error} loading={loading}>
         {reportingSchemaExists ? (
           <>
-            {isTreeView ? (
+            {!isTableView ? (
               <>
                 <SchemasAccordion
                   schema={data.reportingSchemas[0] as GraphQlReportingSchema}
