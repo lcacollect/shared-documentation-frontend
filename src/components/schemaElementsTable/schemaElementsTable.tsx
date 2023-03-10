@@ -498,7 +498,7 @@ export const SchemaElementsTable = (props: SchemaElementsTableProps) => {
         open={!!openElementsFromSourceDialogId}
         handleClose={handleCloseElementsFromSourceDialog}
         addSource={addSource}
-        category={category}
+        category={Array.isArray(category) ? getSchemaCategories() : category}
         unitOptions={unitOptions}
       />
       <SourceDialog

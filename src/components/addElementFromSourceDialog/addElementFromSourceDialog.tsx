@@ -61,7 +61,7 @@ export const AddElementsFromSourceDialog = ({
   const [selectedSourceFile, setSelectedSourceFile] = useState<SourceData>()
   const [isInterpretationEmpty, setIsInterpretationEmpty] = useState<boolean>()
   const [snackbar, setSnackbar] = useState<Pick<AlertProps, 'children' | 'severity'> | null>(null)
-  const [categoryID, setCategoryID] = useState<string>('')
+  const [categoryId, setCategoryId] = useState<string>('')
 
   const getCategoriesId = (): string[] => {
     if (Array.isArray(category)) {
@@ -126,7 +126,7 @@ export const AddElementsFromSourceDialog = ({
         return row.unit
       }
     })
-    const schemaCategoryId = Array.isArray(category) ? categoryID : Object.keys(category.children)[0]
+    const schemaCategoryId = Array.isArray(category) ? categoryId : Object.keys(category.children)[0]
     const sourceId = selectedSource?.id
 
     if (!schemaCategoryId) {
@@ -290,9 +290,9 @@ export const AddElementsFromSourceDialog = ({
                     <InputLabel id='category'>Select Category</InputLabel>
                     <Select
                       labelId='category'
-                      value={categoryID}
+                      value={categoryId}
                       label='Category'
-                      onChange={(event) => setCategoryID(event.target.value as string)}
+                      onChange={(event) => setCategoryId(event.target.value as string)}
                     >
                       {getMeniuCategories()}
                     </Select>
