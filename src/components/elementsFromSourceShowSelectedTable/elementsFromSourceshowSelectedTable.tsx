@@ -22,16 +22,20 @@ type ElementsFromSourceShowSelectedTableProps = {
   setSelectedInterpretationRows: Dispatch<SetStateAction<SourceInterpretationRow[]>>
 }
 
-export type SourceInterpretationRow = {
+export interface SourceInterpretationRow {
   id: string
   unit: Unit
-  quantity: string
-  [key: string]: string
+  quantity: number
+
+  [key: string]: string | number
 }
 
-export function decorateRow(row: SourceRow, unitValue?: string, quantityValue?: string): SourceInterpretationRow {
-  return { ...row, unit: (unitValue as Unit) ?? Unit.None, quantity: quantityValue ?? '' }
-}
+export const decorateRow = (row: SourceRow, unitValue?: string, quantityValue?: number): SourceInterpretationRow => ({
+  ...row,
+  id: row.id,
+  unit: (unitValue as Unit) ?? Unit.None,
+  quantity: quantityValue || 0.0,
+})
 
 export const ElementsFromSourceShowSelectedTable = ({
   selectedRows,
@@ -57,7 +61,7 @@ export const ElementsFromSourceShowSelectedTable = ({
           if (!decoratedRow) {
             // No default values for selectedRow exists, let's decorate it
             const { unitValue, quantityValue } = getDefaultInterpretationRowValues(selectedRow)
-            return decorateRow(selectedRow, unitValue, quantityValue)
+            return decorateRow(selectedRow, unitValue, Number(quantityValue))
           } else {
             return decorateRow(selectedRow, decoratedRow?.unit, decoratedRow?.quantity)
           }
@@ -77,7 +81,7 @@ export const ElementsFromSourceShowSelectedTable = ({
   function getInitialRows(): SourceInterpretationRow[] {
     return selectedRows.map((row) => {
       const { unitValue, quantityValue } = getDefaultInterpretationRowValues(row)
-      return decorateRow(row, unitValue, quantityValue)
+      return decorateRow(row, unitValue, Number(quantityValue))
     })
   }
 
@@ -221,10 +225,10 @@ export const UnitEditComponent = (props: UnitEditComponentProps) => {
       return
     }
     const interpretationQuantityForUnit = selectedSource?.interpretation[newUnitValue]
-    const newQuantityValue = selectedRow[interpretationQuantityForUnit]
+    const newQuantityValue = Number(selectedRow[interpretationQuantityForUnit])
 
     const decoratedRows = sourceInterpretationRows.map((row) =>
-      row.id === rowId ? decorateRow(row, newUnitValue, newQuantityValue) : row,
+      row.id === rowId ? decorateRow(row as unknown as SourceRow, newUnitValue, newQuantityValue) : row,
     )
     setRows(decoratedRows)
 

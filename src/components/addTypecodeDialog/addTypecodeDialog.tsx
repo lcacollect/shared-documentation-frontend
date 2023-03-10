@@ -12,7 +12,7 @@ import {
   Typography,
 } from '@mui/material'
 import React, { useState } from 'react'
-import { CsvField } from '../sourceDialog/sourceForm'
+import { FileField } from '../sourceDialog/sourceForm'
 
 export const AssigneeTypeMap = {
   GraphQLProjectMember: 'PROJECT_MEMBER',
@@ -81,7 +81,7 @@ export const AddTypecodeDialog = ({ open, handleClose }: AddTypecodeProps) => {
                 inputProps={{ style: { fontWeight: 'bold', fontSize: 20 } }}
               />
             </Grid>
-            <CsvField show handleSetFile={handleSetFile} />
+            {/* <FileField show handleSetFile={handleSetFile} fileType={} />*/}
           </Grid>
         </DialogContent>
         <DialogActions sx={{ padding: '0 1rem 1rem 0' }}>
