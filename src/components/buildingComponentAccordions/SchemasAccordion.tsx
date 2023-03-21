@@ -15,6 +15,7 @@ interface SchemasAccordionProps {
   setRefToAddTaskTo: Dispatch<SetStateAction<GraphQlSchemaCategory | SchemaElement | undefined>>
   setSelectedTask: Dispatch<SetStateAction<Task | undefined>>
   setIsAddTaskDialogOpen: Dispatch<SetStateAction<boolean>>
+  refetchElements: () => void
 }
 
 export const SchemasAccordion = (props: SchemasAccordionProps) => {
@@ -28,6 +29,7 @@ export const SchemasAccordion = (props: SchemasAccordionProps) => {
     setRefToAddTaskTo,
     setSelectedTask,
     setIsAddTaskDialogOpen,
+    refetchElements,
   } = props
 
   if (!schema.categories || !schema.categories.find((cat) => cat.path)) {
@@ -56,6 +58,7 @@ export const SchemasAccordion = (props: SchemasAccordionProps) => {
             setRefToAddTaskTo={setRefToAddTaskTo}
             setSelectedTask={setSelectedTask}
             setIsAddTaskDialogOpen={setIsAddTaskDialogOpen}
+            refetchElements={refetchElements}
           />
         ))}
       </BCAccordionDetails>

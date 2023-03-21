@@ -55,6 +55,7 @@ interface SchemaElementsTableProps {
   setRefToAddTaskTo: Dispatch<SetStateAction<GraphQlSchemaCategory | SchemaElement | undefined>>
   setSelectedTask: Dispatch<SetStateAction<Task | undefined>>
   setIsAddTaskDialogOpen: Dispatch<SetStateAction<boolean>>
+  refetchElements: () => void
 }
 
 export type SchemaElement = Omit<GraphQlSchemaElement, 'commits'>
@@ -78,7 +79,9 @@ export const SchemaElementsTable = (props: SchemaElementsTableProps) => {
     setRefToAddTaskTo,
     setSelectedTask,
     setIsAddTaskDialogOpen,
+    refetchElements,
   } = props
+
   const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({})
   const [rows, setRows] = useState<GridRowModel<SchemaElement[]>>([])
   const [snackbar, setSnackbar] = useState<Pick<AlertProps, 'children' | 'severity'> | null>(null)
@@ -279,6 +282,10 @@ export const SchemaElementsTable = (props: SchemaElementsTableProps) => {
     setOpenElementsFromSourceDialogId('')
   }
 
+  const handleRowUpdateFromSource = () => {
+    refetchElements()
+  }
+
   const openSourceInterpretationDialog = (id: GridRowId) => {
     setOpenInterpretationDialogId(id.toString())
     setEditInterpretationRow(sourceFiles?.find((sourceFile) => sourceFile.id === id))
@@ -317,7 +324,7 @@ export const SchemaElementsTable = (props: SchemaElementsTableProps) => {
         return param.value.id
       },
       valueFormatter: (params) => {
-        return elements.find((child) => child.id == params.id)?.schemaCategory.name
+        return rows.find((row) => row.id == params.id)?.schemaCategory.name
       },
     },
     {
@@ -460,8 +467,9 @@ export const SchemaElementsTable = (props: SchemaElementsTableProps) => {
   }
 
   return (
-    <div style={{ height: 400, width: '100%' }}>
+    <div style={{ height: Array.isArray(category) ? 'auto' : 400, width: '100%' }}>
       <DataGridPro
+        autoHeight={Array.isArray(category) ? true : false}
         columns={columns}
         rows={rows}
         editMode='row'
@@ -500,6 +508,7 @@ export const SchemaElementsTable = (props: SchemaElementsTableProps) => {
         addSource={addSource}
         category={Array.isArray(category) ? getSchemaCategories() : category}
         unitOptions={unitOptions}
+        handleRowUpdateFromSource={handleRowUpdateFromSource}
       />
       <SourceDialog
         openDialog={openSourceDialog}

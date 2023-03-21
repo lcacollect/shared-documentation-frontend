@@ -54,7 +54,7 @@ export const BuildingComponentsPage = () => {
 
   const categoriesId = data?.reportingSchemas[0].categories?.map((category) => category.id) || []
 
-  const { data: elements } = useGetSchemaElementsQuery({
+  const { data: elements, refetch: refetchElements } = useGetSchemaElementsQuery({
     variables: { schemaCategoryIds: categoriesId },
     skip: !reportingSchemaExists,
   })
@@ -134,6 +134,7 @@ export const BuildingComponentsPage = () => {
                   setRefToAddTaskTo={setRefToAddTaskTo}
                   setSelectedTask={setSelectedTask}
                   setIsAddTaskDialogOpen={setIsAddTaskDialogOpen}
+                  refetchElements={refetchElements}
                 />
               </>
             ) : (
@@ -148,6 +149,7 @@ export const BuildingComponentsPage = () => {
                   setRefToAddTaskTo={setRefToAddTaskTo}
                   setSelectedTask={setSelectedTask}
                   setIsAddTaskDialogOpen={setIsAddTaskDialogOpen}
+                  refetchElements={refetchElements}
                 />
               </>
             )}
