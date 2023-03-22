@@ -14,6 +14,7 @@ interface CategoriesAccordionProps {
   setRefToAddTaskTo: React.Dispatch<React.SetStateAction<GraphQlSchemaCategory | SchemaElement | undefined>>
   setSelectedTask: React.Dispatch<React.SetStateAction<Task | undefined>>
   setIsAddTaskDialogOpen: Dispatch<SetStateAction<boolean>>
+  refetchElements: () => void
 }
 
 export const CategoriesAccordion = (props: CategoriesAccordionProps) => {
@@ -28,6 +29,7 @@ export const CategoriesAccordion = (props: CategoriesAccordionProps) => {
     setRefToAddTaskTo,
     setSelectedTask,
     setIsAddTaskDialogOpen,
+    refetchElements,
   } = props
   const [expanded, setExpanded] = useState<boolean>(false)
 
@@ -70,6 +72,7 @@ export const CategoriesAccordion = (props: CategoriesAccordionProps) => {
                 setRefToAddTaskTo={setRefToAddTaskTo}
                 setSelectedTask={setSelectedTask}
                 setIsAddTaskDialogOpen={setIsAddTaskDialogOpen}
+                refetchElements={refetchElements}
               />
             ))
           : null}
@@ -84,6 +87,7 @@ export const CategoriesAccordion = (props: CategoriesAccordionProps) => {
             setRefToAddTaskTo={setRefToAddTaskTo}
             setSelectedTask={setSelectedTask}
             setIsAddTaskDialogOpen={setIsAddTaskDialogOpen}
+            refetchElements={refetchElements}
           />
         ) : null}
       </BCAccordionDetails>

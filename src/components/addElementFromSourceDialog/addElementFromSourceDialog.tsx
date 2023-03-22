@@ -1,4 +1,4 @@
-import { ErrorBoundary, LcaButton, Loading, Unit } from '@lcacollect/components'
+import { ErrorBoundary, LcaButton, Unit, DataFetchWrapper } from '@lcacollect/components'
 import {
   Alert,
   AlertProps,
@@ -21,7 +21,6 @@ import {
 import { MouseEvent, useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import {
-  GetSchemaElementsDocument,
   useAddSchemaElementFromSourceMutation,
   useGetProjectSourceDataQuery,
   GraphQlSchemaCategory,
@@ -39,6 +38,7 @@ type AddElementsFromSourceProps = {
   category: NestedCategory | GraphQlSchemaCategory[]
   unitOptions: UnitOptions
   addSource: () => void
+  handleRowUpdateFromSource: () => void
 }
 
 export type SourceRow = {
@@ -52,6 +52,7 @@ export const AddElementsFromSourceDialog = ({
   category,
   unitOptions,
   addSource,
+  handleRowUpdateFromSource,
 }: AddElementsFromSourceProps) => {
   const { projectId = '' } = useParams()
   const navigate = useNavigate()
@@ -63,24 +64,13 @@ export const AddElementsFromSourceDialog = ({
   const [snackbar, setSnackbar] = useState<Pick<AlertProps, 'children' | 'severity'> | null>(null)
   const [categoryId, setCategoryId] = useState<string>('')
 
-  const getCategoriesId = (): string[] => {
-    if (Array.isArray(category)) {
-      return category.map((child) => child.id)
-    } else {
-      return Object.values(category.children).map((child) => child.id)
-    }
-  }
+  const [addSchemaElementFromSourceMutation] = useAddSchemaElementFromSourceMutation()
 
-  const [addSchemaElementFromSourceMutation] = useAddSchemaElementFromSourceMutation({
-    refetchQueries: [
-      {
-        query: GetSchemaElementsDocument,
-        variables: { schemaCategoryIds: getCategoriesId() as string[] },
-      },
-    ],
-  })
-
-  const { data: sourceFilesData } = useGetProjectSourceDataQuery({
+  const {
+    data: sourceFilesData,
+    loading,
+    error,
+  } = useGetProjectSourceDataQuery({
     variables: { projectId: projectId as string },
     skip: !projectId,
   })
@@ -106,6 +96,7 @@ export const AddElementsFromSourceDialog = ({
   }
 
   const handleCancel = () => {
+    setCategoryId('')
     resetValue()
     handleClose()
   }
@@ -118,7 +109,7 @@ export const AddElementsFromSourceDialog = ({
     resetValue()
 
     const objectIds = selectedInterpretationRows.map((row) => row.id.toString())
-    const quantities = selectedInterpretationRows.map((row) => row.quantity)
+    const quantities = selectedInterpretationRows.map((row) => row.quantity.toString())
     const units = selectedInterpretationRows.map((row) => {
       if (row.unit === 'NONE') {
         return Unit.M
@@ -126,6 +117,7 @@ export const AddElementsFromSourceDialog = ({
         return row.unit
       }
     })
+
     const schemaCategoryId = Array.isArray(category) ? categoryId : Object.keys(category.children)[0]
     const sourceId = selectedSource?.id
 
@@ -156,7 +148,8 @@ export const AddElementsFromSourceDialog = ({
         setSnackbar({ children: error.message, severity: 'error' })
       })
     } else {
-      handleClose()
+      handleCancel()
+      handleRowUpdateFromSource()
     }
   }
 
@@ -212,110 +205,141 @@ export const AddElementsFromSourceDialog = ({
         PaperProps={{ sx: { borderRadius: 5, paddingX: 3, paddingY: 3 } }}
       >
         <DialogContent>
-          <Grid container spacing={2} justifyContent='center' alignItems='center'>
-            <Grid item sx={{ width: '50%' }}>
-              {selectedSourceFile && sourceFiles ? (
-                <>
-                  <ToggleButtonGroup
-                    exclusive
-                    value={selectedSourceFile.id}
-                    onChange={handleChangeFile}
-                    aria-label='text button group'
-                  >
-                    {sourceFiles?.map((source) => (
-                      <ToggleButton key={source.id} value={source.id}>
-                        {source.name}
-                      </ToggleButton>
-                    ))}
-                  </ToggleButtonGroup>
-                  <IconButton
-                    data-testid='add-source-icon-button'
-                    onClick={addSource}
-                    sx={{
-                      padding: 'unset',
-                      marginLeft: '10px',
-                      width: `${11 * 1.5}px`,
-                      height: `${11 * 1.5}px`,
-                    }}
-                  >
-                    <AddIcon
-                      sx={{
-                        boxShadow: '0px 1px 2px #00000061',
-                        fill: '#333',
-                        borderRadius: '100%',
-                        height: `${11}px`,
-                        width: `${11}px`,
-                        padding: `${11 / 4}px`,
-                      }}
-                    />
-                  </IconButton>
-                  {isInterpretationEmpty ? (
-                    <Grid container sx={{ paddingTop: '1rem' }}>
-                      <Typography>
-                        Add a{' '}
-                        <Link sx={{ cursor: 'pointer' }} onClick={() => navigate('../sources')}>
-                          source interepretation
-                        </Link>{' '}
-                        for <i>{selectedSource?.name}</i> to allow adding elements
-                      </Typography>
-                    </Grid>
-                  ) : (
-                    <ErrorBoundary>
-                      <ElementsFromSourceSelectionTable
-                        selectedRows={selectedRows}
-                        handleChangeSelectedRow={handleChangeSelectedRow}
-                        handleChangeAllSelectedRows={handleChangeAllSelectedRows}
-                        selectedSourceFile={selectedSourceFile}
-                        setSelectedSourceFile={setSelectedSourceFile}
-                      />
-                    </ErrorBoundary>
-                  )}
-                </>
-              ) : (
-                <Loading />
-              )}
-            </Grid>
-            {isInterpretationEmpty ? null : (
-              <Grid item sx={{ width: '50%' }}>
-                {!Array.isArray(category) ? (
-                  <TextField
-                    fullWidth
-                    label='Category Name'
-                    value={category.name}
-                    variant='standard'
-                    inputProps={{ style: { fontSize: 20 } }}
-                  />
-                ) : (
-                  <FormControl fullWidth>
-                    <InputLabel id='category'>Select Category</InputLabel>
-                    <Select
-                      labelId='category'
-                      value={categoryId}
-                      label='Category'
-                      onChange={(event) => setCategoryId(event.target.value as string)}
+          <DataFetchWrapper error={error} loading={loading}>
+            {selectedSourceFile ? (
+              <>
+                <Grid container spacing={2} justifyContent='center' alignItems='center'>
+                  <Grid item sx={{ width: '50%' }}>
+                    <ToggleButtonGroup
+                      exclusive
+                      value={selectedSourceFile.id}
+                      onChange={handleChangeFile}
+                      aria-label='text button group'
                     >
-                      {getMeniuCategories()}
-                    </Select>
-                  </FormControl>
-                )}
-                {selectedSourceFile ? (
-                  <ErrorBoundary>
-                    <ElementsFromSourceShowSelectedTable
-                      selectedRows={selectedRows}
-                      handleChangeSelectedRow={handleChangeSelectedRow}
-                      handleChangeAllSelectedRows={handleChangeAllSelectedRows}
-                      selectedSourceFile={selectedSourceFile}
-                      selectedSource={selectedSource}
-                      unitOptions={unitOptions}
-                      setSelectedInterpretationRows={setSelectedInterpretationRows}
-                    />
-                  </ErrorBoundary>
-                ) : (
-                  <Loading />
-                )}
-              </Grid>
+                      {sourceFiles?.map((source) => (
+                        <ToggleButton key={source.id} value={source.id}>
+                          {source.name}
+                        </ToggleButton>
+                      ))}
+                    </ToggleButtonGroup>
+                    <IconButton
+                      data-testid='add-source-icon-button'
+                      onClick={addSource}
+                      sx={{
+                        padding: 'unset',
+                        marginLeft: '10px',
+                        width: `${11 * 1.5}px`,
+                        height: `${11 * 1.5}px`,
+                      }}
+                    >
+                      <AddIcon
+                        sx={{
+                          boxShadow: '0px 1px 2px #00000061',
+                          fill: '#333',
+                          borderRadius: '100%',
+                          height: `${11}px`,
+                          width: `${11}px`,
+                          padding: `${11 / 4}px`,
+                        }}
+                      />
+                    </IconButton>
+                    {isInterpretationEmpty ? (
+                      <Grid container sx={{ paddingTop: '1rem' }}>
+                        <Typography>
+                          Add a{' '}
+                          <Link sx={{ cursor: 'pointer' }} onClick={() => navigate('../sources')}>
+                            source interepretation
+                          </Link>{' '}
+                          for <i>{selectedSource?.name}</i> to allow adding elements
+                        </Typography>
+                      </Grid>
+                    ) : (
+                      <ErrorBoundary>
+                        <ElementsFromSourceSelectionTable
+                          selectedRows={selectedRows}
+                          handleChangeSelectedRow={handleChangeSelectedRow}
+                          handleChangeAllSelectedRows={handleChangeAllSelectedRows}
+                          selectedSourceFile={selectedSourceFile}
+                          setSelectedSourceFile={setSelectedSourceFile}
+                        />
+                      </ErrorBoundary>
+                    )}
+                  </Grid>
+
+                  {isInterpretationEmpty ? null : (
+                    <Grid item sx={{ width: '50%' }}>
+                      {!Array.isArray(category) ? (
+                        <TextField
+                          fullWidth
+                          label='Category Name'
+                          value={category.name}
+                          variant='standard'
+                          inputProps={{ style: { fontSize: 20 } }}
+                        />
+                      ) : (
+                        <FormControl fullWidth>
+                          <InputLabel id='category'>Select Category</InputLabel>
+                          <Select
+                            labelId='category'
+                            value={categoryId}
+                            label='Category'
+                            onChange={(event) => setCategoryId(event.target.value as string)}
+                          >
+                            {getMeniuCategories()}
+                          </Select>
+                        </FormControl>
+                      )}
+
+                      <ErrorBoundary>
+                        <ElementsFromSourceShowSelectedTable
+                          selectedRows={selectedRows}
+                          handleChangeSelectedRow={handleChangeSelectedRow}
+                          handleChangeAllSelectedRows={handleChangeAllSelectedRows}
+                          selectedSourceFile={selectedSourceFile}
+                          selectedSource={selectedSource}
+                          unitOptions={unitOptions}
+                          setSelectedInterpretationRows={setSelectedInterpretationRows}
+                        />
+                      </ErrorBoundary>
+                    </Grid>
+                  )}
+                </Grid>
+              </>
+            ) : (
+              <>
+                <Grid container spacing={2} justifyContent='center' alignItems='center'>
+                  <Grid item sx={{ width: '50%' }}>
+                    <Typography sx={{ display: 'inline', 'font-size': '1.25rem', 'font-weight': 'bold' }}>
+                      There is no soure! Add source first
+                    </Typography>
+
+                    <IconButton
+                      data-testid='add-source-icon-button'
+                      onClick={addSource}
+                      sx={{
+                        padding: 'unset',
+                        marginLeft: '10px',
+                        marginBottom: '9px',
+                        width: `${12 * 1.5}px`,
+                        height: `${12 * 1.5}px`,
+                      }}
+                    >
+                      <AddIcon
+                        sx={{
+                          boxShadow: '0px 1px 2px #00000061',
+                          fill: '#333',
+                          borderRadius: '100%',
+                          height: `${17}px`,
+                          width: `${17}px`,
+                          padding: `${11 / 4}px`,
+                        }}
+                      />
+                    </IconButton>
+                  </Grid>
+                </Grid>
+              </>
             )}
-          </Grid>
+          </DataFetchWrapper>
         </DialogContent>
         <DialogActions sx={{ padding: '0 1rem 1rem 0' }}>
           <LcaButton onClick={handleCancel}>

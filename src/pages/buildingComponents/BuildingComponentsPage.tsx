@@ -52,10 +52,10 @@ export const BuildingComponentsPage = () => {
   const reportingSchemaExists = data?.reportingSchemas[0] !== undefined && data.reportingSchemas.length > 0
   const reportingSchemaId = data?.reportingSchemas[0]?.id || ''
 
-  const categoriesID = data?.reportingSchemas[0].categories?.map((category) => category.id) || []
+  const categoriesId = data?.reportingSchemas[0].categories?.map((category) => category.id) || []
 
-  const { data: elements } = useGetSchemaElementsQuery({
-    variables: { schemaCategoryIds: categoriesID },
+  const { data: elements, refetch: refetchElements } = useGetSchemaElementsQuery({
+    variables: { schemaCategoryIds: categoriesId },
     skip: !reportingSchemaExists,
   })
 
@@ -126,7 +126,7 @@ export const BuildingComponentsPage = () => {
               <>
                 <SchemasAccordion
                   schema={data.reportingSchemas[0] as GraphQlReportingSchema}
-                  categoriesId={categoriesID}
+                  categoriesId={categoriesId}
                   projElements={allElements as SchemaElement[]}
                   projTasks={allTasks as unknown as Task[]}
                   isAddingTasks={isAddingTasks}
@@ -134,12 +134,13 @@ export const BuildingComponentsPage = () => {
                   setRefToAddTaskTo={setRefToAddTaskTo}
                   setSelectedTask={setSelectedTask}
                   setIsAddTaskDialogOpen={setIsAddTaskDialogOpen}
+                  refetchElements={refetchElements}
                 />
               </>
             ) : (
               <>
                 <SchemaElementsTable
-                  categoriesId={categoriesID}
+                  categoriesId={categoriesId}
                   category={data.reportingSchemas[0].categories as GraphQlSchemaCategory[]}
                   tasks={allTasks as unknown as Task[]}
                   elements={allElements as SchemaElement[]}
@@ -148,6 +149,7 @@ export const BuildingComponentsPage = () => {
                   setRefToAddTaskTo={setRefToAddTaskTo}
                   setSelectedTask={setSelectedTask}
                   setIsAddTaskDialogOpen={setIsAddTaskDialogOpen}
+                  refetchElements={refetchElements}
                 />
               </>
             )}
