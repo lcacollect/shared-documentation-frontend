@@ -184,14 +184,13 @@ export const AddElementsFromSourceDialog = ({
     setSelectedSourceFile(sourceFile)
   }
 
-  const getMeniuCategories = () => {
+  const getMenuCategories = () => {
     if (Array.isArray(category)) {
-      const menuItems = category.map((child) => (
+      return category.map((child) => (
         <MenuItem value={child.id} key={child.id}>
           {child.name}
         </MenuItem>
       ))
-      return menuItems
     }
   }
 
@@ -285,7 +284,7 @@ export const AddElementsFromSourceDialog = ({
                             label='Category'
                             onChange={(event) => setCategoryId(event.target.value as string)}
                           >
-                            {getMeniuCategories()}
+                            {getMenuCategories()}
                           </Select>
                         </FormControl>
                       )}
