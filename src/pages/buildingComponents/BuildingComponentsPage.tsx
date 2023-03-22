@@ -1,15 +1,19 @@
 import { CardTitle, DataFetchWrapper, PaperPage, theme } from '@lcacollect/components'
 import AddTaskIcon from '@mui/icons-material/AddTask'
-import { Box, Grid, IconButton, Paper, styled, Tooltip } from '@mui/material'
+import { Box, Grid, IconButton, Paper, styled, Tooltip, alpha } from '@mui/material'
 import { tooltipClasses, TooltipProps } from '@mui/material/Tooltip'
+import FormControlLabel from '@mui/material/FormControlLabel'
+import Switch from '@mui/material/Switch'
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { SchemaElement, SchemasAccordion, Task, TaskDialog } from '../../components'
+import { SchemaElement, SchemasAccordion, Task, TaskDialog, SchemaElementsTable } from '../../components'
 import {
   GraphQlReportingSchema,
   GraphQlSchemaCategory,
   TaskItemType,
   useGetProjectSchemasWithCategoriesQuery,
+  useGetSchemaElementsQuery,
+  useGetTasksQuery,
 } from '../../dataAccess'
 
 const CustomWidthTooltip = styled(({ className, ...props }: TooltipProps) => (
@@ -20,12 +24,25 @@ const CustomWidthTooltip = styled(({ className, ...props }: TooltipProps) => (
   },
 })
 
+const StyledSwitch = styled(Switch)(({ theme }) => ({
+  '& .MuiSwitch-switchBase.Mui-checked': {
+    color: '#97A6B4',
+    '&:hover': {
+      backgroundColor: alpha('#97A6B4', theme.palette.action.hoverOpacity),
+    },
+  },
+  '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+    backgroundColor: '#97A6B4',
+  },
+}))
+
 export const BuildingComponentsPage = () => {
   const { projectId } = useParams()
   const [isAddingTasks, setIsAddingTasks] = useState(false)
   const [refToAddTaskTo, setRefToAddTaskTo] = useState<GraphQlSchemaCategory | SchemaElement>()
   const [isAddTaskDialogOpen, setIsAddTaskDialogOpen] = useState(false)
   const [selectedTask, setSelectedTask] = useState<Task>()
+  const [isTableView, setIsTableView] = useState(false)
 
   const { data, loading, error } = useGetProjectSchemasWithCategoriesQuery({
     variables: { projectId: projectId as string },
@@ -33,7 +50,22 @@ export const BuildingComponentsPage = () => {
   })
 
   const reportingSchemaExists = data?.reportingSchemas[0] !== undefined && data.reportingSchemas.length > 0
-  const reportingSchemaId = data?.reportingSchemas[0]?.id
+  const reportingSchemaId = data?.reportingSchemas[0]?.id || ''
+
+  const categoriesId = data?.reportingSchemas[0].categories?.map((category) => category.id) || []
+
+  const { data: elements, refetch: refetchElements } = useGetSchemaElementsQuery({
+    variables: { schemaCategoryIds: categoriesId },
+    skip: !reportingSchemaExists,
+  })
+
+  const { data: tasks } = useGetTasksQuery({
+    variables: { reportingSchemaId: reportingSchemaId },
+    skip: !reportingSchemaExists,
+  })
+
+  const allElements = elements?.schemaElements || []
+  const allTasks = tasks?.tasks || []
 
   const handleClickTaskIcon = () => {
     if (isAddingTasks) {
@@ -53,6 +85,10 @@ export const BuildingComponentsPage = () => {
     setRefToAddTaskTo(undefined)
   }
 
+  const handleChangeView = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setIsTableView(event.target.checked)
+  }
+
   return (
     <PaperPage data-testid='building-components-page'>
       <Grid container alignItems='center' justifyContent='space-between' pb={1}>
@@ -60,6 +96,13 @@ export const BuildingComponentsPage = () => {
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <CardTitle title='Building Components' size='large' />
           </Box>
+        </Grid>
+        <Grid item sx={{ marginLeft: 'auto', marginRight: '2%' }}>
+          <FormControlLabel
+            control={<StyledSwitch checked={isTableView} onChange={handleChangeView} />}
+            label={isTableView ? 'Grouped' : 'Table'}
+            labelPlacement={isTableView ? 'start' : 'end'}
+          />
         </Grid>
         <Grid item>
           <CustomWidthTooltip
@@ -76,18 +119,41 @@ export const BuildingComponentsPage = () => {
           </CustomWidthTooltip>
         </Grid>
       </Grid>
-
       <DataFetchWrapper error={error} loading={loading}>
         {reportingSchemaExists ? (
           <>
-            <SchemasAccordion
-              schema={data.reportingSchemas[0] as GraphQlReportingSchema}
-              isAddingTasks={isAddingTasks}
-              refToAddTaskTo={refToAddTaskTo}
-              setRefToAddTaskTo={setRefToAddTaskTo}
-              setSelectedTask={setSelectedTask}
-              setIsAddTaskDialogOpen={setIsAddTaskDialogOpen}
-            />
+            {!isTableView ? (
+              <>
+                <SchemasAccordion
+                  schema={data.reportingSchemas[0] as GraphQlReportingSchema}
+                  categoriesId={categoriesId}
+                  projElements={allElements as SchemaElement[]}
+                  projTasks={allTasks as unknown as Task[]}
+                  isAddingTasks={isAddingTasks}
+                  refToAddTaskTo={refToAddTaskTo}
+                  setRefToAddTaskTo={setRefToAddTaskTo}
+                  setSelectedTask={setSelectedTask}
+                  setIsAddTaskDialogOpen={setIsAddTaskDialogOpen}
+                  refetchElements={refetchElements}
+                />
+              </>
+            ) : (
+              <>
+                <SchemaElementsTable
+                  categoriesId={categoriesId}
+                  category={data.reportingSchemas[0].categories as GraphQlSchemaCategory[]}
+                  tasks={allTasks as unknown as Task[]}
+                  elements={allElements as SchemaElement[]}
+                  isAddingTasks={isAddingTasks}
+                  refToAddTaskTo={refToAddTaskTo}
+                  setRefToAddTaskTo={setRefToAddTaskTo}
+                  setSelectedTask={setSelectedTask}
+                  setIsAddTaskDialogOpen={setIsAddTaskDialogOpen}
+                  refetchElements={refetchElements}
+                />
+              </>
+            )}
+
             <TaskDialog
               open={isAddTaskDialogOpen}
               handleClose={handleCloseDialog}

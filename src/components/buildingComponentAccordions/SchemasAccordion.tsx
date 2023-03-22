@@ -6,16 +6,31 @@ import { SchemaElement } from '../schemaElementsTable'
 import { Task } from '../tasksTable'
 
 interface SchemasAccordionProps {
+  categoriesId: string[]
   schema: GraphQlReportingSchema
+  projElements: SchemaElement[]
+  projTasks: Task[]
   isAddingTasks: boolean
   refToAddTaskTo: GraphQlSchemaCategory | SchemaElement | undefined
   setRefToAddTaskTo: Dispatch<SetStateAction<GraphQlSchemaCategory | SchemaElement | undefined>>
   setSelectedTask: Dispatch<SetStateAction<Task | undefined>>
   setIsAddTaskDialogOpen: Dispatch<SetStateAction<boolean>>
+  refetchElements: () => void
 }
 
 export const SchemasAccordion = (props: SchemasAccordionProps) => {
-  const { schema, isAddingTasks, refToAddTaskTo, setRefToAddTaskTo, setSelectedTask, setIsAddTaskDialogOpen } = props
+  const {
+    categoriesId,
+    projElements,
+    projTasks,
+    schema,
+    isAddingTasks,
+    refToAddTaskTo,
+    setRefToAddTaskTo,
+    setSelectedTask,
+    setIsAddTaskDialogOpen,
+    refetchElements,
+  } = props
 
   if (!schema.categories || !schema.categories.find((cat) => cat.path)) {
     return (
@@ -35,12 +50,15 @@ export const SchemasAccordion = (props: SchemasAccordionProps) => {
             level={0}
             key={index}
             category={category}
-            schemaId={schema.id}
+            projElements={projElements}
+            projTasks={projTasks}
+            categoriesId={categoriesId}
             isAddingTasks={isAddingTasks}
             refToAddTaskTo={refToAddTaskTo}
             setRefToAddTaskTo={setRefToAddTaskTo}
             setSelectedTask={setSelectedTask}
             setIsAddTaskDialogOpen={setIsAddTaskDialogOpen}
+            refetchElements={refetchElements}
           />
         ))}
       </BCAccordionDetails>
