@@ -50,6 +50,7 @@ export type FilterOptions = {
   isAnyOf?: InputMaybe<Array<Scalars['String']>>
   isEmpty?: InputMaybe<Scalars['Boolean']>
   isNotEmpty?: InputMaybe<Scalars['Boolean']>
+  jsonContains?: InputMaybe<Scalars['String']>
   startsWith?: InputMaybe<Scalars['String']>
 }
 
@@ -421,7 +422,7 @@ export type MutationAddSchemaElementArgs = {
 
 export type MutationAddSchemaElementFromSourceArgs = {
   objectIds: Array<Scalars['String']>
-  quantities?: InputMaybe<Array<Scalars['Float']>>
+  quantities?: InputMaybe<Array<Scalars['String']>>
   schemaCategoryId: Scalars['String']
   sourceId: Scalars['String']
   units?: InputMaybe<Array<Unit>>
@@ -589,6 +590,7 @@ export enum ProjectDomain {
 
 export type ProjectFilters = {
   id?: InputMaybe<FilterOptions>
+  metaFields?: InputMaybe<FilterOptions>
   name?: InputMaybe<FilterOptions>
   projectId?: InputMaybe<FilterOptions>
 }
@@ -2124,7 +2126,7 @@ export type AddSchemaElementFromSourceMutationVariables = Exact<{
   schemaCategoryId: Scalars['String']
   sourceId: Scalars['String']
   objectIds: Array<Scalars['String']> | Scalars['String']
-  quantities?: InputMaybe<Array<Scalars['Float']> | Scalars['Float']>
+  quantities?: InputMaybe<Array<Scalars['String']> | Scalars['String']>
   units?: InputMaybe<Array<Unit> | Unit>
 }>
 
@@ -3814,7 +3816,7 @@ export const AddSchemaElementFromSourceDocument = gql`
     $schemaCategoryId: String!
     $sourceId: String!
     $objectIds: [String!]!
-    $quantities: [Float!]
+    $quantities: [String!]
     $units: [Unit!]
   ) {
     addSchemaElementFromSource(

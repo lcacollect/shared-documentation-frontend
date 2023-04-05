@@ -109,7 +109,7 @@ export const AddElementsFromSourceDialog = ({
     resetValue()
 
     const objectIds = selectedInterpretationRows.map((row) => row.id.toString())
-    const quantities = selectedInterpretationRows.map((row) => row.quantity)
+    const quantities = selectedInterpretationRows.map((row) => row.quantity.toString())
     const units = selectedInterpretationRows.map((row) => {
       if (row.unit === 'NONE') {
         return Unit.M

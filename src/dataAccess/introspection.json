@@ -181,6 +181,14 @@
             "deprecationReason": null
           },
           {
+            "name": "jsonContains",
+            "description": null,
+            "type": { "kind": "SCALAR", "name": "String", "ofType": null },
+            "defaultValue": "null",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "startsWith",
             "description": null,
             "type": { "kind": "SCALAR", "name": "String", "ofType": null },
@@ -2602,7 +2610,7 @@
                   "ofType": {
                     "kind": "NON_NULL",
                     "name": null,
-                    "ofType": { "kind": "SCALAR", "name": "Float", "ofType": null }
+                    "ofType": { "kind": "SCALAR", "name": "String", "ofType": null }
                   }
                 },
                 "defaultValue": "null",
@@ -3781,6 +3789,14 @@
         "inputFields": [
           {
             "name": "id",
+            "description": null,
+            "type": { "kind": "INPUT_OBJECT", "name": "FilterOptions", "ofType": null },
+            "defaultValue": "null",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "metaFields",
             "description": null,
             "type": { "kind": "INPUT_OBJECT", "name": "FilterOptions", "ofType": null },
             "defaultValue": "null",
