@@ -30,10 +30,12 @@ export const ImportExportPage = () => {
     error: base64Error,
   } = useExportReportingSchemaQuery({
     variables: {
-      reportingSchemaId: projectSchemas?.reportingSchemas[0].id as string,
+      reportingSchemaId: projectSchemas?.reportingSchemas.length
+        ? (projectSchemas?.reportingSchemas[0].id as string)
+        : '',
       exportFormat: exportFormat,
     },
-    skip: !clicked,
+    skip: !projectSchemas?.reportingSchemas[0]?.id && !clicked,
   })
 
   useEffect(() => {

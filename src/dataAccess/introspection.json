@@ -1942,6 +1942,29 @@
         "possibleTypes": null
       },
       {
+        "kind": "INPUT_OBJECT",
+        "name": "LifeCycleStageInput",
+        "description": null,
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "stageId",
+            "description": null,
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": { "kind": "SCALAR", "name": "String", "ofType": null }
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
         "kind": "OBJECT",
         "name": "Mutation",
         "description": null,
@@ -1988,7 +2011,31 @@
             "description": "Add a Project",
             "args": [
               {
+                "name": "address",
+                "description": null,
+                "type": { "kind": "SCALAR", "name": "String", "ofType": null },
+                "defaultValue": "null",
+                "isDeprecated": false,
+                "deprecationReason": null
+              },
+              {
+                "name": "city",
+                "description": null,
+                "type": { "kind": "SCALAR", "name": "String", "ofType": null },
+                "defaultValue": "null",
+                "isDeprecated": false,
+                "deprecationReason": null
+              },
+              {
                 "name": "client",
+                "description": null,
+                "type": { "kind": "SCALAR", "name": "String", "ofType": null },
+                "defaultValue": "null",
+                "isDeprecated": false,
+                "deprecationReason": null
+              },
+              {
+                "name": "country",
                 "description": null,
                 "type": { "kind": "SCALAR", "name": "String", "ofType": null },
                 "defaultValue": "null",
@@ -2080,7 +2127,7 @@
                   "ofType": {
                     "kind": "NON_NULL",
                     "name": null,
-                    "ofType": { "kind": "INPUT_OBJECT", "name": "ProjectStageInput", "ofType": null }
+                    "ofType": { "kind": "INPUT_OBJECT", "name": "LifeCycleStageInput", "ofType": null }
                   }
                 },
                 "defaultValue": "null",
@@ -2610,7 +2657,7 @@
                   "ofType": {
                     "kind": "NON_NULL",
                     "name": null,
-                    "ofType": { "kind": "SCALAR", "name": "String", "ofType": null }
+                    "ofType": { "kind": "SCALAR", "name": "Float", "ofType": null }
                   }
                 },
                 "defaultValue": "null",
@@ -4027,65 +4074,6 @@
           { "name": "SPECKLE", "description": null, "isDeprecated": false, "deprecationReason": null },
           { "name": "XLSX", "description": null, "isDeprecated": false, "deprecationReason": null }
         ],
-        "possibleTypes": null
-      },
-      {
-        "kind": "INPUT_OBJECT",
-        "name": "ProjectStageInput",
-        "description": null,
-        "fields": null,
-        "inputFields": [
-          {
-            "name": "id",
-            "description": null,
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": { "kind": "SCALAR", "name": "String", "ofType": null }
-            },
-            "defaultValue": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "lifecyclePhase",
-            "description": null,
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": { "kind": "SCALAR", "name": "String", "ofType": null }
-            },
-            "defaultValue": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "name",
-            "description": null,
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": { "kind": "SCALAR", "name": "String", "ofType": null }
-            },
-            "defaultValue": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "stage",
-            "description": null,
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": { "kind": "SCALAR", "name": "String", "ofType": null }
-            },
-            "defaultValue": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "interfaces": null,
-        "enumValues": null,
         "possibleTypes": null
       },
       {
