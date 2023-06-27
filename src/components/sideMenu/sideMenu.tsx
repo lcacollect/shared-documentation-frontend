@@ -6,7 +6,9 @@ import ReceiptLongOutlinedIcon from '@mui/icons-material/ReceiptLongOutlined'
 import Settings from '@mui/icons-material/Settings'
 import StartOutlinedIcon from '@mui/icons-material/StartOutlined'
 import SwapHorizOutlinedIcon from '@mui/icons-material/SwapHorizOutlined'
+import ForestOutlinedIcon from '@mui/icons-material/ForestOutlined'
 import { useParams } from 'react-router-dom'
+import React from 'react'
 
 export const DocumentationSideMenu = () => {
   const { projectId } = useParams()
@@ -36,6 +38,11 @@ export const DocumentationSideMenu = () => {
       icon: <ReceiptLongOutlinedIcon sx={{ color: theme.palette.common.black }} />,
       link: `/projects/${projectId}/components`,
       title: 'Building Components',
+    },
+    {
+      icon: <ForestOutlinedIcon sx={{ color: theme.palette.common.black }} />,
+      link: `/projects/${projectId}/epds`,
+      title: 'EPDs',
     },
     {
       icon: <PlaylistAddCheckOutlinedIcon sx={{ color: theme.palette.common.black }} />,
