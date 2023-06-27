@@ -32,7 +32,8 @@ export const SourceInterpretationTable = () => {
     variables: { projectId: projectId as string },
     skip: !projectId,
   })
-  const sourceFiles = sourceData?.projectSources
+
+  const sourceFiles = sourceData ? [...sourceData.projectSources] : undefined
 
   const handleRowClick = (params: GridRowParams) => {
     setOpenInterpretationDialogId(params.row.id)
@@ -97,6 +98,31 @@ export const SourceInterpretationTable = () => {
       },
     },
   ]
+
+  if (!editRow) {
+    sourceFiles?.map((source) => {
+      const copySource = { ...source }
+      let data: {
+        name?: string
+        description?: string
+        M?: string
+        M2?: string
+        M3?: string
+        KG?: string
+        PCS?: string
+      } = {}
+      columns.map((column) => {
+        copySource.data?.headers.map((header) => {
+          if (header.toLocaleLowerCase() == column.field.toLocaleLowerCase()) {
+            const fieldName = column.field
+            data = { ...data, [fieldName]: header }
+          }
+        })
+      })
+      copySource.interpretation = { ...source.interpretation, ...data }
+      return copySource
+    })
+  }
 
   return (
     <div style={{ height: 400 }} data-testid='source-interpretation-table'>

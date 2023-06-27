@@ -49,10 +49,10 @@ export const BuildingComponentsPage = () => {
     skip: !projectId,
   })
 
-  const reportingSchemaExists = data?.reportingSchemas[0] !== undefined && data.reportingSchemas.length > 0
+  const reportingSchemaExists = !!data?.reportingSchemas[0]
   const reportingSchemaId = data?.reportingSchemas[0]?.id || ''
 
-  const categoriesId = data?.reportingSchemas[0].categories?.map((category) => category.id) || []
+  const categoriesId = data?.reportingSchemas[0]?.categories?.map((category) => category.id) || []
 
   const { data: elements, refetch: refetchElements } = useGetSchemaElementsQuery({
     variables: { schemaCategoryIds: categoriesId },

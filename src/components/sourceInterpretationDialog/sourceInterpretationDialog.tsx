@@ -46,7 +46,7 @@ export const SourceInterpretationDialog = (props: InterpretationSelectionDialogP
     (prev, cur) => ({ ...prev, [cur.value]: '' }),
     {},
   )
-  const [parameterOptions, setParameterOptions] = useState(initialParameterOptions)
+
   const [selectedParameter, setSelectedParameter] = useState('interpretationName')
   const [selectedColumn, setSelectedColumn] = useState('')
   const [snackbar, setSnackbar] = useState<Pick<AlertProps, 'children' | 'severity'> | null>(null)
@@ -129,7 +129,7 @@ export const SourceInterpretationDialog = (props: InterpretationSelectionDialogP
           onChange={handleChangeParameter}
           aria-label='text button group'
         >
-          {parameterOptions.map((option) => (
+          {initialParameterOptions.map((option) => (
             <ToggleButton key={option.value} value={option.value} sx={{ minWidth: '75px' }}>
               {option.label}
             </ToggleButton>

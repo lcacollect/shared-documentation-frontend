@@ -109,7 +109,7 @@ export const AddElementsFromSourceDialog = ({
     resetValue()
 
     const objectIds = selectedInterpretationRows.map((row) => row.id.toString())
-    const quantities = selectedInterpretationRows.map((row) => row.quantity.toString())
+    const quantities = selectedInterpretationRows.map((row) => row.quantity)
     const units = selectedInterpretationRows.map((row) => {
       if (row.unit === 'NONE') {
         return Unit.M
@@ -202,6 +202,7 @@ export const AddElementsFromSourceDialog = ({
         maxWidth={isInterpretationEmpty ? 'md' : 'xl'}
         fullWidth={true}
         PaperProps={{ sx: { borderRadius: 5, paddingX: 3, paddingY: 3 } }}
+        data-testid={'elementFromSourceDialog'}
       >
         <DialogContent>
           <DataFetchWrapper error={error} loading={loading}>

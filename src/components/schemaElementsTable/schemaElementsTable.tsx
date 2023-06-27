@@ -506,7 +506,7 @@ export const SchemaElementsTable = (props: SchemaElementsTableProps) => {
         open={!!openElementsFromSourceDialogId}
         handleClose={handleCloseElementsFromSourceDialog}
         addSource={addSource}
-        category={Array.isArray(category) ? getSchemaCategories() : category}
+        category={Array.isArray(category) ? schemaCategories : category}
         unitOptions={unitOptions}
         handleRowUpdateFromSource={handleRowUpdateFromSource}
       />

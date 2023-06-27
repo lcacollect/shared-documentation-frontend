@@ -1,8 +1,9 @@
-import { CardTitle, LcaButton } from '@lcacollect/components'
+import { CardTitle, GraphQlSchemaCategory, LcaButton } from '@lcacollect/components'
 import {
   Alert,
   AlertProps,
   Box,
+  Button,
   Dialog,
   DialogActions,
   DialogContent,
@@ -20,8 +21,12 @@ import {
   useGetAccountQuery,
   useGetProjectMembersQuery,
   useUpdateProjectSourceMutation,
+  useGetProjectSchemasWithCategoriesLazyQuery,
+  Unit,
 } from '../../dataAccess'
 import { SourceForm } from './sourceForm'
+import { AddElementsFromSourceDialog } from '../addElementFromSourceDialog'
+import { UnitOptions } from '../schemaElementsTable'
 
 interface SelectionDialogProps {
   openDialog: boolean
@@ -44,6 +49,11 @@ export const SourceDialog: React.FC<SelectionDialogProps> = (props) => {
       projectId: projectId as string,
     },
     skip: !projectId,
+  })
+  const [openElementsFromSourceDialog, setOpenElementsFromSourceDialog] = useState<boolean>(false)
+
+  const [getProjectCategories, { data: categoriesData }] = useGetProjectSchemasWithCategoriesLazyQuery({
+    variables: { projectId: projectId as string },
   })
 
   const [addProjectSourceMutation] = useAddProjectSourceMutation({
@@ -107,11 +117,12 @@ export const SourceDialog: React.FC<SelectionDialogProps> = (props) => {
       if (setSourceId) setSourceId(response.data?.updateProjectSource.id)
     }
 
-    if (response.errors) {
+    if (response?.errors) {
       response.errors.forEach((error) => console.error(error))
       setSnackbar({ children: response.errors[0].message, severity: 'error' })
     } else {
       handleClose()
+      setSnackbar({ children: 'File uploaded! Do you want to add elements to project?', severity: 'success' })
     }
   }
 
@@ -123,55 +134,132 @@ export const SourceDialog: React.FC<SelectionDialogProps> = (props) => {
     handleDialogClose()
   }
 
-  return (
-    <Dialog
-      data-testid='sources-dialog'
-      open={openDialog}
-      onClose={handleDialogClose}
-      maxWidth={'xl'}
-      PaperProps={{ sx: { borderRadius: 5, paddingX: 3, paddingY: 3 } }}
-    >
-      <DialogTitle>
-        <CardTitle title='Add Source' size='medium' />
-      </DialogTitle>
-      <DialogContent>
-        <SourceForm type={type} setType={setType} name={name} setName={setName} setFile={setFile} />
-      </DialogContent>
-      <DialogActions sx={{ paddingX: 3 }}>
-        <LcaButton onClick={handleClose} data-testid='cancel-project-source-button'>
-          <Typography>Cancel</Typography>
-        </LcaButton>
-        <Tooltip
-          placement='top-end'
-          title={
-            !name || !file
-              ? 'Complete the form to upload file'
-              : !isMemberOfProject
-              ? 'Only project members can add files'
-              : ''
-          }
-        >
-          <Box sx={{ ml: 1 }}>
-            <LcaButton
-              disabled={!name || !file || !isMemberOfProject}
-              onClick={handleDialogAdd}
-              data-testid='add-project-source-button'
+  const downloadTemplate = () => {
+    const rows = [
+      ['Name', 'Description', 'm', 'm2', 'm3', 'kg', 'pcs'],
+      ['Test', 'Some text', '', '1', '', '', ''],
+      ['Test2', 'Some text2', '2', '1', '1', '1', '1'],
+    ]
+
+    const csvContent = 'data:text/csv;charset=utf-8,' + rows.map((e) => e.join(',')).join('\n')
+    const encodedUri = encodeURI(csvContent)
+    const link = document.createElement('a')
+
+    link.setAttribute('href', encodedUri)
+    link.setAttribute('download', 'lca_template.csv')
+    document.body.appendChild(link)
+    link.click()
+
+    document.body.removeChild(link)
+  }
+
+  const unitOptions: UnitOptions = {
+    [Unit.M]: 'm',
+    [Unit.M2]: 'm²',
+    [Unit.M3]: 'm³',
+    [Unit.Kg]: 'kg',
+    [Unit.Pcs]: 'pcs',
+  }
+
+  const alertSnackbar =
+    snackbar?.severity == 'success' ? (
+      <Alert
+        {...snackbar}
+        variant='filled'
+        action={
+          <>
+            <Button
+              color='inherit'
+              size='small'
+              data-testid='sourceAlertBtnYes'
+              onClick={() => {
+                getProjectCategories().then(() => {
+                  setOpenElementsFromSourceDialog(true)
+                  setSnackbar(null)
+                })
+              }}
             >
-              <Typography>Add</Typography>
-            </LcaButton>
-          </Box>
-        </Tooltip>
-      </DialogActions>
-      {!!snackbar && (
-        <Snackbar
-          open
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-          onClose={() => setSnackbar(null)}
-          autoHideDuration={6000}
-        >
-          <Alert {...snackbar} onClose={() => setSnackbar(null)} />
-        </Snackbar>
-      )}
-    </Dialog>
+              YES
+            </Button>
+            <Button color='inherit' size='small' onClick={() => setSnackbar(null)}>
+              NO
+            </Button>
+          </>
+        }
+      />
+    ) : (
+      <Alert {...snackbar} variant='filled' />
+    )
+
+  const getSchemCategories = () => {
+    const categories = categoriesData?.reportingSchemas[0]?.categories
+    return categories?.filter((child) => child.depth === 2)
+  }
+
+  return (
+    <>
+      <Dialog
+        data-testid='sources-dialog'
+        open={openDialog}
+        onClose={handleDialogClose}
+        maxWidth={'xl'}
+        PaperProps={{ sx: { borderRadius: 5, paddingX: 3, paddingY: 3 } }}
+      >
+        <DialogTitle sx={{ display: 'flex' }}>
+          <CardTitle title='Add Source' size='medium' />
+          <LcaButton onClick={downloadTemplate} data-testid='downloadTemplate' sx={{ 'margin-left': 'auto' }}>
+            <Typography fontSize={'60%'}>Download template</Typography>
+          </LcaButton>
+        </DialogTitle>
+        <DialogContent>
+          <SourceForm type={type} setType={setType} name={name} setName={setName} setFile={setFile} />
+        </DialogContent>
+        <DialogActions sx={{ paddingX: 3 }}>
+          <LcaButton onClick={handleClose} data-testid='cancel-project-source-button'>
+            <Typography>Cancel</Typography>
+          </LcaButton>
+          <Tooltip
+            placement='top-end'
+            title={
+              !name || !file
+                ? 'Complete the form to upload file'
+                : !isMemberOfProject
+                ? 'Only project members can add files'
+                : ''
+            }
+          >
+            <Box sx={{ ml: 1 }}>
+              <LcaButton
+                disabled={!name || !file || !isMemberOfProject}
+                onClick={handleDialogAdd}
+                data-testid='add-project-source-button'
+              >
+                <Typography>Add</Typography>
+              </LcaButton>
+            </Box>
+          </Tooltip>
+        </DialogActions>
+      </Dialog>
+
+      <Snackbar
+        open={!!snackbar}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        onClose={() => setSnackbar(null)}
+        sx={{ top: '10% !important' }}
+        autoHideDuration={15000}
+        data-testid='alert-snackbar'
+      >
+        {alertSnackbar}
+      </Snackbar>
+
+      <AddElementsFromSourceDialog
+        open={openElementsFromSourceDialog}
+        handleClose={() => setOpenElementsFromSourceDialog(false)}
+        addSource={() => undefined}
+        category={(getSchemCategories() as unknown as GraphQlSchemaCategory[]) || []}
+        unitOptions={unitOptions}
+        handleRowUpdateFromSource={() => undefined}
+      />
+    </>
   )
 }
