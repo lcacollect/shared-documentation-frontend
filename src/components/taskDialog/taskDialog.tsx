@@ -82,7 +82,7 @@ export const TaskDialog = (props: TaskDialogProps) => {
     } as IAssignee)
   }, [data, error, loading])
 
-  const task = useMemo(() => data?.tasks[0] as Task, [data])
+  const task = useMemo(() => data?.tasks[0] as unknown as Task, [data])
 
   const handleUpdateTask = async () => {
     const { errors } = await updateTask({

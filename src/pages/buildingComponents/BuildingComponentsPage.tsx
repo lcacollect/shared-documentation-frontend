@@ -127,7 +127,7 @@ export const BuildingComponentsPage = () => {
                 <SchemasAccordion
                   schema={data.reportingSchemas[0] as GraphQlReportingSchema}
                   categoriesId={categoriesId}
-                  projElements={allElements as SchemaElement[]}
+                  projElements={allElements as unknown as SchemaElement[]}
                   projTasks={allTasks as unknown as Task[]}
                   isAddingTasks={isAddingTasks}
                   refToAddTaskTo={refToAddTaskTo}
@@ -143,7 +143,7 @@ export const BuildingComponentsPage = () => {
                   categoriesId={categoriesId}
                   category={data.reportingSchemas[0].categories as GraphQlSchemaCategory[]}
                   tasks={allTasks as unknown as Task[]}
-                  elements={allElements as SchemaElement[]}
+                  elements={allElements as unknown as SchemaElement[]}
                   isAddingTasks={isAddingTasks}
                   refToAddTaskTo={refToAddTaskTo}
                   setRefToAddTaskTo={setRefToAddTaskTo}
