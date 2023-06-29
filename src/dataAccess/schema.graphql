@@ -90,8 +90,11 @@ query getSchemaElements($schemaCategoryIds: [String!]!) {
     quantity
     unit
     description
-    schemaCategory {
+    assembly {
       id
+    }
+    schemaCategory {
+      categoryId: id
       name
       path
     }
@@ -258,12 +261,12 @@ query getTasks($reportingSchemaId: String!) {
     item {
       ... on GraphQLSchemaCategory {
         __typename
-        id
+        categoryId: id
         name
       }
       ... on GraphQLSchemaElement {
         __typename
-        id
+        elementId: id
         name
       }
     }
@@ -295,12 +298,12 @@ query getTasksForTasksPage($reportingSchemaId: String!) {
     item {
       ... on GraphQLSchemaCategory {
         __typename
-        id
+        categoryId: id
         name
       }
       ... on GraphQLSchemaElement {
         __typename
-        id
+        elementId: id
         name
       }
     }
@@ -387,12 +390,12 @@ query getSingleTask($reportingSchemaId: String!, $taskId: String!) {
     item {
       ... on GraphQLSchemaCategory {
         __typename
-        id
+        categoryId: id
         name
       }
       ... on GraphQLSchemaElement {
         __typename
-        id
+        elementId: id
         name
       }
     }
