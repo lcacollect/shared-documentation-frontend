@@ -151,53 +151,57 @@ export type GraphQlCommit = {
   tasks?: Maybe<Array<GraphQlTask>>
 }
 
+export type GraphQlConversion = {
+  __typename?: 'GraphQLConversion'
+  to: GraphQlUnit
+  value: Scalars['Float']
+}
+
 export type GraphQlepd = {
   __typename?: 'GraphQLEPD'
-  ap: Scalars['Float']
-  apByPhases: Scalars['JSON']
-  category: Scalars['String']
-  dateUpdated: Scalars['Date']
-  ep: Scalars['Float']
-  epByPhases: Scalars['JSON']
-  expirationDate: Scalars['Date']
-  gwp: Scalars['Float']
-  gwpByPhases: Scalars['JSON']
+  ap?: Maybe<GraphQlImpactCategories>
+  comment?: Maybe<Scalars['String']>
+  conversions: Array<GraphQlConversion>
+  declaredUnit?: Maybe<Scalars['String']>
+  ep?: Maybe<GraphQlImpactCategories>
+  gwp?: Maybe<GraphQlImpactCategories>
   id: Scalars['String']
+  location: Scalars['String']
   name: Scalars['String']
-  odp: Scalars['Float']
-  odpByPhases: Scalars['JSON']
+  odp?: Maybe<GraphQlImpactCategories>
   originId?: Maybe<Scalars['String']>
-  owner: Scalars['String']
-  penreByPhases: Scalars['JSON']
-  pereByPhases: Scalars['JSON']
-  pocp: Scalars['Float']
-  pocpByPhases: Scalars['JSON']
-  region: Scalars['String']
+  penre?: Maybe<GraphQlImpactCategories>
+  pere?: Maybe<GraphQlImpactCategories>
+  pocp?: Maybe<GraphQlImpactCategories>
+  publishedDate: Scalars['Date']
+  referenceServiceLife?: Maybe<Scalars['Int']>
   source: Scalars['String']
-  sourceData: Scalars['String']
-  type: Scalars['String']
-  unit?: Maybe<Scalars['String']>
+  subtype: Scalars['String']
+  validUntil: Scalars['Date']
   version: Scalars['String']
 }
 
-export type GraphQlepdApArgs = {
-  phases?: InputMaybe<Array<Scalars['String']>>
-}
-
-export type GraphQlepdEpArgs = {
-  phases?: InputMaybe<Array<Scalars['String']>>
-}
-
-export type GraphQlepdGwpArgs = {
-  phases?: InputMaybe<Array<Scalars['String']>>
-}
-
-export type GraphQlepdOdpArgs = {
-  phases?: InputMaybe<Array<Scalars['String']>>
-}
-
-export type GraphQlepdPocpArgs = {
-  phases?: InputMaybe<Array<Scalars['String']>>
+export type GraphQlepdBase = {
+  __typename?: 'GraphQLEPDBase'
+  ap?: Maybe<GraphQlImpactCategories>
+  comment?: Maybe<Scalars['String']>
+  conversions: Array<GraphQlConversion>
+  declaredUnit?: Maybe<Scalars['String']>
+  ep?: Maybe<GraphQlImpactCategories>
+  gwp?: Maybe<GraphQlImpactCategories>
+  id: Scalars['String']
+  location: Scalars['String']
+  name: Scalars['String']
+  odp?: Maybe<GraphQlImpactCategories>
+  penre?: Maybe<GraphQlImpactCategories>
+  pere?: Maybe<GraphQlImpactCategories>
+  pocp?: Maybe<GraphQlImpactCategories>
+  publishedDate: Scalars['Date']
+  referenceServiceLife?: Maybe<Scalars['Int']>
+  source: Scalars['String']
+  subtype: Scalars['String']
+  validUntil: Scalars['Date']
+  version: Scalars['String']
 }
 
 export type GraphQlepdConnection = {
@@ -211,6 +215,25 @@ export type GraphQlepdEdge = {
   __typename?: 'GraphQLEPDEdge'
   cursor: Scalars['String']
   node: GraphQlepd
+}
+
+export type GraphQlImpactCategories = {
+  __typename?: 'GraphQLImpactCategories'
+  a1a3?: Maybe<Scalars['Float']>
+  a4?: Maybe<Scalars['Float']>
+  a5?: Maybe<Scalars['Float']>
+  b1?: Maybe<Scalars['Float']>
+  b2?: Maybe<Scalars['Float']>
+  b3?: Maybe<Scalars['Float']>
+  b4?: Maybe<Scalars['Float']>
+  b5?: Maybe<Scalars['Float']>
+  b6?: Maybe<Scalars['Float']>
+  b7?: Maybe<Scalars['Float']>
+  c1?: Maybe<Scalars['Float']>
+  c2?: Maybe<Scalars['Float']>
+  c3?: Maybe<Scalars['Float']>
+  c4?: Maybe<Scalars['Float']>
+  d?: Maybe<Scalars['Float']>
 }
 
 export type GraphQlLifeCycleStage = {
@@ -240,56 +263,28 @@ export type GraphQlProject = {
 
 export type GraphQlProjectEpd = {
   __typename?: 'GraphQLProjectEPD'
-  ap: Scalars['Float']
-  apByPhases: Scalars['JSON']
+  ap?: Maybe<GraphQlImpactCategories>
   assemblies?: Maybe<Array<GraphQlAssembly>>
-  category: Scalars['String']
-  dateUpdated: Scalars['Date']
-  ep: Scalars['Float']
-  epByPhases: Scalars['JSON']
-  expirationDate: Scalars['Date']
-  gwp: Scalars['Float']
-  gwpByPhases: Scalars['JSON']
+  comment?: Maybe<Scalars['String']>
+  conversions: Array<GraphQlConversion>
+  declaredUnit?: Maybe<Scalars['String']>
+  ep?: Maybe<GraphQlImpactCategories>
+  gwp?: Maybe<GraphQlImpactCategories>
   id: Scalars['String']
-  kgPerM2?: Maybe<Scalars['Float']>
-  kgPerM3?: Maybe<Scalars['Float']>
+  location: Scalars['String']
   name: Scalars['String']
-  odp: Scalars['Float']
-  odpByPhases: Scalars['JSON']
+  odp?: Maybe<GraphQlImpactCategories>
   originId: Scalars['String']
-  owner: Scalars['String']
-  penreByPhases: Scalars['JSON']
-  pereByPhases: Scalars['JSON']
-  pocp: Scalars['Float']
-  pocpByPhases: Scalars['JSON']
+  penre?: Maybe<GraphQlImpactCategories>
+  pere?: Maybe<GraphQlImpactCategories>
+  pocp?: Maybe<GraphQlImpactCategories>
   projectId: Scalars['ID']
-  region: Scalars['String']
+  publishedDate: Scalars['Date']
+  referenceServiceLife?: Maybe<Scalars['Int']>
   source: Scalars['String']
-  sourceData: Scalars['String']
-  thickness?: Maybe<Scalars['Float']>
-  type: Scalars['String']
-  unit?: Maybe<Scalars['String']>
+  subtype: Scalars['String']
+  validUntil: Scalars['Date']
   version: Scalars['String']
-}
-
-export type GraphQlProjectEpdApArgs = {
-  phases?: InputMaybe<Array<Scalars['String']>>
-}
-
-export type GraphQlProjectEpdEpArgs = {
-  phases?: InputMaybe<Array<Scalars['String']>>
-}
-
-export type GraphQlProjectEpdGwpArgs = {
-  phases?: InputMaybe<Array<Scalars['String']>>
-}
-
-export type GraphQlProjectEpdOdpArgs = {
-  phases?: InputMaybe<Array<Scalars['String']>>
-}
-
-export type GraphQlProjectEpdPocpArgs = {
-  phases?: InputMaybe<Array<Scalars['String']>>
 }
 
 export type GraphQlProjectGroup = {
@@ -432,6 +427,18 @@ export type GraphQlTask = {
   status: TaskStatus
 }
 
+export enum GraphQlUnit {
+  L = 'L',
+  M = 'M',
+  M2 = 'M2',
+  M2R1 = 'M2R1',
+  M3 = 'M3',
+  Pcs = 'PCS',
+  Tones = 'Tones',
+  Unknown = 'UNKNOWN',
+  Kg = 'kg',
+}
+
 export type GraphQlUserAccount = {
   __typename?: 'GraphQLUserAccount'
   email: Scalars['String']
@@ -453,7 +460,8 @@ export type Mutation = {
   addComment: GraphQlComment
   /** Add a Project */
   addProject: GraphQlProject
-  addProjectEpd: GraphQlProjectEpd
+  /** Add Global EPDs to a project. */
+  addProjectEpds: Array<GraphQlProjectEpd>
   /** Add a Project Group */
   addProjectGroup: GraphQlProjectGroup
   /** Add a Project Member */
@@ -494,6 +502,7 @@ export type Mutation = {
   deleteComment: Scalars['String']
   /** Delete a project */
   deleteProject: Scalars['String']
+  /** Delete a project EPD */
   deleteProjectEpd: Scalars['String']
   /** Delete a project group */
   deleteProjectGroup: Scalars['String']
@@ -523,7 +532,6 @@ export type Mutation = {
   updateComment: GraphQlComment
   /** Update a Project */
   updateProject: GraphQlProject
-  updateProjectEpd: GraphQlProjectEpd
   /** Update a Project Group */
   updateProjectGroup: GraphQlProjectGroup
   /** Update a Project Source */
@@ -577,8 +585,8 @@ export type MutationAddProjectArgs = {
   stages?: InputMaybe<Array<LifeCycleStageInput>>
 }
 
-export type MutationAddProjectEpdArgs = {
-  originId: Scalars['String']
+export type MutationAddProjectEpdsArgs = {
+  epdIds: Array<Scalars['String']>
   projectId: Scalars['String']
 }
 
@@ -645,7 +653,7 @@ export type MutationAddSchemaElementArgs = {
 export type MutationAddSchemaElementFromSourceArgs = {
   objectIds: Array<Scalars['String']>
   quantities?: InputMaybe<Array<Scalars['Float']>>
-  schemaCategoryId: Scalars['String']
+  schemaCategoryIds: Array<Scalars['String']>
   sourceId: Scalars['String']
   units?: InputMaybe<Array<Unit>>
 }
@@ -769,13 +777,6 @@ export type MutationUpdateProjectArgs = {
   projectId?: InputMaybe<Scalars['String']>
 }
 
-export type MutationUpdateProjectEpdArgs = {
-  id: Scalars['String']
-  kgPerM2?: InputMaybe<Scalars['Float']>
-  kgPerM3?: InputMaybe<Scalars['Float']>
-  thickness?: InputMaybe<Scalars['Float']>
-}
-
 export type MutationUpdateProjectGroupArgs = {
   id: Scalars['String']
   leadId?: InputMaybe<Scalars['String']>
@@ -856,6 +857,7 @@ export enum ProjectDomain {
 
 export type ProjectEpdFilters = {
   category?: InputMaybe<FilterOptions>
+  id?: InputMaybe<FilterOptions>
   name?: InputMaybe<FilterOptions>
   owner?: InputMaybe<FilterOptions>
   projectId?: InputMaybe<FilterOptions>
@@ -1207,10 +1209,13 @@ export type ResolversTypes = {
   GraphQLAssignee: GraphQlAssignee
   GraphQLComment: ResolverTypeWrapper<GraphQlComment>
   GraphQLCommit: ResolverTypeWrapper<GraphQlCommit>
+  GraphQLConversion: ResolverTypeWrapper<GraphQlConversion>
   GraphQLEPD: ResolverTypeWrapper<GraphQlepd>
-  GraphQLEPDConnection: ResolverTypeWrapper<GraphQlepdConnection>
   Int: ResolverTypeWrapper<Scalars['Int']>
+  GraphQLEPDBase: ResolverTypeWrapper<GraphQlepdBase>
+  GraphQLEPDConnection: ResolverTypeWrapper<GraphQlepdConnection>
   GraphQLEPDEdge: ResolverTypeWrapper<GraphQlepdEdge>
+  GraphQLImpactCategories: ResolverTypeWrapper<GraphQlImpactCategories>
   GraphQLLifeCycleStage: ResolverTypeWrapper<GraphQlLifeCycleStage>
   GraphQLProject: ResolverTypeWrapper<GraphQlProject>
   GraphQLProjectEPD: ResolverTypeWrapper<GraphQlProjectEpd>
@@ -1237,6 +1242,7 @@ export type ResolversTypes = {
       item: ResolversTypes['GraphQLSchemaElementGraphQLSchemaCategory']
     }
   >
+  GraphQLUnit: GraphQlUnit
   GraphQLUserAccount: ResolverTypeWrapper<GraphQlUserAccount>
   JSON: ResolverTypeWrapper<Scalars['JSON']>
   LifeCycleStageInput: LifeCycleStageInput
@@ -1287,10 +1293,13 @@ export type ResolversParentTypes = {
   GraphQLAssignee: GraphQlAssignee
   GraphQLComment: GraphQlComment
   GraphQLCommit: GraphQlCommit
+  GraphQLConversion: GraphQlConversion
   GraphQLEPD: GraphQlepd
-  GraphQLEPDConnection: GraphQlepdConnection
   Int: Scalars['Int']
+  GraphQLEPDBase: GraphQlepdBase
+  GraphQLEPDConnection: GraphQlepdConnection
   GraphQLEPDEdge: GraphQlepdEdge
+  GraphQLImpactCategories: GraphQlImpactCategories
   GraphQLLifeCycleStage: GraphQlLifeCycleStage
   GraphQLProject: GraphQlProject
   GraphQLProjectEPD: GraphQlProjectEpd
@@ -1418,34 +1427,64 @@ export type GraphQlCommitResolvers<
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
+export type GraphQlConversionResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes['GraphQLConversion'] = ResolversParentTypes['GraphQLConversion'],
+> = {
+  to?: Resolver<ResolversTypes['GraphQLUnit'], ParentType, ContextType>
+  value?: Resolver<ResolversTypes['Float'], ParentType, ContextType>
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
 export type GraphQlepdResolvers<
   ContextType = any,
   ParentType extends ResolversParentTypes['GraphQLEPD'] = ResolversParentTypes['GraphQLEPD'],
 > = {
-  ap?: Resolver<ResolversTypes['Float'], ParentType, ContextType, RequireFields<GraphQlepdApArgs, 'phases'>>
-  apByPhases?: Resolver<ResolversTypes['JSON'], ParentType, ContextType>
-  category?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-  dateUpdated?: Resolver<ResolversTypes['Date'], ParentType, ContextType>
-  ep?: Resolver<ResolversTypes['Float'], ParentType, ContextType, RequireFields<GraphQlepdEpArgs, 'phases'>>
-  epByPhases?: Resolver<ResolversTypes['JSON'], ParentType, ContextType>
-  expirationDate?: Resolver<ResolversTypes['Date'], ParentType, ContextType>
-  gwp?: Resolver<ResolversTypes['Float'], ParentType, ContextType, RequireFields<GraphQlepdGwpArgs, 'phases'>>
-  gwpByPhases?: Resolver<ResolversTypes['JSON'], ParentType, ContextType>
+  ap?: Resolver<Maybe<ResolversTypes['GraphQLImpactCategories']>, ParentType, ContextType>
+  comment?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+  conversions?: Resolver<Array<ResolversTypes['GraphQLConversion']>, ParentType, ContextType>
+  declaredUnit?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+  ep?: Resolver<Maybe<ResolversTypes['GraphQLImpactCategories']>, ParentType, ContextType>
+  gwp?: Resolver<Maybe<ResolversTypes['GraphQLImpactCategories']>, ParentType, ContextType>
   id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+  location?: Resolver<ResolversTypes['String'], ParentType, ContextType>
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-  odp?: Resolver<ResolversTypes['Float'], ParentType, ContextType, RequireFields<GraphQlepdOdpArgs, 'phases'>>
-  odpByPhases?: Resolver<ResolversTypes['JSON'], ParentType, ContextType>
+  odp?: Resolver<Maybe<ResolversTypes['GraphQLImpactCategories']>, ParentType, ContextType>
   originId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
-  owner?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-  penreByPhases?: Resolver<ResolversTypes['JSON'], ParentType, ContextType>
-  pereByPhases?: Resolver<ResolversTypes['JSON'], ParentType, ContextType>
-  pocp?: Resolver<ResolversTypes['Float'], ParentType, ContextType, RequireFields<GraphQlepdPocpArgs, 'phases'>>
-  pocpByPhases?: Resolver<ResolversTypes['JSON'], ParentType, ContextType>
-  region?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+  penre?: Resolver<Maybe<ResolversTypes['GraphQLImpactCategories']>, ParentType, ContextType>
+  pere?: Resolver<Maybe<ResolversTypes['GraphQLImpactCategories']>, ParentType, ContextType>
+  pocp?: Resolver<Maybe<ResolversTypes['GraphQLImpactCategories']>, ParentType, ContextType>
+  publishedDate?: Resolver<ResolversTypes['Date'], ParentType, ContextType>
+  referenceServiceLife?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>
   source?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-  sourceData?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-  type?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-  unit?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+  subtype?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+  validUntil?: Resolver<ResolversTypes['Date'], ParentType, ContextType>
+  version?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type GraphQlepdBaseResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes['GraphQLEPDBase'] = ResolversParentTypes['GraphQLEPDBase'],
+> = {
+  ap?: Resolver<Maybe<ResolversTypes['GraphQLImpactCategories']>, ParentType, ContextType>
+  comment?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+  conversions?: Resolver<Array<ResolversTypes['GraphQLConversion']>, ParentType, ContextType>
+  declaredUnit?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+  ep?: Resolver<Maybe<ResolversTypes['GraphQLImpactCategories']>, ParentType, ContextType>
+  gwp?: Resolver<Maybe<ResolversTypes['GraphQLImpactCategories']>, ParentType, ContextType>
+  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+  location?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+  odp?: Resolver<Maybe<ResolversTypes['GraphQLImpactCategories']>, ParentType, ContextType>
+  penre?: Resolver<Maybe<ResolversTypes['GraphQLImpactCategories']>, ParentType, ContextType>
+  pere?: Resolver<Maybe<ResolversTypes['GraphQLImpactCategories']>, ParentType, ContextType>
+  pocp?: Resolver<Maybe<ResolversTypes['GraphQLImpactCategories']>, ParentType, ContextType>
+  publishedDate?: Resolver<ResolversTypes['Date'], ParentType, ContextType>
+  referenceServiceLife?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>
+  source?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+  subtype?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+  validUntil?: Resolver<ResolversTypes['Date'], ParentType, ContextType>
   version?: Resolver<ResolversTypes['String'], ParentType, ContextType>
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
@@ -1466,6 +1505,28 @@ export type GraphQlepdEdgeResolvers<
 > = {
   cursor?: Resolver<ResolversTypes['String'], ParentType, ContextType>
   node?: Resolver<ResolversTypes['GraphQLEPD'], ParentType, ContextType>
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type GraphQlImpactCategoriesResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes['GraphQLImpactCategories'] = ResolversParentTypes['GraphQLImpactCategories'],
+> = {
+  a1a3?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>
+  a4?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>
+  a5?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>
+  b1?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>
+  b2?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>
+  b3?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>
+  b4?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>
+  b5?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>
+  b6?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>
+  b7?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>
+  c1?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>
+  c2?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>
+  c3?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>
+  c4?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>
+  d?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
@@ -1504,35 +1565,27 @@ export type GraphQlProjectEpdResolvers<
   ContextType = any,
   ParentType extends ResolversParentTypes['GraphQLProjectEPD'] = ResolversParentTypes['GraphQLProjectEPD'],
 > = {
-  ap?: Resolver<ResolversTypes['Float'], ParentType, ContextType, RequireFields<GraphQlProjectEpdApArgs, 'phases'>>
-  apByPhases?: Resolver<ResolversTypes['JSON'], ParentType, ContextType>
+  ap?: Resolver<Maybe<ResolversTypes['GraphQLImpactCategories']>, ParentType, ContextType>
   assemblies?: Resolver<Maybe<Array<ResolversTypes['GraphQLAssembly']>>, ParentType, ContextType>
-  category?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-  dateUpdated?: Resolver<ResolversTypes['Date'], ParentType, ContextType>
-  ep?: Resolver<ResolversTypes['Float'], ParentType, ContextType, RequireFields<GraphQlProjectEpdEpArgs, 'phases'>>
-  epByPhases?: Resolver<ResolversTypes['JSON'], ParentType, ContextType>
-  expirationDate?: Resolver<ResolversTypes['Date'], ParentType, ContextType>
-  gwp?: Resolver<ResolversTypes['Float'], ParentType, ContextType, RequireFields<GraphQlProjectEpdGwpArgs, 'phases'>>
-  gwpByPhases?: Resolver<ResolversTypes['JSON'], ParentType, ContextType>
+  comment?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+  conversions?: Resolver<Array<ResolversTypes['GraphQLConversion']>, ParentType, ContextType>
+  declaredUnit?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+  ep?: Resolver<Maybe<ResolversTypes['GraphQLImpactCategories']>, ParentType, ContextType>
+  gwp?: Resolver<Maybe<ResolversTypes['GraphQLImpactCategories']>, ParentType, ContextType>
   id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-  kgPerM2?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>
-  kgPerM3?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>
+  location?: Resolver<ResolversTypes['String'], ParentType, ContextType>
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-  odp?: Resolver<ResolversTypes['Float'], ParentType, ContextType, RequireFields<GraphQlProjectEpdOdpArgs, 'phases'>>
-  odpByPhases?: Resolver<ResolversTypes['JSON'], ParentType, ContextType>
+  odp?: Resolver<Maybe<ResolversTypes['GraphQLImpactCategories']>, ParentType, ContextType>
   originId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-  owner?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-  penreByPhases?: Resolver<ResolversTypes['JSON'], ParentType, ContextType>
-  pereByPhases?: Resolver<ResolversTypes['JSON'], ParentType, ContextType>
-  pocp?: Resolver<ResolversTypes['Float'], ParentType, ContextType, RequireFields<GraphQlProjectEpdPocpArgs, 'phases'>>
-  pocpByPhases?: Resolver<ResolversTypes['JSON'], ParentType, ContextType>
+  penre?: Resolver<Maybe<ResolversTypes['GraphQLImpactCategories']>, ParentType, ContextType>
+  pere?: Resolver<Maybe<ResolversTypes['GraphQLImpactCategories']>, ParentType, ContextType>
+  pocp?: Resolver<Maybe<ResolversTypes['GraphQLImpactCategories']>, ParentType, ContextType>
   projectId?: Resolver<ResolversTypes['ID'], ParentType, ContextType>
-  region?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+  publishedDate?: Resolver<ResolversTypes['Date'], ParentType, ContextType>
+  referenceServiceLife?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>
   source?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-  sourceData?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-  thickness?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>
-  type?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-  unit?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+  subtype?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+  validUntil?: Resolver<ResolversTypes['Date'], ParentType, ContextType>
   version?: Resolver<ResolversTypes['String'], ParentType, ContextType>
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
@@ -1784,11 +1837,11 @@ export type MutationResolvers<
       | 'stages'
     >
   >
-  addProjectEpd?: Resolver<
-    ResolversTypes['GraphQLProjectEPD'],
+  addProjectEpds?: Resolver<
+    Array<ResolversTypes['GraphQLProjectEPD']>,
     ParentType,
     ContextType,
-    RequireFields<MutationAddProjectEpdArgs, 'originId' | 'projectId'>
+    RequireFields<MutationAddProjectEpdsArgs, 'epdIds' | 'projectId'>
   >
   addProjectGroup?: Resolver<
     ResolversTypes['GraphQLProjectGroup'],
@@ -1853,7 +1906,7 @@ export type MutationResolvers<
     ContextType,
     RequireFields<
       MutationAddSchemaElementFromSourceArgs,
-      'objectIds' | 'quantities' | 'schemaCategoryId' | 'sourceId' | 'units'
+      'objectIds' | 'quantities' | 'schemaCategoryIds' | 'sourceId' | 'units'
     >
   >
   addSchemaTemplate?: Resolver<
@@ -1992,12 +2045,6 @@ export type MutationResolvers<
       MutationUpdateProjectArgs,
       'address' | 'city' | 'client' | 'country' | 'domain' | 'file' | 'id' | 'metaFields' | 'name' | 'projectId'
     >
-  >
-  updateProjectEpd?: Resolver<
-    ResolversTypes['GraphQLProjectEPD'],
-    ParentType,
-    ContextType,
-    RequireFields<MutationUpdateProjectEpdArgs, 'id' | 'kgPerM2' | 'kgPerM3' | 'thickness'>
   >
   updateProjectGroup?: Resolver<
     ResolversTypes['GraphQLProjectGroup'],
@@ -2186,9 +2233,12 @@ export type Resolvers<ContextType = any> = {
   GraphQLAssemblyLayer?: GraphQlAssemblyLayerResolvers<ContextType>
   GraphQLComment?: GraphQlCommentResolvers<ContextType>
   GraphQLCommit?: GraphQlCommitResolvers<ContextType>
+  GraphQLConversion?: GraphQlConversionResolvers<ContextType>
   GraphQLEPD?: GraphQlepdResolvers<ContextType>
+  GraphQLEPDBase?: GraphQlepdBaseResolvers<ContextType>
   GraphQLEPDConnection?: GraphQlepdConnectionResolvers<ContextType>
   GraphQLEPDEdge?: GraphQlepdEdgeResolvers<ContextType>
+  GraphQLImpactCategories?: GraphQlImpactCategoriesResolvers<ContextType>
   GraphQLLifeCycleStage?: GraphQlLifeCycleStageResolvers<ContextType>
   GraphQLProject?: GraphQlProjectResolvers<ContextType>
   GraphQLProjectEPD?: GraphQlProjectEpdResolvers<ContextType>
@@ -2676,7 +2726,7 @@ export type GetAccountQuery = {
 }
 
 export type AddSchemaElementFromSourceMutationVariables = Exact<{
-  schemaCategoryId: Scalars['String']
+  schemaCategoryIds: Array<Scalars['String']> | Scalars['String']
   sourceId: Scalars['String']
   objectIds: Array<Scalars['String']> | Scalars['String']
   quantities?: InputMaybe<Array<Scalars['Float']> | Scalars['Float']>
@@ -4369,14 +4419,14 @@ export type GetAccountLazyQueryHookResult = ReturnType<typeof useGetAccountLazyQ
 export type GetAccountQueryResult = Apollo.QueryResult<GetAccountQuery, GetAccountQueryVariables>
 export const AddSchemaElementFromSourceDocument = gql`
   mutation addSchemaElementFromSource(
-    $schemaCategoryId: String!
+    $schemaCategoryIds: [String!]!
     $sourceId: String!
     $objectIds: [String!]!
     $quantities: [Float!]
     $units: [Unit!]
   ) {
     addSchemaElementFromSource(
-      schemaCategoryId: $schemaCategoryId
+      schemaCategoryIds: $schemaCategoryIds
       sourceId: $sourceId
       objectIds: $objectIds
       quantities: $quantities
@@ -4413,7 +4463,7 @@ export type AddSchemaElementFromSourceMutationFn = Apollo.MutationFunction<
  * @example
  * const [addSchemaElementFromSourceMutation, { data, loading, error }] = useAddSchemaElementFromSourceMutation({
  *   variables: {
- *      schemaCategoryId: // value for 'schemaCategoryId'
+ *      schemaCategoryIds: // value for 'schemaCategoryIds'
  *      sourceId: // value for 'sourceId'
  *      objectIds: // value for 'objectIds'
  *      quantities: // value for 'quantities'

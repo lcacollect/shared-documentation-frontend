@@ -466,14 +466,14 @@ query getAccount {
 }
 
 mutation addSchemaElementFromSource(
-  $schemaCategoryId: String!
+  $schemaCategoryIds: [String!]!
   $sourceId: String!
   $objectIds: [String!]!
   $quantities: [Float!]
   $units: [Unit!]
 ) {
   addSchemaElementFromSource(
-    schemaCategoryId: $schemaCategoryId
+    schemaCategoryIds: $schemaCategoryIds
     sourceId: $sourceId
     objectIds: $objectIds
     quantities: $quantities

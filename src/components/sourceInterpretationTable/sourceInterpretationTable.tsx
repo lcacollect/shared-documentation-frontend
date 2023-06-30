@@ -56,6 +56,12 @@ export const SourceInterpretationTable = () => {
   const columns: GridColumns = [
     { field: 'name', headerName: 'Source', flex: 1 },
     {
+      field: 'id',
+      headerName: 'Id',
+      flex: 0.5,
+      renderCell: ParameterCell,
+    },
+    {
       field: 'interpretationName',
       headerName: 'Name',
       flex: 1,
@@ -67,6 +73,7 @@ export const SourceInterpretationTable = () => {
       flex: 1,
       renderCell: ParameterCell,
     },
+    { field: 'typeCode', headerName: 'Type Code', flex: 1, renderCell: ParameterCell },
     { field: Unit.M, headerName: 'm', flex: 1, renderCell: ParameterCell },
     { field: Unit.M2, headerName: 'm²', flex: 1, renderCell: ParameterCell },
     { field: Unit.M3, headerName: 'm³', flex: 1, renderCell: ParameterCell },

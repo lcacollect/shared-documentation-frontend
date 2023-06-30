@@ -34,8 +34,10 @@ export const SourceInterpretationDialog = (props: InterpretationSelectionDialogP
   const { openDialog, handleDialogClose, editRow, setEditRow, setSourceId } = props
 
   const initialParameterOptions = [
+    { value: 'id', label: 'Id' },
     { value: 'interpretationName', label: 'Name' },
     { value: 'description', label: 'Description' },
+    { value: 'typeCode', label: 'Type Code' },
     { value: Unit.M, label: 'm' },
     { value: Unit.M2, label: 'm²' },
     { value: Unit.M3, label: 'm³' },

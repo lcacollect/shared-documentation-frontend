@@ -24,6 +24,8 @@ import {
   useAddSchemaElementFromSourceMutation,
   useGetProjectSourceDataQuery,
   GraphQlSchemaCategory,
+  useGetProjectSchemasWithCategoriesQuery,
+  GetSchemaElementsDocument,
 } from '../../dataAccess'
 import { NestedCategory } from '../buildingComponentAccordions'
 import { ElementsFromSourceSelectionTable } from '../elementsFromSourceSelectionTable'
@@ -65,6 +67,14 @@ export const AddElementsFromSourceDialog = ({
   const [categoryId, setCategoryId] = useState<string>('')
 
   const [addSchemaElementFromSourceMutation] = useAddSchemaElementFromSourceMutation()
+
+  const {
+    data: categoryData,
+    loading: categoryLoading,
+    error: categoryError,
+  } = useGetProjectSchemasWithCategoriesQuery({
+    variables: { projectId },
+  })
 
   const {
     data: sourceFilesData,
@@ -120,12 +130,25 @@ export const AddElementsFromSourceDialog = ({
 
     const schemaCategoryId = Array.isArray(category) ? categoryId : Object.keys(category.children)[0]
     const sourceId = selectedSource?.id
+    let schemaCategoryIds: string[] = []
 
-    if (!schemaCategoryId) {
+    const hasTypeCodes = selectedInterpretationRows.every((row) => row['Type Code'])
+
+    if (!schemaCategoryId && !hasTypeCodes) {
       setSnackbar({ children: 'Please select category!', severity: 'warning' })
       return
+    } else if (!schemaCategoryId && hasTypeCodes) {
+      const categories = categoryData?.reportingSchemas[0] ? categoryData?.reportingSchemas[0].categories : null
+      schemaCategoryIds = selectedInterpretationRows.map(
+        (row) => categories?.find((category) => category.name.startsWith(row['Type Code'] as string))?.id as string,
+      )
+      if (!schemaCategoryIds.every((row) => row)) {
+        setSnackbar({ children: 'Some Type Codes are invalid. Please correct', severity: 'error' })
+        return
+      }
+    } else {
+      schemaCategoryIds = selectedInterpretationRows.map(() => schemaCategoryId)
     }
-
     if (!sourceId) {
       console.log('sourceId is falsy | value is:', sourceId)
       return
@@ -135,12 +158,15 @@ export const AddElementsFromSourceDialog = ({
 
     const { errors } = await addSchemaElementFromSourceMutation({
       variables: {
-        schemaCategoryId: schemaCategoryId,
+        schemaCategoryIds: schemaCategoryIds,
         sourceId: sourceId,
         objectIds: objectIds,
         quantities: quantities,
         units: units,
       },
+      refetchQueries: [
+        { query: GetSchemaElementsDocument, variables: { schemaCategoryIds: [...new Set(schemaCategoryIds)] } },
+      ],
     })
     if (errors) {
       errors.forEach((error) => {
@@ -154,6 +180,7 @@ export const AddElementsFromSourceDialog = ({
   }
 
   const handleFormIncomplete = () => {
+    console.log('Add rows from the source')
     setSnackbar({ children: 'Add rows from the source', severity: 'warning' })
   }
 
@@ -205,7 +232,7 @@ export const AddElementsFromSourceDialog = ({
         data-testid={'elementFromSourceDialog'}
       >
         <DialogContent>
-          <DataFetchWrapper error={error} loading={loading}>
+          <DataFetchWrapper error={error || categoryError} loading={loading || categoryLoading}>
             {selectedSourceFile ? (
               <>
                 <Grid container spacing={2} justifyContent='center' alignItems='center'>
@@ -248,7 +275,7 @@ export const AddElementsFromSourceDialog = ({
                         <Typography>
                           Add a{' '}
                           <Link sx={{ cursor: 'pointer' }} onClick={() => navigate('../sources')}>
-                            source interepretation
+                            source interpretation
                           </Link>{' '}
                           for <i>{selectedSource?.name}</i> to allow adding elements
                         </Typography>
@@ -278,7 +305,10 @@ export const AddElementsFromSourceDialog = ({
                         />
                       ) : (
                         <FormControl fullWidth>
-                          <InputLabel id='category'>Select Category</InputLabel>
+                          <InputLabel id='category'>
+                            Select Category - If no category is selected and then the elements will be sorted by Type
+                            Code
+                          </InputLabel>
                           <Select
                             labelId='category'
                             value={categoryId}
@@ -345,7 +375,9 @@ export const AddElementsFromSourceDialog = ({
           <LcaButton onClick={handleCancel}>
             <Typography>Cancel</Typography>
           </LcaButton>
-          <LcaButton onClick={() => (selectedInterpretationRows.length ? handleAdd() : handleFormIncomplete())}>
+          <LcaButton
+            onClick={async () => (selectedInterpretationRows.length ? await handleAdd() : handleFormIncomplete())}
+          >
             <Typography>Done</Typography>
           </LcaButton>
         </DialogActions>

@@ -560,7 +560,6 @@ const ElementToolbar = ({ handleAddRow, handleOpenMultipleElementsDialog }: Elem
           sx={{ color }}
           data-testid='addMultipleSourceElementsButton'
         >
-          {/* TODO - rotate 180 degrees */}
           <ControlPointDuplicateOutlinedIcon />
         </IconButton>
       </Tooltip>

@@ -136,9 +136,9 @@ export const SourceDialog: React.FC<SelectionDialogProps> = (props) => {
 
   const downloadTemplate = () => {
     const rows = [
-      ['Name', 'Description', 'm', 'm2', 'm3', 'kg', 'pcs'],
-      ['Test', 'Some text', '', '1', '', '', ''],
-      ['Test2', 'Some text2', '2', '1', '1', '1', '1'],
+      ['Id', 'Name', 'Description', 'Type Code', 'm', 'm2', 'm3', 'kg', 'pcs'],
+      ['2781f8dc-aea7-409b-9c36-c6f33551a5b4', 'Test', 'Some text', '103', '', '1', '', '', ''],
+      ['b918aac2-b2d1-4762-976c-09cccb682259', 'Test2', 'Some text2', '205', '2', '1', '1', '1', '1'],
     ]
 
     const csvContent = 'data:text/csv;charset=utf-8,' + rows.map((e) => e.join(',')).join('\n')
@@ -146,7 +146,7 @@ export const SourceDialog: React.FC<SelectionDialogProps> = (props) => {
     const link = document.createElement('a')
 
     link.setAttribute('href', encodedUri)
-    link.setAttribute('download', 'lca_template.csv')
+    link.setAttribute('download', 'LCAcollect - Source Template.csv')
     document.body.appendChild(link)
     link.click()
 
