@@ -11,3 +11,13 @@ export const sourcesPageMock: MockedResponse[] = [
     result: getProjectSourcesResponse,
   },
 ]
+
+export const emptySourcesPageMock: MockedResponse[] = [
+  {
+    request: {
+      query: GetProjectSourcesDocument,
+      variables: { projectId: '741dfc36-23fa-4582-8746-1879fddab9c7' },
+    },
+    result: {},
+  },
+]

@@ -3,20 +3,24 @@ import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { SourceTable } from './sourceTable'
 import { MockedProvider } from '@apollo/client/testing'
-import { sourcesPageMock } from '../../__mocks__'
+import { emptySourcesPageMock, sourcesPageMock } from '../../__mocks__'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 
 describe('Source Table', () => {
   it('should render no rows', async () => {
     const { baseElement } = render(
-      <MockedProvider>
-        <SourceTable />
-      </MockedProvider>,
+      <MemoryRouter initialEntries={['/projects/741dfc36-23fa-4582-8746-1879fddab9c7/sources']}>
+        <MockedProvider mocks={emptySourcesPageMock}>
+          <Routes>
+            <Route path={'/projects/:projectId/sources'} element={<SourceTable />} />
+          </Routes>
+        </MockedProvider>
+      </MemoryRouter>,
     )
 
     expect(baseElement).toBeDefined()
     expect(screen.getByTestId('sources-table')).toBeInTheDocument()
-    expect(screen.getByText('No sources added')).toBeInTheDocument()
+    expect(await screen.findByText('No sources added')).toBeInTheDocument()
   })
 
   it('should render rows', async () => {
