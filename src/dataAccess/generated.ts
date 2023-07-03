@@ -360,7 +360,7 @@ export type GraphQlSchemaCategory = {
   depth: Scalars['Int']
   description?: Maybe<Scalars['String']>
   elements?: Maybe<Array<GraphQlSchemaElement>>
-  id: Scalars['String']
+  id: Scalars['ID']
   name: Scalars['String']
   path: Scalars['String']
   reportingSchema: GraphQlReportingSchema
@@ -1688,7 +1688,7 @@ export type GraphQlSchemaCategoryResolvers<
   depth?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
   description?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
   elements?: Resolver<Maybe<Array<ResolversTypes['GraphQLSchemaElement']>>, ParentType, ContextType>
-  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
   path?: Resolver<ResolversTypes['String'], ParentType, ContextType>
   reportingSchema?: Resolver<ResolversTypes['GraphQLReportingSchema'], ParentType, ContextType>
@@ -2367,7 +2367,7 @@ export type GetSchemaElementsQuery = {
     unit: Unit
     description?: string | null
     assembly?: { __typename?: 'GraphQLAssembly'; id: string } | null
-    schemaCategory: { __typename?: 'GraphQLSchemaCategory'; name: string; path: string; categoryId: string }
+    schemaCategory: { __typename?: 'GraphQLSchemaCategory'; id: string; name: string; path: string }
     source?: { __typename?: 'GraphQLProjectSource'; name: string; type: ProjectSourceType } | null
   }>
 }
@@ -2565,8 +2565,8 @@ export type GetTasksQuery = {
     authorId: string
     status: TaskStatus
     item:
-      | { __typename: 'GraphQLSchemaCategory'; name: string; categoryId: string }
-      | { __typename: 'GraphQLSchemaElement'; name: string; elementId: string }
+      | { __typename: 'GraphQLSchemaCategory'; id: string; name: string }
+      | { __typename: 'GraphQLSchemaElement'; id: string; name: string }
   }>
 }
 
@@ -2587,8 +2587,8 @@ export type GetTasksForTasksPageQuery = {
       | { __typename: 'GraphQLProjectGroup'; name: string; id: string }
       | { __typename: 'GraphQLProjectMember'; name: string; id: string }
     item:
-      | { __typename: 'GraphQLSchemaCategory'; name: string; categoryId: string }
-      | { __typename: 'GraphQLSchemaElement'; name: string; elementId: string }
+      | { __typename: 'GraphQLSchemaCategory'; id: string; name: string }
+      | { __typename: 'GraphQLSchemaElement'; id: string; name: string }
     comments?: Array<{ __typename?: 'GraphQLComment'; id: string }> | null
   }>
 }
@@ -2645,8 +2645,8 @@ export type GetSingleTaskQuery = {
       | { __typename: 'GraphQLProjectGroup'; name: string; id: string }
       | { __typename: 'GraphQLProjectMember'; name: string; id: string }
     item:
-      | { __typename: 'GraphQLSchemaCategory'; name: string; categoryId: string }
-      | { __typename: 'GraphQLSchemaElement'; name: string; elementId: string }
+      | { __typename: 'GraphQLSchemaCategory'; id: string; name: string }
+      | { __typename: 'GraphQLSchemaElement'; id: string; name: string }
   }>
 }
 
@@ -3107,7 +3107,7 @@ export const GetSchemaElementsDocument = gql`
         id
       }
       schemaCategory {
-        categoryId: id
+        id
         name
         path
       }
@@ -3797,12 +3797,12 @@ export const GetTasksDocument = gql`
       item {
         ... on GraphQLSchemaCategory {
           __typename
-          categoryId: id
+          id
           name
         }
         ... on GraphQLSchemaElement {
           __typename
-          elementId: id
+          id
           name
         }
       }
@@ -3863,12 +3863,12 @@ export const GetTasksForTasksPageDocument = gql`
       item {
         ... on GraphQLSchemaCategory {
           __typename
-          categoryId: id
+          id
           name
         }
         ... on GraphQLSchemaElement {
           __typename
-          elementId: id
+          id
           name
         }
       }
@@ -4096,12 +4096,12 @@ export const GetSingleTaskDocument = gql`
       item {
         ... on GraphQLSchemaCategory {
           __typename
-          categoryId: id
+          id
           name
         }
         ... on GraphQLSchemaElement {
           __typename
-          elementId: id
+          id
           name
         }
       }

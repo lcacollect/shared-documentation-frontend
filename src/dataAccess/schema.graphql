@@ -94,7 +94,7 @@ query getSchemaElements($schemaCategoryIds: [String!]!) {
       id
     }
     schemaCategory {
-      categoryId: id
+      id
       name
       path
     }
@@ -261,12 +261,12 @@ query getTasks($reportingSchemaId: String!) {
     item {
       ... on GraphQLSchemaCategory {
         __typename
-        categoryId: id
+        id
         name
       }
       ... on GraphQLSchemaElement {
         __typename
-        elementId: id
+        id
         name
       }
     }
@@ -298,12 +298,12 @@ query getTasksForTasksPage($reportingSchemaId: String!) {
     item {
       ... on GraphQLSchemaCategory {
         __typename
-        categoryId: id
+        id
         name
       }
       ... on GraphQLSchemaElement {
         __typename
-        elementId: id
+        id
         name
       }
     }
@@ -390,12 +390,12 @@ query getSingleTask($reportingSchemaId: String!, $taskId: String!) {
     item {
       ... on GraphQLSchemaCategory {
         __typename
-        categoryId: id
+        id
         name
       }
       ... on GraphQLSchemaElement {
         __typename
-        elementId: id
+        id
         name
       }
     }
