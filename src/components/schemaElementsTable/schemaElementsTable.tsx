@@ -35,6 +35,7 @@ import {
   useDeleteSchemaElementMutation,
   useUpdateSchemaElementMutation,
   useGetProjectSourceDataQuery,
+  useGetAssembliesQuery,
 } from '../../dataAccess'
 import { AddElementsFromSourceDialog } from '../addElementFromSourceDialog'
 import { NestedCategory } from '../buildingComponentAccordions'
@@ -113,6 +114,12 @@ export const SchemaElementsTable = (props: SchemaElementsTableProps) => {
   const handleAddSource = () => {
     setOpenSourceDialog(true)
   }
+
+  const { data: assemblyData } = useGetAssembliesQuery({
+    variables: { projectId: projectId as string },
+    skip: !projectId,
+  })
+  const assemblies = assemblyData?.assemblies
 
   const { data: sourceData } = useGetProjectSourceDataQuery({
     variables: { projectId: projectId as string },
@@ -219,6 +226,7 @@ export const SchemaElementsTable = (props: SchemaElementsTableProps) => {
         quantity: newRow.quantity,
         unit: newRow.unit,
         description: newRow.description as string,
+        assemblyId: newRow.assemblyId,
       },
     })
     if (errors) {
@@ -364,6 +372,17 @@ export const SchemaElementsTable = (props: SchemaElementsTableProps) => {
       editable: true,
       type: 'string',
       renderEditCell: (params) => <EditTextArea {...params} />,
+    },
+    {
+      field: 'assemblyId',
+      headerName: 'Assembly',
+      flex: 2.0,
+      editable: true,
+      type: 'singleSelect',
+      valueOptions: assemblies?.map((assembly) => ({ value: assembly.id, label: assembly.name })),
+      valueFormatter: (params) => {
+        return assemblies?.find((assembly) => assembly.id === params.value)?.name
+      },
     },
     {
       field: 'actions',
