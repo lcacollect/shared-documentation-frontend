@@ -7,8 +7,8 @@ import Settings from '@mui/icons-material/Settings'
 import StartOutlinedIcon from '@mui/icons-material/StartOutlined'
 import SwapHorizOutlinedIcon from '@mui/icons-material/SwapHorizOutlined'
 import ForestOutlinedIcon from '@mui/icons-material/ForestOutlined'
+import MediationOutlinedIcon from '@mui/icons-material/MediationOutlined'
 import { useParams } from 'react-router-dom'
-import React from 'react'
 
 export const DocumentationSideMenu = () => {
   const { projectId } = useParams()
@@ -28,6 +28,11 @@ export const DocumentationSideMenu = () => {
       icon: <Settings sx={{ color: theme.palette.common.black }} />,
       link: `/projects/${projectId}/settings`,
       title: 'Settings',
+    },
+    {
+      icon: <MediationOutlinedIcon sx={{ color: theme.palette.common.black }} />,
+      link: `/projects/${projectId}/assemlies`,
+      title: 'Aseemblies',
     },
     {
       icon: <StartOutlinedIcon sx={{ color: theme.palette.common.black }} />,
