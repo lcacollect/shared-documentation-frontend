@@ -104,6 +104,7 @@ export type GraphQlAssembly = {
   lifeTime: Scalars['Float']
   metaFields: Scalars['JSON']
   name: Scalars['String']
+  projectId: Scalars['String']
   unit: Scalars['String']
 }
 
@@ -1379,6 +1380,7 @@ export type GraphQlAssemblyResolvers<
   lifeTime?: Resolver<ResolversTypes['Float'], ParentType, ContextType>
   metaFields?: Resolver<ResolversTypes['JSON'], ParentType, ContextType>
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+  projectId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
   unit?: Resolver<ResolversTypes['String'], ParentType, ContextType>
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
@@ -2366,7 +2368,8 @@ export type GetSchemaElementsQuery = {
     quantity: number
     unit: Unit
     description?: string | null
-    assembly?: { __typename?: 'GraphQLAssembly'; id: string } | null
+    assemblyId?: string | null
+    assembly?: { __typename?: 'GraphQLAssembly'; id: string; name: string } | null
     schemaCategory: { __typename?: 'GraphQLSchemaCategory'; id: string; name: string; path: string }
     source?: { __typename?: 'GraphQLProjectSource'; name: string; type: ProjectSourceType } | null
   }>
@@ -2378,6 +2381,7 @@ export type AddSchemaElementMutationVariables = Exact<{
   quantity: Scalars['Float']
   unit: Unit
   description: Scalars['String']
+  assemblyId?: InputMaybe<Scalars['String']>
 }>
 
 export type AddSchemaElementMutation = {
@@ -2425,6 +2429,7 @@ export type UpdateSchemaElementMutationVariables = Exact<{
   quantity?: InputMaybe<Scalars['Float']>
   unit?: InputMaybe<Unit>
   description?: InputMaybe<Scalars['String']>
+  assemblyId?: InputMaybe<Scalars['String']>
 }>
 
 export type UpdateSchemaElementMutation = {
@@ -2743,6 +2748,15 @@ export type AddSchemaElementFromSourceMutation = {
     source?: { __typename?: 'GraphQLProjectSource'; id: string; dataId: string } | null
     schemaCategory: { __typename?: 'GraphQLSchemaCategory'; id: string }
   }>
+}
+
+export type GetAssembliesQueryVariables = Exact<{
+  projectId: Scalars['String']
+}>
+
+export type GetAssembliesQuery = {
+  __typename?: 'Query'
+  assemblies: Array<{ __typename?: 'GraphQLAssembly'; id: string; name: string }>
 }
 
 export const GetSchemaTemplatesDocument = gql`
@@ -3103,8 +3117,10 @@ export const GetSchemaElementsDocument = gql`
       quantity
       unit
       description
+      assemblyId
       assembly {
         id
+        name
       }
       schemaCategory {
         id
@@ -3160,6 +3176,7 @@ export const AddSchemaElementDocument = gql`
     $quantity: Float!
     $unit: Unit!
     $description: String!
+    $assemblyId: String
   ) {
     addSchemaElement(
       schemaCategoryId: $schemaCategoryId
@@ -3167,6 +3184,7 @@ export const AddSchemaElementDocument = gql`
       quantity: $quantity
       unit: $unit
       description: $description
+      assemblyId: $assemblyId
     ) {
       id
       name
@@ -3203,6 +3221,7 @@ export type AddSchemaElementMutationFn = Apollo.MutationFunction<
  *      quantity: // value for 'quantity'
  *      unit: // value for 'unit'
  *      description: // value for 'description'
+ *      assemblyId: // value for 'assemblyId'
  *   },
  * });
  */
@@ -3289,6 +3308,7 @@ export const UpdateSchemaElementDocument = gql`
     $quantity: Float
     $unit: Unit
     $description: String
+    $assemblyId: String
   ) {
     updateSchemaElement(
       id: $id
@@ -3297,6 +3317,7 @@ export const UpdateSchemaElementDocument = gql`
       quantity: $quantity
       unit: $unit
       description: $description
+      assemblyId: $assemblyId
     ) {
       id
       schemaCategory {
@@ -3330,6 +3351,7 @@ export type UpdateSchemaElementMutationFn = Apollo.MutationFunction<
  *      quantity: // value for 'quantity'
  *      unit: // value for 'unit'
  *      description: // value for 'description'
+ *      assemblyId: // value for 'assemblyId'
  *   },
  * });
  */
@@ -4489,3 +4511,43 @@ export type AddSchemaElementFromSourceMutationOptions = Apollo.BaseMutationOptio
   AddSchemaElementFromSourceMutation,
   AddSchemaElementFromSourceMutationVariables
 >
+export const GetAssembliesDocument = gql`
+  query getAssemblies($projectId: String!) {
+    assemblies(projectId: $projectId) {
+      id
+      name
+    }
+  }
+`
+
+/**
+ * __useGetAssembliesQuery__
+ *
+ * To run a query within a React component, call `useGetAssembliesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetAssembliesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetAssembliesQuery({
+ *   variables: {
+ *      projectId: // value for 'projectId'
+ *   },
+ * });
+ */
+export function useGetAssembliesQuery(
+  baseOptions: Apollo.QueryHookOptions<GetAssembliesQuery, GetAssembliesQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useQuery<GetAssembliesQuery, GetAssembliesQueryVariables>(GetAssembliesDocument, options)
+}
+export function useGetAssembliesLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<GetAssembliesQuery, GetAssembliesQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useLazyQuery<GetAssembliesQuery, GetAssembliesQueryVariables>(GetAssembliesDocument, options)
+}
+export type GetAssembliesQueryHookResult = ReturnType<typeof useGetAssembliesQuery>
+export type GetAssembliesLazyQueryHookResult = ReturnType<typeof useGetAssembliesLazyQuery>
+export type GetAssembliesQueryResult = Apollo.QueryResult<GetAssembliesQuery, GetAssembliesQueryVariables>
