@@ -31,8 +31,8 @@ export const DocumentationSideMenu = () => {
     },
     {
       icon: <MediationOutlinedIcon sx={{ color: theme.palette.common.black }} />,
-      link: `/projects/${projectId}/assemlies`,
-      title: 'Aseemblies',
+      link: `/projects/${projectId}/assemblies`,
+      title: 'Assemblies',
     },
     {
       icon: <StartOutlinedIcon sx={{ color: theme.palette.common.black }} />,
