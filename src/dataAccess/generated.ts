@@ -31,16 +31,28 @@ export type AssemblyLayerDeleteInput = {
 
 export type AssemblyLayerInput = {
   conversionFactor?: InputMaybe<Scalars['Float']>
+  description?: InputMaybe<Scalars['String']>
   epdId: Scalars['String']
   id?: InputMaybe<Scalars['String']>
   name?: InputMaybe<Scalars['String']>
+  referenceServiceLife?: InputMaybe<Scalars['Int']>
 }
 
 export type AssemblyLayerUpdateInput = {
   conversionFactor?: InputMaybe<Scalars['Float']>
+  description?: InputMaybe<Scalars['String']>
   epdId?: InputMaybe<Scalars['String']>
   id: Scalars['String']
   name?: InputMaybe<Scalars['String']>
+  referenceServiceLife?: InputMaybe<Scalars['Int']>
+}
+
+export enum AssemblyUnit {
+  Kg = 'kg',
+  M = 'm',
+  M2 = 'm2',
+  M3 = 'm3',
+  Pcs = 'pcs',
 }
 
 export enum AssigneeType {
@@ -95,17 +107,17 @@ export type FilterOptions = {
 
 export type GraphQlAssembly = {
   __typename?: 'GraphQLAssembly'
-  category: Scalars['String']
+  category?: Maybe<Scalars['String']>
   conversionFactor: Scalars['Float']
-  description: Scalars['String']
+  description?: Maybe<Scalars['String']>
   gwp: Scalars['Float']
   id: Scalars['String']
-  layers: Array<GraphQlAssemblyLayer>
+  layers?: Maybe<Array<GraphQlAssemblyLayer>>
   lifeTime: Scalars['Float']
-  metaFields: Scalars['JSON']
+  metaFields?: Maybe<Scalars['JSON']>
   name: Scalars['String']
   projectId: Scalars['String']
-  unit: Scalars['String']
+  unit?: Maybe<AssemblyUnit>
 }
 
 export type GraphQlAssemblyGwpArgs = {
@@ -115,11 +127,12 @@ export type GraphQlAssemblyGwpArgs = {
 export type GraphQlAssemblyLayer = {
   __typename?: 'GraphQLAssemblyLayer'
   conversionFactor?: Maybe<Scalars['Float']>
+  description?: Maybe<Scalars['String']>
   epdId: Scalars['String']
   epdName: Scalars['String']
   id?: Maybe<Scalars['String']>
   name?: Maybe<Scalars['String']>
-  projectId: Scalars['ID']
+  referenceServiceLife?: Maybe<Scalars['Int']>
 }
 
 export type GraphQlAssignee = {
@@ -559,6 +572,7 @@ export type MutationAddAssemblyArgs = {
   metaFields?: InputMaybe<Scalars['JSON']>
   name: Scalars['String']
   projectId: Scalars['String']
+  unit: AssemblyUnit
 }
 
 export type MutationAddAssemblyLayersArgs = {
@@ -753,6 +767,7 @@ export type MutationUpdateAssemblyArgs = {
   lifeTime?: InputMaybe<Scalars['Float']>
   metaFields?: InputMaybe<Scalars['JSON']>
   name?: InputMaybe<Scalars['String']>
+  unit?: InputMaybe<AssemblyUnit>
 }
 
 export type MutationUpdateAssemblyLayersArgs = {
@@ -1194,7 +1209,9 @@ export type ResolversTypes = {
   String: ResolverTypeWrapper<Scalars['String']>
   AssemblyLayerInput: AssemblyLayerInput
   Float: ResolverTypeWrapper<Scalars['Float']>
+  Int: ResolverTypeWrapper<Scalars['Int']>
   AssemblyLayerUpdateInput: AssemblyLayerUpdateInput
+  AssemblyUnit: AssemblyUnit
   AssigneeType: AssigneeType
   CommentFilters: CommentFilters
   CommitFilters: CommitFilters
@@ -1206,13 +1223,12 @@ export type ResolversTypes = {
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>
   GraphQLAssembly: ResolverTypeWrapper<GraphQlAssembly>
   GraphQLAssemblyLayer: ResolverTypeWrapper<GraphQlAssemblyLayer>
-  ID: ResolverTypeWrapper<Scalars['ID']>
   GraphQLAssignee: GraphQlAssignee
   GraphQLComment: ResolverTypeWrapper<GraphQlComment>
+  ID: ResolverTypeWrapper<Scalars['ID']>
   GraphQLCommit: ResolverTypeWrapper<GraphQlCommit>
   GraphQLConversion: ResolverTypeWrapper<GraphQlConversion>
   GraphQLEPD: ResolverTypeWrapper<GraphQlepd>
-  Int: ResolverTypeWrapper<Scalars['Int']>
   GraphQLEPDBase: ResolverTypeWrapper<GraphQlepdBase>
   GraphQLEPDConnection: ResolverTypeWrapper<GraphQlepdConnection>
   GraphQLEPDEdge: ResolverTypeWrapper<GraphQlepdEdge>
@@ -1279,6 +1295,7 @@ export type ResolversParentTypes = {
   String: Scalars['String']
   AssemblyLayerInput: AssemblyLayerInput
   Float: Scalars['Float']
+  Int: Scalars['Int']
   AssemblyLayerUpdateInput: AssemblyLayerUpdateInput
   CommentFilters: CommentFilters
   CommitFilters: CommitFilters
@@ -1290,13 +1307,12 @@ export type ResolversParentTypes = {
   Boolean: Scalars['Boolean']
   GraphQLAssembly: GraphQlAssembly
   GraphQLAssemblyLayer: GraphQlAssemblyLayer
-  ID: Scalars['ID']
   GraphQLAssignee: GraphQlAssignee
   GraphQLComment: GraphQlComment
+  ID: Scalars['ID']
   GraphQLCommit: GraphQlCommit
   GraphQLConversion: GraphQlConversion
   GraphQLEPD: GraphQlepd
-  Int: Scalars['Int']
   GraphQLEPDBase: GraphQlepdBase
   GraphQLEPDConnection: GraphQlepdConnection
   GraphQLEPDEdge: GraphQlepdEdge
@@ -1371,17 +1387,17 @@ export type GraphQlAssemblyResolvers<
   ContextType = any,
   ParentType extends ResolversParentTypes['GraphQLAssembly'] = ResolversParentTypes['GraphQLAssembly'],
 > = {
-  category?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+  category?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
   conversionFactor?: Resolver<ResolversTypes['Float'], ParentType, ContextType>
-  description?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+  description?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
   gwp?: Resolver<ResolversTypes['Float'], ParentType, ContextType, RequireFields<GraphQlAssemblyGwpArgs, 'phases'>>
   id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-  layers?: Resolver<Array<ResolversTypes['GraphQLAssemblyLayer']>, ParentType, ContextType>
+  layers?: Resolver<Maybe<Array<ResolversTypes['GraphQLAssemblyLayer']>>, ParentType, ContextType>
   lifeTime?: Resolver<ResolversTypes['Float'], ParentType, ContextType>
-  metaFields?: Resolver<ResolversTypes['JSON'], ParentType, ContextType>
+  metaFields?: Resolver<Maybe<ResolversTypes['JSON']>, ParentType, ContextType>
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
   projectId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-  unit?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+  unit?: Resolver<Maybe<ResolversTypes['AssemblyUnit']>, ParentType, ContextType>
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
@@ -1390,11 +1406,12 @@ export type GraphQlAssemblyLayerResolvers<
   ParentType extends ResolversParentTypes['GraphQLAssemblyLayer'] = ResolversParentTypes['GraphQLAssemblyLayer'],
 > = {
   conversionFactor?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>
+  description?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
   epdId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
   epdName?: Resolver<ResolversTypes['String'], ParentType, ContextType>
   id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
   name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
-  projectId?: Resolver<ResolversTypes['ID'], ParentType, ContextType>
+  referenceServiceLife?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
@@ -1804,7 +1821,7 @@ export type MutationResolvers<
     ContextType,
     RequireFields<
       MutationAddAssemblyArgs,
-      'category' | 'conversionFactor' | 'lifeTime' | 'metaFields' | 'name' | 'projectId'
+      'category' | 'conversionFactor' | 'lifeTime' | 'metaFields' | 'name' | 'projectId' | 'unit'
     >
   >
   addAssemblyLayers?: Resolver<
@@ -2024,7 +2041,7 @@ export type MutationResolvers<
     ContextType,
     RequireFields<
       MutationUpdateAssemblyArgs,
-      'category' | 'conversionFactor' | 'description' | 'id' | 'lifeTime' | 'metaFields' | 'name'
+      'category' | 'conversionFactor' | 'description' | 'id' | 'lifeTime' | 'metaFields' | 'name' | 'unit'
     >
   >
   updateAssemblyLayers?: Resolver<
@@ -2369,7 +2386,27 @@ export type GetSchemaElementsQuery = {
     unit: Unit
     description?: string | null
     assemblyId?: string | null
-    assembly?: { __typename?: 'GraphQLAssembly'; id: string; name: string } | null
+    assembly?: {
+      __typename?: 'GraphQLAssembly'
+      id: string
+      name: string
+      category?: string | null
+      conversionFactor: number
+      lifeTime: number
+      unit?: AssemblyUnit | null
+      description?: string | null
+      metaFields?: any | null
+      layers?: Array<{
+        __typename?: 'GraphQLAssemblyLayer'
+        id?: string | null
+        name?: string | null
+        epdId: string
+        epdName: string
+        description?: string | null
+        conversionFactor?: number | null
+        referenceServiceLife?: number | null
+      }> | null
+    } | null
     schemaCategory: { __typename?: 'GraphQLSchemaCategory'; id: string; name: string; path: string }
     source?: { __typename?: 'GraphQLProjectSource'; name: string; type: ProjectSourceType } | null
   }>
@@ -3121,6 +3158,21 @@ export const GetSchemaElementsDocument = gql`
       assembly {
         id
         name
+        category
+        conversionFactor
+        lifeTime
+        unit
+        layers {
+          id
+          name
+          epdId
+          epdName
+          description
+          conversionFactor
+          referenceServiceLife
+        }
+        description
+        metaFields
       }
       schemaCategory {
         id

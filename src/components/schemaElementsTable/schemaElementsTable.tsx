@@ -8,6 +8,7 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
 import SaveIcon from '@mui/icons-material/Save'
 import Tooltip from '@mui/material/Tooltip'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import { Alert, AlertProps, IconButton, LinearProgress, Radio, Snackbar } from '@mui/material'
 import {
   DataGridPro,
@@ -23,7 +24,9 @@ import {
   GridToolbarContainer,
   GridToolbarFilterButton,
   GridValueFormatterParams,
+  GridRenderCellParams,
   MuiEvent,
+  GRID_DETAIL_PANEL_TOGGLE_COL_DEF,
 } from '@mui/x-data-grid-pro'
 import { ChangeEvent, Dispatch, SetStateAction, SyntheticEvent, useCallback, useEffect, useState } from 'react'
 import {
@@ -45,6 +48,7 @@ import { Task } from '../tasksTable'
 import { EditTextArea } from './multilineTextEdit'
 import { useParams } from 'react-router-dom'
 import { SourceData } from '../sourceInterpretationDialog/types'
+import { AssemblyDetail } from './assemblyDetailGrid'
 
 interface SchemaElementsTableProps {
   category: NestedCategory | GraphQlSchemaCategory[]
@@ -385,6 +389,10 @@ export const SchemaElementsTable = (props: SchemaElementsTableProps) => {
       },
     },
     {
+      ...GRID_DETAIL_PANEL_TOGGLE_COL_DEF,
+      renderCell: (params) => <CustomDetailPanelToggle id={params.row.assemblyId} value={params.value} />,
+    },
+    {
       field: 'actions',
       type: 'actions',
       headerName: 'Actions',
@@ -485,6 +493,12 @@ export const SchemaElementsTable = (props: SchemaElementsTableProps) => {
     })
   }
 
+  const getDetailPanelContent = useCallback(({ row }: GridRowParams) => {
+    return <AssemblyDetail assembly={row.assembly} />
+  }, [])
+
+  const getDetailPanelHeight = useCallback(() => 'auto', [])
+
   return (
     <div style={{ height: Array.isArray(category) ? 'auto' : 400, width: '100%' }}>
       <DataGridPro
@@ -510,6 +524,8 @@ export const SchemaElementsTable = (props: SchemaElementsTableProps) => {
         sx={{ border: 0 }}
         onProcessRowUpdateError={handleProcessRowUpdateError}
         getRowHeight={(params) => (rowModesModel[params.id]?.mode === GridRowModes.Edit ? 'auto' : null)}
+        getDetailPanelContent={getDetailPanelContent}
+        getDetailPanelHeight={getDetailPanelHeight}
       />
       {!!snackbar && (
         <Snackbar
@@ -583,5 +599,24 @@ const ElementToolbar = ({ handleAddRow, handleOpenMultipleElementsDialog }: Elem
         </IconButton>
       </Tooltip>
     </GridToolbarContainer>
+  )
+}
+
+const CustomDetailPanelToggle = (props: Pick<GridRenderCellParams, 'id' | 'value'>) => {
+  const { id, value: isExpanded } = props
+
+  return (
+    <IconButton size='small' tabIndex={-1} disabled={!id} aria-label={isExpanded ? 'Close' : 'Open'}>
+      <ExpandMoreIcon
+        sx={{
+          transform: `rotateZ(${isExpanded ? 180 : 0}deg)`,
+          transition: (theme) =>
+            theme.transitions.create('transform', {
+              duration: theme.transitions.duration.shortest,
+            }),
+        }}
+        fontSize='inherit'
+      />
+    </IconButton>
   )
 }
