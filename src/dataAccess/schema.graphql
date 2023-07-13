@@ -94,6 +94,21 @@ query getSchemaElements($schemaCategoryIds: [String!]!) {
     assembly {
       id
       name
+      category
+      conversionFactor
+      lifeTime
+      unit
+      layers {
+        id
+        name
+        epdId
+        epdName
+        description
+        conversionFactor
+        referenceServiceLife
+      }
+      description
+      metaFields
     }
     schemaCategory {
       id
