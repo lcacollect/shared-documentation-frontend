@@ -128,8 +128,8 @@ export type GraphQlAssemblyLayer = {
   __typename?: 'GraphQLAssemblyLayer'
   conversionFactor?: Maybe<Scalars['Float']>
   description?: Maybe<Scalars['String']>
+  epd: GraphQlProjectEpd
   epdId: Scalars['String']
-  epdName: Scalars['String']
   id?: Maybe<Scalars['String']>
   name?: Maybe<Scalars['String']>
   referenceServiceLife?: Maybe<Scalars['Int']>
@@ -1126,6 +1126,7 @@ export enum Unit {
 export enum ExportFormat {
   Csv = 'CSV',
   Lcabyg = 'LCABYG',
+  Lcax = 'LCAX',
 }
 
 export type TaskItem = {
@@ -1407,8 +1408,8 @@ export type GraphQlAssemblyLayerResolvers<
 > = {
   conversionFactor?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>
   description?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+  epd?: Resolver<ResolversTypes['GraphQLProjectEPD'], ParentType, ContextType>
   epdId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-  epdName?: Resolver<ResolversTypes['String'], ParentType, ContextType>
   id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
   name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
   referenceServiceLife?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>
@@ -2400,11 +2401,10 @@ export type GetSchemaElementsQuery = {
         __typename?: 'GraphQLAssemblyLayer'
         id?: string | null
         name?: string | null
-        epdId: string
-        epdName: string
         description?: string | null
         conversionFactor?: number | null
         referenceServiceLife?: number | null
+        epd: { __typename?: 'GraphQLProjectEPD'; id: string; name: string }
       }> | null
     } | null
     schemaCategory: { __typename?: 'GraphQLSchemaCategory'; id: string; name: string; path: string }
@@ -3165,8 +3165,10 @@ export const GetSchemaElementsDocument = gql`
         layers {
           id
           name
-          epdId
-          epdName
+          epd {
+            id
+            name
+          }
           description
           conversionFactor
           referenceServiceLife

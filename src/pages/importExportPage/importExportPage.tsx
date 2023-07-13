@@ -46,7 +46,7 @@ export const ImportExportPage = () => {
       }
       const downloadLink = document.createElement('a')
       const fileName = `${projectData?.projects[0].name}.${
-        exportFormat === ExportFormat.Lcabyg ? 'json' : exportFormat.toLowerCase()
+        exportFormat !== ExportFormat.Csv ? 'json' : exportFormat.toLowerCase()
       }`
 
       downloadLink.href = ('data:text/plain;base64,' + base64File?.exportReportingSchema) as string
@@ -64,6 +64,9 @@ export const ImportExportPage = () => {
         break
       case 'lcabyg':
         setExportFormat(ExportFormat.Lcabyg)
+        break
+      case 'lcax':
+        setExportFormat(ExportFormat.Lcax)
         break
       default:
         console.log('Unknown export format:', value, 'setting format to ExportFormat.Csv')
