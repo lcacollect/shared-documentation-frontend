@@ -43,11 +43,12 @@ export const AssemblyDetail = (props: AssemblyDetailProps) => {
       renderHeader: () => <strong>{'Factor'}</strong>,
     },
     {
-      field: 'epdName',
+      field: 'epd',
       sortable: false,
       flex: 2,
       type: 'string',
       renderHeader: () => <strong>{'Environmental Data'}</strong>,
+      valueFormatter: (params) => params.value.name,
     },
     {
       field: 'referenceServiceLife',
@@ -68,8 +69,8 @@ export const AssemblyDetail = (props: AssemblyDetailProps) => {
   return assembly ? (
     <>
       <Typography variant='h6' sx={{ fontSize: '1rem', marginBottom: '10px', marginTop: '20px' }}>
-        category: <b>{assembly.category}</b>&nbsp;&nbsp; description: <b>{assembly.description}</b>&nbsp;&nbsp; life
-        time: <b>{assembly.lifeTime}</b>&nbsp;&nbsp; conversion factor: <b>{assembly.conversionFactor}</b>&nbsp;&nbsp;
+        Category: <b>{assembly.category}</b>&nbsp;&nbsp; Description: <b>{assembly.description}</b>&nbsp;&nbsp; Life
+        Time: <b>{assembly.lifeTime}</b>&nbsp;&nbsp; Conversion Factor: <b>{assembly.conversionFactor}</b>&nbsp;&nbsp;
       </Typography>
       <DataGrid
         autoHeight={true}

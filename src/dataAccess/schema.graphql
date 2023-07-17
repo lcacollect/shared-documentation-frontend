@@ -101,8 +101,10 @@ query getSchemaElements($schemaCategoryIds: [String!]!) {
       layers {
         id
         name
-        epdId
-        epdName
+        epd {
+          id
+          name
+        }
         description
         conversionFactor
         referenceServiceLife
