@@ -517,7 +517,7 @@ export type Mutation = {
   /** Delete a project */
   deleteProject: Scalars['String']
   /** Delete a project EPD */
-  deleteProjectEpd: Scalars['String']
+  deleteProjectEpds: Array<Scalars['String']>
   /** Delete a project group */
   deleteProjectGroup: Scalars['String']
   /** Delete a Project Member */
@@ -554,8 +554,8 @@ export type Mutation = {
   updateReportingSchema: GraphQlReportingSchema
   /** Update a Schema Category */
   updateSchemaCategory: GraphQlSchemaCategory
-  /** Update a Schema Element */
-  updateSchemaElement: GraphQlSchemaElement
+  /** Update Schema Elements */
+  updateSchemaElements: Array<GraphQlSchemaElement>
   /** Update a Schema Template */
   updateSchemaTemplate: GraphQlSchemaTemplate
   /** Change the name of the tag or move it to a different commit. */
@@ -709,8 +709,8 @@ export type MutationDeleteProjectArgs = {
   id: Scalars['String']
 }
 
-export type MutationDeleteProjectEpdArgs = {
-  id: Scalars['String']
+export type MutationDeleteProjectEpdsArgs = {
+  ids: Array<Scalars['String']>
 }
 
 export type MutationDeleteProjectGroupArgs = {
@@ -823,15 +823,8 @@ export type MutationUpdateSchemaCategoryArgs = {
   path?: InputMaybe<Scalars['String']>
 }
 
-export type MutationUpdateSchemaElementArgs = {
-  assemblyId?: InputMaybe<Scalars['String']>
-  description?: InputMaybe<Scalars['String']>
-  id: Scalars['String']
-  name?: InputMaybe<Scalars['String']>
-  quantity?: InputMaybe<Scalars['Float']>
-  result?: InputMaybe<Scalars['JSON']>
-  schemaCategoryId?: InputMaybe<Scalars['String']>
-  unit?: InputMaybe<Unit>
+export type MutationUpdateSchemaElementsArgs = {
+  schemaElements: Array<SchemaElementUpdateInput>
 }
 
 export type MutationUpdateSchemaTemplateArgs = {
@@ -1077,6 +1070,17 @@ export type SchemaElementFilters = {
   unit?: InputMaybe<FilterOptions>
 }
 
+export type SchemaElementUpdateInput = {
+  assemblyId?: InputMaybe<Scalars['String']>
+  description?: InputMaybe<Scalars['String']>
+  id: Scalars['String']
+  name?: InputMaybe<Scalars['String']>
+  quantity?: InputMaybe<Scalars['Float']>
+  result?: InputMaybe<Scalars['JSON']>
+  schemaCategory?: InputMaybe<Scalars['String']>
+  unit?: InputMaybe<Unit>
+}
+
 export type SchemaTemplateFilters = {
   id?: InputMaybe<FilterOptions>
   name?: InputMaybe<FilterOptions>
@@ -1279,6 +1283,7 @@ export type ResolversTypes = {
   ReportingSchemaFilters: ReportingSchemaFilters
   SchemaCategoryFilters: SchemaCategoryFilters
   SchemaElementFilters: SchemaElementFilters
+  SchemaElementUpdateInput: SchemaElementUpdateInput
   SchemaTemplateFilters: SchemaTemplateFilters
   SortOptions: SortOptions
   TagFilters: TagFilters
@@ -1358,6 +1363,7 @@ export type ResolversParentTypes = {
   ReportingSchemaFilters: ReportingSchemaFilters
   SchemaCategoryFilters: SchemaCategoryFilters
   SchemaElementFilters: SchemaElementFilters
+  SchemaElementUpdateInput: SchemaElementUpdateInput
   SchemaTemplateFilters: SchemaTemplateFilters
   TagFilters: TagFilters
   TaskFilters: TaskFilters
@@ -1974,11 +1980,11 @@ export type MutationResolvers<
     ContextType,
     RequireFields<MutationDeleteProjectArgs, 'id'>
   >
-  deleteProjectEpd?: Resolver<
-    ResolversTypes['String'],
+  deleteProjectEpds?: Resolver<
+    Array<ResolversTypes['String']>,
     ParentType,
     ContextType,
-    RequireFields<MutationDeleteProjectEpdArgs, 'id'>
+    RequireFields<MutationDeleteProjectEpdsArgs, 'ids'>
   >
   deleteProjectGroup?: Resolver<
     ResolversTypes['String'],
@@ -2093,14 +2099,11 @@ export type MutationResolvers<
     ContextType,
     RequireFields<MutationUpdateSchemaCategoryArgs, 'description' | 'id' | 'name' | 'path'>
   >
-  updateSchemaElement?: Resolver<
-    ResolversTypes['GraphQLSchemaElement'],
+  updateSchemaElements?: Resolver<
+    Array<ResolversTypes['GraphQLSchemaElement']>,
     ParentType,
     ContextType,
-    RequireFields<
-      MutationUpdateSchemaElementArgs,
-      'assemblyId' | 'description' | 'id' | 'name' | 'quantity' | 'result' | 'schemaCategoryId' | 'unit'
-    >
+    RequireFields<MutationUpdateSchemaElementsArgs, 'schemaElements'>
   >
   updateSchemaTemplate?: Resolver<
     ResolversTypes['GraphQLSchemaTemplate'],
@@ -2459,23 +2462,17 @@ export type GetSingleSchemaElementQuery = {
   }>
 }
 
-export type UpdateSchemaElementMutationVariables = Exact<{
-  id: Scalars['String']
-  name?: InputMaybe<Scalars['String']>
-  schemaCategory?: InputMaybe<Scalars['String']>
-  quantity?: InputMaybe<Scalars['Float']>
-  unit?: InputMaybe<Unit>
-  description?: InputMaybe<Scalars['String']>
-  assemblyId?: InputMaybe<Scalars['String']>
+export type UpdateSchemaElementsMutationVariables = Exact<{
+  elements: Array<SchemaElementUpdateInput> | SchemaElementUpdateInput
 }>
 
-export type UpdateSchemaElementMutation = {
+export type UpdateSchemaElementsMutation = {
   __typename?: 'Mutation'
-  updateSchemaElement: {
+  updateSchemaElements: Array<{
     __typename?: 'GraphQLSchemaElement'
     id: string
     schemaCategory: { __typename?: 'GraphQLSchemaCategory'; id: string; name: string }
-  }
+  }>
 }
 
 export type DeleteSchemaElementMutationVariables = Exact<{
@@ -2794,6 +2791,15 @@ export type GetAssembliesQueryVariables = Exact<{
 export type GetAssembliesQuery = {
   __typename?: 'Query'
   assemblies: Array<{ __typename?: 'GraphQLAssembly'; id: string; name: string }>
+}
+
+export type GetSingleProjectQueryVariables = Exact<{
+  id: Scalars['String']
+}>
+
+export type GetSingleProjectQuery = {
+  __typename?: 'Query'
+  projects: Array<{ __typename?: 'GraphQLProject'; id: string; name: string; metaFields?: any | null }>
 }
 
 export const GetSchemaTemplatesDocument = gql`
@@ -3354,25 +3360,9 @@ export type GetSingleSchemaElementQueryResult = Apollo.QueryResult<
   GetSingleSchemaElementQuery,
   GetSingleSchemaElementQueryVariables
 >
-export const UpdateSchemaElementDocument = gql`
-  mutation updateSchemaElement(
-    $id: String!
-    $name: String
-    $schemaCategory: String
-    $quantity: Float
-    $unit: Unit
-    $description: String
-    $assemblyId: String
-  ) {
-    updateSchemaElement(
-      id: $id
-      name: $name
-      schemaCategoryId: $schemaCategory
-      quantity: $quantity
-      unit: $unit
-      description: $description
-      assemblyId: $assemblyId
-    ) {
+export const UpdateSchemaElementsDocument = gql`
+  mutation updateSchemaElements($elements: [SchemaElementUpdateInput!]!) {
+    updateSchemaElements(schemaElements: $elements) {
       id
       schemaCategory {
         id
@@ -3381,48 +3371,42 @@ export const UpdateSchemaElementDocument = gql`
     }
   }
 `
-export type UpdateSchemaElementMutationFn = Apollo.MutationFunction<
-  UpdateSchemaElementMutation,
-  UpdateSchemaElementMutationVariables
+export type UpdateSchemaElementsMutationFn = Apollo.MutationFunction<
+  UpdateSchemaElementsMutation,
+  UpdateSchemaElementsMutationVariables
 >
 
 /**
- * __useUpdateSchemaElementMutation__
+ * __useUpdateSchemaElementsMutation__
  *
- * To run a mutation, you first call `useUpdateSchemaElementMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useUpdateSchemaElementMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useUpdateSchemaElementsMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateSchemaElementsMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [updateSchemaElementMutation, { data, loading, error }] = useUpdateSchemaElementMutation({
+ * const [updateSchemaElementsMutation, { data, loading, error }] = useUpdateSchemaElementsMutation({
  *   variables: {
- *      id: // value for 'id'
- *      name: // value for 'name'
- *      schemaCategory: // value for 'schemaCategory'
- *      quantity: // value for 'quantity'
- *      unit: // value for 'unit'
- *      description: // value for 'description'
- *      assemblyId: // value for 'assemblyId'
+ *      elements: // value for 'elements'
  *   },
  * });
  */
-export function useUpdateSchemaElementMutation(
-  baseOptions?: Apollo.MutationHookOptions<UpdateSchemaElementMutation, UpdateSchemaElementMutationVariables>,
+export function useUpdateSchemaElementsMutation(
+  baseOptions?: Apollo.MutationHookOptions<UpdateSchemaElementsMutation, UpdateSchemaElementsMutationVariables>,
 ) {
   const options = { ...defaultOptions, ...baseOptions }
-  return Apollo.useMutation<UpdateSchemaElementMutation, UpdateSchemaElementMutationVariables>(
-    UpdateSchemaElementDocument,
+  return Apollo.useMutation<UpdateSchemaElementsMutation, UpdateSchemaElementsMutationVariables>(
+    UpdateSchemaElementsDocument,
     options,
   )
 }
-export type UpdateSchemaElementMutationHookResult = ReturnType<typeof useUpdateSchemaElementMutation>
-export type UpdateSchemaElementMutationResult = Apollo.MutationResult<UpdateSchemaElementMutation>
-export type UpdateSchemaElementMutationOptions = Apollo.BaseMutationOptions<
-  UpdateSchemaElementMutation,
-  UpdateSchemaElementMutationVariables
+export type UpdateSchemaElementsMutationHookResult = ReturnType<typeof useUpdateSchemaElementsMutation>
+export type UpdateSchemaElementsMutationResult = Apollo.MutationResult<UpdateSchemaElementsMutation>
+export type UpdateSchemaElementsMutationOptions = Apollo.BaseMutationOptions<
+  UpdateSchemaElementsMutation,
+  UpdateSchemaElementsMutationVariables
 >
 export const DeleteSchemaElementDocument = gql`
   mutation deleteSchemaElement($id: String!) {
@@ -4605,3 +4589,44 @@ export function useGetAssembliesLazyQuery(
 export type GetAssembliesQueryHookResult = ReturnType<typeof useGetAssembliesQuery>
 export type GetAssembliesLazyQueryHookResult = ReturnType<typeof useGetAssembliesLazyQuery>
 export type GetAssembliesQueryResult = Apollo.QueryResult<GetAssembliesQuery, GetAssembliesQueryVariables>
+export const GetSingleProjectDocument = gql`
+  query getSingleProject($id: String!) {
+    projects(filters: { id: { equal: $id } }) {
+      id
+      name
+      metaFields
+    }
+  }
+`
+
+/**
+ * __useGetSingleProjectQuery__
+ *
+ * To run a query within a React component, call `useGetSingleProjectQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetSingleProjectQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetSingleProjectQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useGetSingleProjectQuery(
+  baseOptions: Apollo.QueryHookOptions<GetSingleProjectQuery, GetSingleProjectQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useQuery<GetSingleProjectQuery, GetSingleProjectQueryVariables>(GetSingleProjectDocument, options)
+}
+export function useGetSingleProjectLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<GetSingleProjectQuery, GetSingleProjectQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useLazyQuery<GetSingleProjectQuery, GetSingleProjectQueryVariables>(GetSingleProjectDocument, options)
+}
+export type GetSingleProjectQueryHookResult = ReturnType<typeof useGetSingleProjectQuery>
+export type GetSingleProjectLazyQueryHookResult = ReturnType<typeof useGetSingleProjectLazyQuery>
+export type GetSingleProjectQueryResult = Apollo.QueryResult<GetSingleProjectQuery, GetSingleProjectQueryVariables>
