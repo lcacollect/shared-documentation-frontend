@@ -16,6 +16,8 @@ export type Scalars = {
   Boolean: boolean
   Int: number
   Float: number
+  /** Represents binary data as Base64-encoded strings, using the standard alphabet. */
+  Base64: any
   /** Date (isoformat) */
   Date: any
   /** Date with time (isoformat) */
@@ -517,7 +519,7 @@ export type Mutation = {
   /** Delete a project */
   deleteProject: Scalars['String']
   /** Delete a project EPD */
-  deleteProjectEpds: Array<Scalars['String']>
+  deleteProjectEpd: Scalars['String']
   /** Delete a project group */
   deleteProjectGroup: Scalars['String']
   /** Delete a Project Member */
@@ -709,8 +711,8 @@ export type MutationDeleteProjectArgs = {
   id: Scalars['String']
 }
 
-export type MutationDeleteProjectEpdsArgs = {
-  ids: Array<Scalars['String']>
+export type MutationDeleteProjectEpdArgs = {
+  id: Scalars['String']
 }
 
 export type MutationDeleteProjectGroupArgs = {
@@ -924,6 +926,12 @@ export type Query = {
   /** Get current user */
   account: GraphQlUserAccount
   assemblies: Array<GraphQlAssembly>
+  /**
+   * Calculates the LCA result of a project from a base 64 encoded file.
+   * The project argument is a base64 encoded string of a LCAxProject.
+   * The result is a base64 encoded string of a LCAxProject with a result object included.
+   */
+  calculateLca: Scalars['Base64']
   /** Query all comments of a task */
   comments: Array<GraphQlComment>
   /** Get all commits of a Reporting Schema */
@@ -963,6 +971,10 @@ export type Query = {
 
 export type QueryAssembliesArgs = {
   projectId: Scalars['String']
+}
+
+export type QueryCalculateLcaArgs = {
+  project: Scalars['Base64']
 }
 
 export type QueryCommentsArgs = {
@@ -1218,6 +1230,7 @@ export type ResolversTypes = {
   AssemblyLayerUpdateInput: AssemblyLayerUpdateInput
   AssemblyUnit: AssemblyUnit
   AssigneeType: AssigneeType
+  Base64: ResolverTypeWrapper<Scalars['Base64']>
   CommentFilters: CommentFilters
   CommitFilters: CommitFilters
   Date: ResolverTypeWrapper<Scalars['Date']>
@@ -1303,6 +1316,7 @@ export type ResolversParentTypes = {
   Float: Scalars['Float']
   Int: Scalars['Int']
   AssemblyLayerUpdateInput: AssemblyLayerUpdateInput
+  Base64: Scalars['Base64']
   CommentFilters: CommentFilters
   CommitFilters: CommitFilters
   Date: Scalars['Date']
@@ -1381,6 +1395,10 @@ export type DeferDirectiveResolver<Result, Parent, ContextType = any, Args = Def
   ContextType,
   Args
 >
+
+export interface Base64ScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Base64'], any> {
+  name: 'Base64'
+}
 
 export interface DateScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Date'], any> {
   name: 'Date'
@@ -1980,11 +1998,11 @@ export type MutationResolvers<
     ContextType,
     RequireFields<MutationDeleteProjectArgs, 'id'>
   >
-  deleteProjectEpds?: Resolver<
-    Array<ResolversTypes['String']>,
+  deleteProjectEpd?: Resolver<
+    ResolversTypes['String'],
     ParentType,
     ContextType,
-    RequireFields<MutationDeleteProjectEpdsArgs, 'ids'>
+    RequireFields<MutationDeleteProjectEpdArgs, 'id'>
   >
   deleteProjectGroup?: Resolver<
     ResolversTypes['String'],
@@ -2150,6 +2168,12 @@ export type QueryResolvers<
     ContextType,
     RequireFields<QueryAssembliesArgs, 'projectId'>
   >
+  calculateLca?: Resolver<
+    ResolversTypes['Base64'],
+    ParentType,
+    ContextType,
+    RequireFields<QueryCalculateLcaArgs, 'project'>
+  >
   comments?: Resolver<
     Array<ResolversTypes['GraphQLComment']>,
     ParentType,
@@ -2250,6 +2274,7 @@ export type QueryResolvers<
 }
 
 export type Resolvers<ContextType = any> = {
+  Base64?: GraphQLScalarType
   Date?: GraphQLScalarType
   DateTime?: GraphQLScalarType
   GraphQLAssembly?: GraphQlAssemblyResolvers<ContextType>
@@ -2389,6 +2414,7 @@ export type GetSchemaElementsQuery = {
     quantity: number
     unit: Unit
     description?: string | null
+    result?: any | null
     assemblyId?: string | null
     assembly?: {
       __typename?: 'GraphQLAssembly'
@@ -3160,6 +3186,7 @@ export const GetSchemaElementsDocument = gql`
       quantity
       unit
       description
+      result
       assemblyId
       assembly {
         id

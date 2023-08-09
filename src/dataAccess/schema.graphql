@@ -90,6 +90,7 @@ query getSchemaElements($schemaCategoryIds: [String!]!) {
     quantity
     unit
     description
+    result
     assemblyId
     assembly {
       id

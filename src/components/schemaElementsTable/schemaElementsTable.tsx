@@ -404,8 +404,14 @@ export const SchemaElementsTable = (props: SchemaElementsTableProps) => {
       headerName: 'Result',
       flex: 1.5,
       type: 'number',
-      valueFormatter: (params: GridValueFormatterParams<number>) => {
-        return `${params.value ? params.value.toFixed(2) : 0} kgCO₂Eq`
+      valueFormatter: (params: GridValueFormatterParams<{ [key: string]: { [key: string]: number } }>) => {
+        return `${
+          params.value?.gwp
+            ? Object.values(params.value.gwp)
+                .reduce((sum, current) => sum + current, 0)
+                .toFixed(2)
+            : 0
+        } kgCO₂Eq`
       },
     },
     {
