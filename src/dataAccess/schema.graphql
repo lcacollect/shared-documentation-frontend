@@ -90,6 +90,7 @@ query getSchemaElements($schemaCategoryIds: [String!]!) {
     quantity
     unit
     description
+    result
     assemblyId
     assembly {
       id
@@ -178,24 +179,8 @@ query getSingleSchemaElement($schemaCategoryIds: [String!]!, $schemaElementId: S
   }
 }
 
-mutation updateSchemaElement(
-  $id: String!
-  $name: String
-  $schemaCategory: String
-  $quantity: Float
-  $unit: Unit
-  $description: String
-  $assemblyId: String
-) {
-  updateSchemaElement(
-    id: $id
-    name: $name
-    schemaCategoryId: $schemaCategory
-    quantity: $quantity
-    unit: $unit
-    description: $description
-    assemblyId: $assemblyId
-  ) {
+mutation updateSchemaElements($elements: [SchemaElementUpdateInput!]!) {
+  updateSchemaElements(schemaElements: $elements) {
     id
     schemaCategory {
       id
@@ -519,5 +504,13 @@ query getAssemblies($projectId: String!) {
   assemblies(projectId: $projectId) {
     id
     name
+  }
+}
+
+query getSingleProject($id: String!) {
+  projects(filters: { id: { equal: $id } }) {
+    id
+    name
+    metaFields
   }
 }

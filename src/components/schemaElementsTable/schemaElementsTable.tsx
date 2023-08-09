@@ -36,9 +36,10 @@ import {
   Unit,
   useAddSchemaElementMutation,
   useDeleteSchemaElementMutation,
-  useUpdateSchemaElementMutation,
+  useUpdateSchemaElementsMutation,
   useGetProjectSourceDataQuery,
   useGetAssembliesQuery,
+  useGetSingleProjectQuery,
 } from '../../dataAccess'
 import { AddElementsFromSourceDialog } from '../addElementFromSourceDialog'
 import { NestedCategory } from '../buildingComponentAccordions'
@@ -99,6 +100,8 @@ export const SchemaElementsTable = (props: SchemaElementsTableProps) => {
 
   const { projectId = '' } = useParams()
 
+  const { data: projectData } = useGetSingleProjectQuery({ variables: { id: projectId }, skip: !projectId })
+
   const getSchemaCategories = () => {
     if (Array.isArray(category)) {
       return category.filter((child) => child.depth === 2)
@@ -148,7 +151,7 @@ export const SchemaElementsTable = (props: SchemaElementsTableProps) => {
   ]
   const [addSchemaElement] = useAddSchemaElementMutation({ refetchQueries: refetchUpdateQueries })
 
-  const [updateSchemaElementMutation] = useUpdateSchemaElementMutation({ refetchQueries: refetchUpdateQueries })
+  const [updateSchemaElementsMutation] = useUpdateSchemaElementsMutation({ refetchQueries: refetchUpdateQueries })
 
   const [deleteSchemaElementMutation] = useDeleteSchemaElementMutation({ refetchQueries: refetchUpdateQueries })
 
@@ -252,11 +255,15 @@ export const SchemaElementsTable = (props: SchemaElementsTableProps) => {
     if (typeof changeObject.schemaCategory !== 'string') {
       delete changeObject.schemaCategory
     }
-    const { errors, data } = await updateSchemaElementMutation({ variables: { ...changeObject, id: oldRow.id } })
+    const { errors, data } = await updateSchemaElementsMutation({
+      variables: { elements: [{ ...changeObject, id: oldRow.id }] },
+    })
+
     if (errors) {
       throw new Error(errors[0].message)
     }
-    const schemaElement = data?.updateSchemaElement
+
+    const schemaElement = data?.updateSchemaElements[0]
     const updatedRow = { ...newRow, schemaCategory: schemaElement?.schemaCategory as GraphQlSchemaCategory }
     setRows((rows) => rows.map((row) => (row.id === updatedRow.id ? updatedRow : row)))
     const newRowModes = {
@@ -393,6 +400,21 @@ export const SchemaElementsTable = (props: SchemaElementsTableProps) => {
       renderCell: (params) => <CustomDetailPanelToggle id={params.row.assemblyId} value={params.value} />,
     },
     {
+      field: 'result',
+      headerName: 'Result',
+      flex: 1.5,
+      type: 'number',
+      valueFormatter: (params: GridValueFormatterParams<{ [key: string]: { [key: string]: number } }>) => {
+        return `${
+          params.value?.gwp
+            ? Object.values(params.value.gwp)
+                .reduce((sum, current) => sum + current, 0)
+                .toFixed(2)
+            : 0
+        } kgCO₂Eq`
+      },
+    },
+    {
       field: 'actions',
       type: 'actions',
       headerName: 'Actions',
@@ -510,6 +532,7 @@ export const SchemaElementsTable = (props: SchemaElementsTableProps) => {
         columnVisibilityModel={{
           id: false,
           selectRow: isAddingTasks,
+          result: !!projectData?.projects[0].metaFields.lcaResults,
         }}
         components={{ Toolbar: ElementToolbar, LoadingOverlay: LinearProgress, NoRowsOverlay: NoRowsOverlay }}
         componentsProps={{
