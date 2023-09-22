@@ -13,6 +13,7 @@ import {
 } from '@mui/material'
 import React, { useState } from 'react'
 import { FileField } from '../sourceDialog/sourceForm'
+import { ProjectSourceType, useUploadTypeCodeElementsMutation } from '../../dataAccess'
 
 export const AssigneeTypeMap = {
   GraphQLProjectMember: 'PROJECT_MEMBER',
@@ -30,6 +31,8 @@ export const AddTypecodeDialog = ({ open, handleClose }: AddTypecodeProps) => {
   const [file, setFile] = useState<File>()
   const [snackbar, setSnackbar] = useState<Pick<AlertProps, 'children' | 'severity'> | null>(null)
 
+  const [uploadTypeCodeElements] = useUploadTypeCodeElementsMutation()
+
   const resetValue = () => {
     setName(undefined)
     setFile(undefined)
@@ -40,10 +43,41 @@ export const AddTypecodeDialog = ({ open, handleClose }: AddTypecodeProps) => {
     handleClose()
   }
 
-  const handleAdd = () => {
-    resetValue()
-    setSnackbar({ children: 'Adding typecode...', severity: 'info' })
-    handleClose()
+  const fileToBase64 = (file: File) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        if (typeof reader.result === 'string') {
+          resolve(reader.result.replace(/^data:.+;base64,/, ''))
+        }
+      }
+      reader.onerror = reject
+      reader.readAsDataURL(file)
+    })
+  }
+
+  const handleAdd = async () => {
+    if (file) {
+      const encodedFile = (await fileToBase64(file)) as string
+      setSnackbar({ children: 'Adding typecode...', severity: 'info' })
+
+      await uploadTypeCodeElements({
+        variables: { file: encodedFile },
+      })
+        .then((data) => {
+          if (data.errors) {
+            data.errors.forEach((error) => console.error(error))
+            setSnackbar({ children: data.errors[0].message, severity: 'error' })
+          } else {
+            setSnackbar({ children: 'File uploaded', severity: 'success' })
+          }
+        })
+        .catch((error) => {
+          console.log(error)
+          setSnackbar({ children: error.message, severity: 'error' })
+        })
+    }
+    handleCancel()
   }
 
   const handleFormIncomplete = () => {
@@ -57,6 +91,26 @@ export const AddTypecodeDialog = ({ open, handleClose }: AddTypecodeProps) => {
 
     const newFile = event.currentTarget.files[0]
     setFile(newFile)
+  }
+
+  const downloadTemplate = () => {
+    const rows = [
+      ['Code', 'Name', 'Level'],
+      ['1', 'Bygningsbasis', 1],
+      ['10x', 'TerrĆ¦n', 3],
+      ['121', 'Liniefundamenter', 3],
+    ]
+
+    const csvContent = 'data:text/csv;charset=utf-8,' + rows.map((e) => e.join(',')).join('\n')
+    const encodedUri = encodeURI(csvContent)
+    const link = document.createElement('a')
+
+    link.setAttribute('href', encodedUri)
+    link.setAttribute('download', 'LCAcollect - TypeCodeElement Template.csv')
+    document.body.appendChild(link)
+    link.click()
+
+    document.body.removeChild(link)
   }
 
   return (
@@ -79,16 +133,20 @@ export const AddTypecodeDialog = ({ open, handleClose }: AddTypecodeProps) => {
                 onChange={(e) => setName(e.target.value)}
                 variant='standard'
                 inputProps={{ style: { fontWeight: 'bold', fontSize: 20 } }}
+                data-testid='name'
               />
             </Grid>
-            {/* <FileField show handleSetFile={handleSetFile} fileType={} />*/}
+            <FileField data-testid='file' show handleSetFile={handleSetFile} fileType={ProjectSourceType.Csv} />
           </Grid>
         </DialogContent>
         <DialogActions sx={{ padding: '0 1rem 1rem 0' }}>
+          <LcaButton onClick={downloadTemplate} data-testid='downloadTemplate' sx={{ 'margin-right': 'auto' }}>
+            <Typography>Download template</Typography>
+          </LcaButton>
           <LcaButton onClick={handleCancel}>
             <Typography>Cancel</Typography>
           </LcaButton>
-          <LcaButton onClick={() => (name && file ? handleAdd : handleFormIncomplete)}>
+          <LcaButton onClick={() => (name && file ? handleAdd() : handleFormIncomplete())}>
             <Typography>Add</Typography>
           </LcaButton>
         </DialogActions>
