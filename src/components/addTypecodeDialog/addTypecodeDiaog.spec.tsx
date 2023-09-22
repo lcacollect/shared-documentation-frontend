@@ -13,7 +13,7 @@ describe('TypeCode Dialog', () => {
 
     expect(await screen.findByText('Add Typecode')).toBeInTheDocument()
     expect(await screen.findByTestId('name')).toBeInTheDocument()
-    expect(await screen.findByTestId('file')).toBeInTheDocument()
+    expect(await screen.findByTestId('source-csv-file')).toBeInTheDocument()
     expect(await screen.findByTestId('downloadTemplate')).toBeInTheDocument()
   })
 })

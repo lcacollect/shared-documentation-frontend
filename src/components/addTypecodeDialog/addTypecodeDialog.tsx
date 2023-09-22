@@ -136,7 +136,7 @@ export const AddTypecodeDialog = ({ open, handleClose }: AddTypecodeProps) => {
                 data-testid='name'
               />
             </Grid>
-            <FileField data-testid='file' show handleSetFile={handleSetFile} fileType={ProjectSourceType.Csv} />
+            <FileField show handleSetFile={handleSetFile} fileType={ProjectSourceType.Csv} />
           </Grid>
         </DialogContent>
         <DialogActions sx={{ padding: '0 1rem 1rem 0' }}>
