@@ -514,3 +514,11 @@ query getSingleProject($id: String!) {
     metaFields
   }
 }
+
+mutation uploadTypeCodeElements($file: String!) {
+  createTypeCodeElementFromSource(file: $file) {
+    name
+    code
+    level
+  }
+}
