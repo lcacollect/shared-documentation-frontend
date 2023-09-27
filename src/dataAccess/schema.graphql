@@ -501,7 +501,7 @@ mutation addSchemaElementFromSource(
 }
 
 query getAssemblies($projectId: String!) {
-  assemblies(projectId: $projectId) {
+  projectAssemblies(projectId: $projectId) {
     id
     name
   }

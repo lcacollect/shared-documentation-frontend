@@ -126,7 +126,7 @@ export const SchemaElementsTable = (props: SchemaElementsTableProps) => {
     variables: { projectId: projectId as string },
     skip: !projectId,
   })
-  const assemblies = assemblyData?.assemblies
+  const assemblies = assemblyData?.projectAssemblies
 
   const { data: sourceData } = useGetProjectSourceDataQuery({
     variables: { projectId: projectId as string },
