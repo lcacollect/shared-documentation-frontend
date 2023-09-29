@@ -2,10 +2,10 @@ import { CardTitle, DataFetchWrapper, LcaButton, PaperPage, PaperPageStack } fro
 import { Stack } from '@mui/material'
 import { useState } from 'react'
 import { SchemaTemplatesTable } from '../../components'
-import { useGetSchemaTemplatesQuery } from '../../dataAccess'
+import { useGetSchemaTemplatesQuery, GraphQlSchemaTemplate } from '../../dataAccess'
 
 export const AdminPage = () => {
-  const [openCreateTemplateDialogId, setOpenCreateTemplateDialogId] = useState('')
+  const [openCreateTemplateDialog, setOpenCreateTemplateDialog] = useState(false)
   const [openAddTypecodeDialog, setOpenAddTypecodeDialog] = useState(false)
 
   const { data, loading, error } = useGetSchemaTemplatesQuery()
@@ -17,16 +17,16 @@ export const AdminPage = () => {
         <CardTitle title={'Template management'} size={'large'} />
         <DataFetchWrapper loading={loading} error={error}>
           <SchemaTemplatesTable
-            schemaTemplates={schemaTemplates}
+            schemaTemplates={schemaTemplates as GraphQlSchemaTemplate[]}
             loading={loading}
-            openCreateTemplateDialogId={openCreateTemplateDialogId}
-            setOpenCreateTemplateDialogId={setOpenCreateTemplateDialogId}
+            openCreateTemplateDialog={openCreateTemplateDialog}
+            setOpenCreateTemplateDialog={setOpenCreateTemplateDialog}
             openAddTypecodeDialog={openAddTypecodeDialog}
             setOpenAddTypecodeDialog={setOpenAddTypecodeDialog}
           />
         </DataFetchWrapper>
         <Stack direction='row' spacing={2} justifyContent='flex-end'>
-          <LcaButton onClick={() => setOpenCreateTemplateDialogId('new template')}>Create Template</LcaButton>
+          <LcaButton onClick={() => setOpenCreateTemplateDialog(true)}>Create Template</LcaButton>
           <LcaButton onClick={() => setOpenAddTypecodeDialog(true)}>Add Typecode</LcaButton>
         </Stack>
       </PaperPage>

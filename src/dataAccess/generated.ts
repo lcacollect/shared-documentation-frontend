@@ -508,6 +508,13 @@ export type GraphQlTypeCodeElement = {
   name: Scalars['String']
 }
 
+export type GraphQlTypeCodeElementInput = {
+  code: Scalars['String']
+  id: Scalars['String']
+  level: Scalars['Int']
+  name: Scalars['String']
+}
+
 export enum GraphQlUnit {
   Kg = 'KG',
   L = 'L',
@@ -778,6 +785,7 @@ export type MutationAddSchemaElementFromSourceArgs = {
 
 export type MutationAddSchemaTemplateArgs = {
   name: Scalars['String']
+  typeCodes?: InputMaybe<Array<GraphQlTypeCodeElementInput>>
 }
 
 export type MutationAddSitesArgs = {
@@ -960,6 +968,7 @@ export type MutationUpdateSchemaElementsArgs = {
 export type MutationUpdateSchemaTemplateArgs = {
   id: Scalars['String']
   name?: InputMaybe<Scalars['String']>
+  typeCodes?: InputMaybe<Array<GraphQlTypeCodeElementInput>>
 }
 
 export type MutationUpdateSitesArgs = {
@@ -1453,6 +1462,7 @@ export type ResolversTypes = {
     }
   >
   GraphQLTypeCodeElement: ResolverTypeWrapper<GraphQlTypeCodeElement>
+  GraphQLTypeCodeElementInput: GraphQlTypeCodeElementInput
   GraphQLUnit: GraphQlUnit
   GraphQLUpdateSiteInput: GraphQlUpdateSiteInput
   GraphQLUserAccount: ResolverTypeWrapper<GraphQlUserAccount>
@@ -1544,6 +1554,7 @@ export type ResolversParentTypes = {
     item: ResolversParentTypes['GraphQLSchemaElementGraphQLSchemaCategory']
   }
   GraphQLTypeCodeElement: GraphQlTypeCodeElement
+  GraphQLTypeCodeElementInput: GraphQlTypeCodeElementInput
   GraphQLUpdateSiteInput: GraphQlUpdateSiteInput
   GraphQLUserAccount: GraphQlUserAccount
   JSON: Scalars['JSON']
@@ -2181,7 +2192,7 @@ export type MutationResolvers<
     ResolversTypes['GraphQLSchemaTemplate'],
     ParentType,
     ContextType,
-    RequireFields<MutationAddSchemaTemplateArgs, 'name'>
+    RequireFields<MutationAddSchemaTemplateArgs, 'name' | 'typeCodes'>
   >
   addSites?: Resolver<
     Array<ResolversTypes['GraphQLSite']>,
@@ -2397,7 +2408,7 @@ export type MutationResolvers<
     ResolversTypes['GraphQLSchemaTemplate'],
     ParentType,
     ContextType,
-    RequireFields<MutationUpdateSchemaTemplateArgs, 'id' | 'name'>
+    RequireFields<MutationUpdateSchemaTemplateArgs, 'id' | 'name' | 'typeCodes'>
   >
   updateSites?: Resolver<
     Array<ResolversTypes['GraphQLSite']>,
@@ -2563,7 +2574,7 @@ export type QueryResolvers<
     Array<ResolversTypes['GraphQLTypeCodeElement']>,
     ParentType,
     ContextType,
-    Partial<QueryTypeCodeElementsArgs>
+    RequireFields<QueryTypeCodeElementsArgs, 'code' | 'id' | 'name'>
   >
 }
 
@@ -2619,7 +2630,18 @@ export type GetSchemaTemplatesQuery = {
     __typename?: 'GraphQLSchemaTemplate'
     id: string
     name: string
-    schema?: { __typename?: 'GraphQLReportingSchema'; name: string; id: string; templateId?: string | null } | null
+    schema?: {
+      __typename?: 'GraphQLReportingSchema'
+      name: string
+      id: string
+      categories?: Array<{
+        __typename?: 'GraphQLSchemaCategory'
+        id: string
+        name: string
+        path: string
+        depth: number
+      }> | null
+    } | null
   }>
 }
 
@@ -2631,6 +2653,7 @@ export type DeleteSchemaTemplateMutation = { __typename?: 'Mutation'; deleteSche
 
 export type AddSchemaTemplateMutationVariables = Exact<{
   name: Scalars['String']
+  typeCodes?: InputMaybe<Array<GraphQlTypeCodeElementInput> | GraphQlTypeCodeElementInput>
 }>
 
 export type AddSchemaTemplateMutation = {
@@ -2639,13 +2662,25 @@ export type AddSchemaTemplateMutation = {
     __typename?: 'GraphQLSchemaTemplate'
     id: string
     name: string
-    schema?: { __typename?: 'GraphQLReportingSchema'; id: string; name: string; templateId?: string | null } | null
+    schema?: {
+      __typename?: 'GraphQLReportingSchema'
+      id: string
+      name: string
+      categories?: Array<{
+        __typename?: 'GraphQLSchemaCategory'
+        id: string
+        name: string
+        path: string
+        depth: number
+      }> | null
+    } | null
   }
 }
 
 export type UpdateSchemaTemplateMutationVariables = Exact<{
   id: Scalars['String']
   name: Scalars['String']
+  typeCodes?: InputMaybe<Array<GraphQlTypeCodeElementInput> | GraphQlTypeCodeElementInput>
 }>
 
 export type UpdateSchemaTemplateMutation = {
@@ -2654,7 +2689,18 @@ export type UpdateSchemaTemplateMutation = {
     __typename?: 'GraphQLSchemaTemplate'
     id: string
     name: string
-    schema?: { __typename?: 'GraphQLReportingSchema'; id: string; name: string; templateId?: string | null } | null
+    schema?: {
+      __typename?: 'GraphQLReportingSchema'
+      id: string
+      name: string
+      categories?: Array<{
+        __typename?: 'GraphQLSchemaCategory'
+        id: string
+        name: string
+        path: string
+        depth: number
+      }> | null
+    } | null
   }
 }
 
@@ -3133,6 +3179,19 @@ export type UploadTypeCodeElementsMutation = {
   createTypeCodeElementFromSource: { __typename?: 'GraphQLTypeCodeElement'; name: string; code: string; level: number }
 }
 
+export type GetTypeCodesQueryVariables = Exact<{ [key: string]: never }>
+
+export type GetTypeCodesQuery = {
+  __typename?: 'Query'
+  typeCodeElements: Array<{
+    __typename?: 'GraphQLTypeCodeElement'
+    id: string
+    name: string
+    code: string
+    level: number
+  }>
+}
+
 export const GetSchemaTemplatesDocument = gql`
   query getSchemaTemplates {
     schemaTemplates {
@@ -3141,7 +3200,12 @@ export const GetSchemaTemplatesDocument = gql`
       schema {
         name
         id
-        templateId
+        categories {
+          id
+          name
+          path
+          depth
+        }
       }
     }
   }
@@ -3226,14 +3290,19 @@ export type DeleteSchemaTemplateMutationOptions = Apollo.BaseMutationOptions<
   DeleteSchemaTemplateMutationVariables
 >
 export const AddSchemaTemplateDocument = gql`
-  mutation addSchemaTemplate($name: String!) {
-    addSchemaTemplate(name: $name) {
+  mutation addSchemaTemplate($name: String!, $typeCodes: [GraphQLTypeCodeElementInput!] = null) {
+    addSchemaTemplate(name: $name, typeCodes: $typeCodes) {
       id
       name
       schema {
         id
         name
-        templateId
+        categories {
+          id
+          name
+          path
+          depth
+        }
       }
     }
   }
@@ -3257,6 +3326,7 @@ export type AddSchemaTemplateMutationFn = Apollo.MutationFunction<
  * const [addSchemaTemplateMutation, { data, loading, error }] = useAddSchemaTemplateMutation({
  *   variables: {
  *      name: // value for 'name'
+ *      typeCodes: // value for 'typeCodes'
  *   },
  * });
  */
@@ -3276,14 +3346,19 @@ export type AddSchemaTemplateMutationOptions = Apollo.BaseMutationOptions<
   AddSchemaTemplateMutationVariables
 >
 export const UpdateSchemaTemplateDocument = gql`
-  mutation updateSchemaTemplate($id: String!, $name: String!) {
-    updateSchemaTemplate(id: $id, name: $name) {
+  mutation updateSchemaTemplate($id: String!, $name: String!, $typeCodes: [GraphQLTypeCodeElementInput!] = null) {
+    updateSchemaTemplate(id: $id, name: $name, typeCodes: $typeCodes) {
       id
       name
       schema {
         id
         name
-        templateId
+        categories {
+          id
+          name
+          path
+          depth
+        }
       }
     }
   }
@@ -3308,6 +3383,7 @@ export type UpdateSchemaTemplateMutationFn = Apollo.MutationFunction<
  *   variables: {
  *      id: // value for 'id'
  *      name: // value for 'name'
+ *      typeCodes: // value for 'typeCodes'
  *   },
  * });
  */
@@ -5008,3 +5084,44 @@ export type UploadTypeCodeElementsMutationOptions = Apollo.BaseMutationOptions<
   UploadTypeCodeElementsMutation,
   UploadTypeCodeElementsMutationVariables
 >
+export const GetTypeCodesDocument = gql`
+  query getTypeCodes {
+    typeCodeElements {
+      id
+      name
+      code
+      level
+    }
+  }
+`
+
+/**
+ * __useGetTypeCodesQuery__
+ *
+ * To run a query within a React component, call `useGetTypeCodesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetTypeCodesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetTypeCodesQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetTypeCodesQuery(
+  baseOptions?: Apollo.QueryHookOptions<GetTypeCodesQuery, GetTypeCodesQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useQuery<GetTypeCodesQuery, GetTypeCodesQueryVariables>(GetTypeCodesDocument, options)
+}
+export function useGetTypeCodesLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<GetTypeCodesQuery, GetTypeCodesQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useLazyQuery<GetTypeCodesQuery, GetTypeCodesQueryVariables>(GetTypeCodesDocument, options)
+}
+export type GetTypeCodesQueryHookResult = ReturnType<typeof useGetTypeCodesQuery>
+export type GetTypeCodesLazyQueryHookResult = ReturnType<typeof useGetTypeCodesLazyQuery>
+export type GetTypeCodesQueryResult = Apollo.QueryResult<GetTypeCodesQuery, GetTypeCodesQueryVariables>
