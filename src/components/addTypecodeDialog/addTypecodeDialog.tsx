@@ -97,10 +97,10 @@ export const AddTypecodeDialog = ({ open, handleClose }: AddTypecodeProps) => {
 
   const downloadTemplate = () => {
     const rows = [
-      ['Code', 'Name', 'Level'],
-      ['1', 'Bygningsbasis', 1],
-      ['10x', 'TerrĆ¦n', 3],
-      ['121', 'Liniefundamenter', 3],
+      ['Code', 'Name', 'Level', 'parentPath'],
+      ['1', 'Bygningsbasis', 1, '/'],
+      ['10x', 'TerrĆ¦n', 3, '/1'],
+      ['121', 'Liniefundamenter', 3, '/1/10x'],
     ]
 
     const csvContent = 'data:text/csv;charset=utf-8,' + rows.map((e) => e.join(',')).join('\n')

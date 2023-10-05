@@ -31,7 +31,7 @@ interface ReportingSchema {
 export interface SchemaTemplate {
   id: string
   name: string
-  schema: ReportingSchema | undefined
+  schemas: ReportingSchema[] | undefined
 }
 
 interface SchemaTemplatesTableProps {
@@ -93,7 +93,7 @@ export const SchemaTemplatesTable = (props: SchemaTemplatesTableProps) => {
   }
 
   const getTypecode = (cell: GridValueGetterParams) => {
-    return cell.row.schema.name
+    return cell.row.schemas[0]?.name
   }
 
   const columns: GridColumns = [

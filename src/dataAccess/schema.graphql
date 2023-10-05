@@ -18,15 +18,15 @@ input SchemaCategoryFilters {
 input GraphQLTypeCodeElementInput {
   id: String!
   name: String!
-  code: String!
   level: Int!
+  parentPath: String
 }
 
 query getSchemaTemplates {
   schemaTemplates {
     id
     name
-    schema {
+    schemas {
       name
       id
       categories {
@@ -47,7 +47,7 @@ mutation addSchemaTemplate($name: String!, $typeCodes: [GraphQLTypeCodeElementIn
   addSchemaTemplate(name: $name, typeCodes: $typeCodes) {
     id
     name
-    schema {
+    schemas {
       id
       name
       categories {
@@ -64,7 +64,7 @@ mutation updateSchemaTemplate($id: String!, $name: String!, $typeCodes: [GraphQL
   updateSchemaTemplate(id: $id, name: $name, typeCodes: $typeCodes) {
     id
     name
-    schema {
+    schemas {
       id
       name
       categories {
@@ -523,7 +523,7 @@ mutation addSchemaElementFromSource(
 }
 
 query getAssemblies($projectId: String!) {
-  assemblies(projectId: $projectId) {
+  assemblies {
     id
     name
   }
@@ -540,8 +540,8 @@ query getSingleProject($id: String!) {
 mutation uploadTypeCodeElements($file: String!) {
   createTypeCodeElementFromSource(file: $file) {
     name
-    code
     level
+    parentPath
   }
 }
 
@@ -549,7 +549,7 @@ query getTypeCodes {
   typeCodeElements {
     id
     name
-    code
+    parentPath
     level
   }
 }

@@ -2,17 +2,17 @@ export default {
   data: {
     typeCodeElements: [
       {
-        id: '3481d0bb-a0b5-49fa-bdea-27a4253cff0a',
+        id: 'code',
         name: 's2',
-        code: 'code',
         level: 1,
+        parentPath: '/',
         __typename: 'GraphQLTypeCodeElements',
       },
       {
-        id: '3481d0bb-a0b5-49fa-bdea-27a4253cff02',
+        id: 'code2',
         name: 's3',
-        code: 'code2',
         level: 2,
+        parentPath: '/code',
         __typename: 'GraphQLTypeCodeElements',
       },
     ],

@@ -70,9 +70,10 @@ export const CreateTemplateDialog = ({
   useEffect(() => {
     if (editTemplate && TypeCodeData) {
       const editTypeCodes = TypeCodeData.typeCodeElements.filter((row) => {
-        return !!editTemplate?.schema?.categories.find((category) => {
-          return row.name === category.name && row.code === category.path
-        })
+        if (editTemplate?.schemas && editTemplate?.schemas.length)
+          return !!editTemplate?.schemas[0].categories.find((category) => {
+            return row.name === category.name && row.parentPath === category.path
+          })
       })
 
       const notAddedTypeCodes: GraphQlTypeCodeElement[] = TypeCodeData.typeCodeElements.filter((row) => {
@@ -83,6 +84,7 @@ export const CreateTemplateDialog = ({
 
       setTemplateRows(editTypeCodes)
       setDataRows(notAddedTypeCodes)
+      setName(editTemplate.name)
     } else if (TypeCodeData && TypeCodeData.typeCodeElements.length) {
       setDataRows(TypeCodeData.typeCodeElements)
     }
@@ -115,10 +117,10 @@ export const CreateTemplateDialog = ({
   }
 
   const handleChangeAllSelectedTemplateRows = () => {
-    if (selectedRows.length) {
+    if (selectedTemplateRows.length) {
       setSelectedTemplateRows([])
     } else {
-      if (TypeCodeData) setSelectedTemplateRows(TypeCodeData?.typeCodeElements)
+      setSelectedTemplateRows(templateRows)
     }
   }
 
@@ -153,9 +155,9 @@ export const CreateTemplateDialog = ({
     const typeCodes = templateRows.map((row) => {
       return {
         id: row.id,
-        code: row.code,
         level: row.level,
         name: row.name,
+        parentPath: row.parentPath,
       }
     }) as GraphQlTypeCodeElementInput[]
     let error = null
@@ -223,7 +225,7 @@ export const CreateTemplateDialog = ({
             <TextField
               label='Name'
               helperText='Name for template'
-              value={editTemplate ? editTemplate.name : ''} // editTemplate.name
+              value={name}
               onChange={(e) => setName(e.target.value)}
               variant='standard'
               inputProps={{ style: { fontWeight: 'bold', fontSize: 20 } }}
