@@ -60,7 +60,7 @@ export const CreateTemplateDialog = ({
     skip: !open,
   })
 
-  const [name, setName] = useState<string>()
+  const [name, setName] = useState<string>('')
   const [snackbar, setSnackbar] = useState<Pick<AlertProps, 'children' | 'severity'> | null>(null)
   const [selectedRows, setSelectedRows] = useState<GraphQlTypeCodeElement[]>([])
   const [selectedTemplateRows, setSelectedTemplateRows] = useState<GraphQlTypeCodeElement[]>([])
@@ -103,12 +103,12 @@ export const CreateTemplateDialog = ({
     if (selectedRows.length) {
       setSelectedRows([])
     } else {
-      if (TypeCodeData) setSelectedRows(TypeCodeData?.typeCodeElements)
+      if (TypeCodeData) setSelectedRows(dataRows)
     }
   }
 
   const handleChangeSelectedTemplateRow = (row: GraphQlTypeCodeElement) => {
-    const selectedRow = selectedRows.find((selectRow) => selectRow.id === row.id)
+    const selectedRow = selectedTemplateRows.find((selectRow) => selectRow.id === row.id)
     if (selectedRow) {
       setSelectedTemplateRows(selectedRows.filter((selectRow) => selectRow.id !== row.id))
     } else {
@@ -156,6 +156,7 @@ export const CreateTemplateDialog = ({
       return {
         id: row.id,
         level: row.level,
+        code: row.code,
         name: row.name,
         parentPath: row.parentPath,
       }
@@ -195,7 +196,7 @@ export const CreateTemplateDialog = ({
   }
 
   const resetValue = () => {
-    setName(undefined)
+    setName('')
     setSelectedRows([])
     setSelectedTemplateRows([])
     if (TypeCodeData && TypeCodeData.typeCodeElements.length) {

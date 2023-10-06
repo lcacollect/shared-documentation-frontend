@@ -57,6 +57,12 @@ export const TypecodeSelectionTable = (props: TypecodeSelectionTableProps) => {
     },
     {
       field: 'id',
+      headerName: 'Id',
+      flex: 1,
+      type: 'string',
+    },
+    {
+      field: 'code',
       headerName: 'Code',
       flex: 1,
       type: 'string',
@@ -84,7 +90,7 @@ export const TypecodeSelectionTable = (props: TypecodeSelectionTableProps) => {
   return (
     <>
       <div style={{ height: 600, width: '100%' }} data-testid='type-code-selection-table'>
-        <DataGridPro columns={columns} rows={rows} loading={typeCodeLoading} />
+        <DataGridPro columnVisibilityModel={{ id: false }} columns={columns} rows={rows} loading={typeCodeLoading} />
       </div>
     </>
   )

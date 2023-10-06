@@ -549,6 +549,7 @@ export type GraphQlTask = {
 
 export type GraphQlTypeCodeElement = {
   __typename?: 'GraphQLTypeCodeElement'
+  code: Scalars['String']
   id: Scalars['String']
   level: Scalars['Int']
   name: Scalars['String']
@@ -556,8 +557,9 @@ export type GraphQlTypeCodeElement = {
 }
 
 export type GraphQlTypeCodeElementInput = {
-  id: Scalars['String']
-  level: Scalars['Int']
+  code: Scalars['String']
+  id?: InputMaybe<Scalars['String']>
+  level?: InputMaybe<Scalars['Int']>
   name: Scalars['String']
   parentPath: Scalars['String']
 }
@@ -1077,6 +1079,7 @@ export type MutationUpdateTaskArgs = {
 }
 
 export type MutationUpdateTypeCodeElementArgs = {
+  code?: InputMaybe<Scalars['String']>
   id: Scalars['String']
   level?: InputMaybe<Scalars['Int']>
   name?: InputMaybe<Scalars['String']>
@@ -1331,6 +1334,7 @@ export type QueryTasksArgs = {
 }
 
 export type QueryTypeCodeElementsArgs = {
+  code?: InputMaybe<Scalars['String']>
   id?: InputMaybe<Scalars['String']>
   name?: InputMaybe<Scalars['String']>
 }
@@ -2186,6 +2190,7 @@ export type GraphQlTypeCodeElementResolvers<
   ContextType = any,
   ParentType extends ResolversParentTypes['GraphQLTypeCodeElement'] = ResolversParentTypes['GraphQLTypeCodeElement'],
 > = {
+  code?: Resolver<ResolversTypes['String'], ParentType, ContextType>
   id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
   level?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
@@ -2617,7 +2622,7 @@ export type MutationResolvers<
     ResolversTypes['GraphQLTypeCodeElement'],
     ParentType,
     ContextType,
-    RequireFields<MutationUpdateTypeCodeElementArgs, 'id' | 'level' | 'name' | 'parentPath'>
+    RequireFields<MutationUpdateTypeCodeElementArgs, 'code' | 'id' | 'level' | 'name' | 'parentPath'>
   >
 }
 
@@ -2762,7 +2767,7 @@ export type QueryResolvers<
     Array<ResolversTypes['GraphQLTypeCodeElement']>,
     ParentType,
     ContextType,
-    RequireFields<QueryTypeCodeElementsArgs, 'id' | 'name'>
+    RequireFields<QueryTypeCodeElementsArgs, 'code' | 'id' | 'name'>
   >
 }
 
@@ -3369,6 +3374,7 @@ export type UploadTypeCodeElementsMutation = {
     __typename?: 'GraphQLTypeCodeElement'
     name: string
     level: number
+    code: string
     parentPath: string
   }
 }
@@ -3380,6 +3386,7 @@ export type GetTypeCodesQuery = {
   typeCodeElements: Array<{
     __typename?: 'GraphQLTypeCodeElement'
     id: string
+    code: string
     name: string
     parentPath: string
     level: number
@@ -5237,6 +5244,7 @@ export const UploadTypeCodeElementsDocument = gql`
     createTypeCodeElementFromSource(file: $file) {
       name
       level
+      code
       parentPath
     }
   }
@@ -5282,6 +5290,7 @@ export const GetTypeCodesDocument = gql`
   query getTypeCodes {
     typeCodeElements {
       id
+      code
       name
       parentPath
       level

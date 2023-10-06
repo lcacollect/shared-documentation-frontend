@@ -18,7 +18,8 @@ input SchemaCategoryFilters {
 input GraphQLTypeCodeElementInput {
   id: String!
   name: String!
-  level: Int!
+  code: String!
+  level: Int
   parentPath: String
 }
 
@@ -541,6 +542,7 @@ mutation uploadTypeCodeElements($file: String!) {
   createTypeCodeElementFromSource(file: $file) {
     name
     level
+    code
     parentPath
   }
 }
@@ -548,6 +550,7 @@ mutation uploadTypeCodeElements($file: String!) {
 query getTypeCodes {
   typeCodeElements {
     id
+    code
     name
     parentPath
     level
