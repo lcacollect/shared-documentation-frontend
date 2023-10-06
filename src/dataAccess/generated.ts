@@ -3352,7 +3352,7 @@ export type GetAssembliesQueryVariables = Exact<{
 
 export type GetAssembliesQuery = {
   __typename?: 'Query'
-  assemblies: Array<{ __typename?: 'GraphQLAssembly'; id: string; name: string }>
+  projectAssemblies: Array<{ __typename?: 'GraphQLProjectAssembly'; id: string; name: string }>
 }
 
 export type GetSingleProjectQueryVariables = Exact<{
