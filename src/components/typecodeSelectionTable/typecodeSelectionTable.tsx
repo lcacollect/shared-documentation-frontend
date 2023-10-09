@@ -80,6 +80,12 @@ export const TypecodeSelectionTable = (props: TypecodeSelectionTableProps) => {
       type: 'string',
     },
     {
+      field: 'parentCode',
+      headerName: 'Parent',
+      flex: 1,
+      type: 'string',
+    },
+    {
       field: 'parentPath',
       headerName: 'Path',
       flex: 1,
@@ -90,7 +96,12 @@ export const TypecodeSelectionTable = (props: TypecodeSelectionTableProps) => {
   return (
     <>
       <div style={{ height: 600, width: '100%' }} data-testid='type-code-selection-table'>
-        <DataGridPro columnVisibilityModel={{ id: false }} columns={columns} rows={rows} loading={typeCodeLoading} />
+        <DataGridPro
+          columnVisibilityModel={{ id: false, parentPath: false }}
+          columns={columns}
+          rows={rows}
+          loading={typeCodeLoading}
+        />
       </div>
     </>
   )

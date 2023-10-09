@@ -539,12 +539,7 @@ query getSingleProject($id: String!) {
 }
 
 mutation uploadTypeCodeElements($file: String!) {
-  createTypeCodeElementFromSource(file: $file) {
-    name
-    level
-    code
-    parentPath
-  }
+  createTypeCodeElementFromSource(file: $file)
 }
 
 query getTypeCodes {
@@ -554,5 +549,6 @@ query getTypeCodes {
     name
     parentPath
     level
+    parentCode
   }
 }

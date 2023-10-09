@@ -553,6 +553,7 @@ export type GraphQlTypeCodeElement = {
   id: Scalars['String']
   level: Scalars['Int']
   name: Scalars['String']
+  parentCode: Scalars['String']
   parentPath: Scalars['String']
 }
 
@@ -661,7 +662,7 @@ export type Mutation = {
   /** Add a new typeCodeElement */
   createTypeCodeElement: GraphQlTypeCodeElement
   /** Add a new typeCodeElement from csv file */
-  createTypeCodeElementFromSource: GraphQlTypeCodeElement
+  createTypeCodeElementFromSource: Scalars['String']
   /** Delete Assemblies */
   deleteAssemblies: Array<Scalars['ID']>
   /** Delete layers from an Assembly */
@@ -2194,6 +2195,7 @@ export type GraphQlTypeCodeElementResolvers<
   id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
   level?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+  parentCode?: Resolver<ResolversTypes['String'], ParentType, ContextType>
   parentPath?: Resolver<ResolversTypes['String'], ParentType, ContextType>
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
@@ -2388,7 +2390,7 @@ export type MutationResolvers<
     RequireFields<MutationCreateTypeCodeElementArgs, 'code' | 'level' | 'name' | 'parentPath'>
   >
   createTypeCodeElementFromSource?: Resolver<
-    ResolversTypes['GraphQLTypeCodeElement'],
+    ResolversTypes['String'],
     ParentType,
     ContextType,
     RequireFields<MutationCreateTypeCodeElementFromSourceArgs, 'file'>
@@ -3368,16 +3370,7 @@ export type UploadTypeCodeElementsMutationVariables = Exact<{
   file: Scalars['String']
 }>
 
-export type UploadTypeCodeElementsMutation = {
-  __typename?: 'Mutation'
-  createTypeCodeElementFromSource: {
-    __typename?: 'GraphQLTypeCodeElement'
-    name: string
-    level: number
-    code: string
-    parentPath: string
-  }
-}
+export type UploadTypeCodeElementsMutation = { __typename?: 'Mutation'; createTypeCodeElementFromSource: string }
 
 export type GetTypeCodesQueryVariables = Exact<{ [key: string]: never }>
 
@@ -3390,6 +3383,7 @@ export type GetTypeCodesQuery = {
     name: string
     parentPath: string
     level: number
+    parentCode: string
   }>
 }
 
@@ -5241,12 +5235,7 @@ export type GetSingleProjectLazyQueryHookResult = ReturnType<typeof useGetSingle
 export type GetSingleProjectQueryResult = Apollo.QueryResult<GetSingleProjectQuery, GetSingleProjectQueryVariables>
 export const UploadTypeCodeElementsDocument = gql`
   mutation uploadTypeCodeElements($file: String!) {
-    createTypeCodeElementFromSource(file: $file) {
-      name
-      level
-      code
-      parentPath
-    }
+    createTypeCodeElementFromSource(file: $file)
   }
 `
 export type UploadTypeCodeElementsMutationFn = Apollo.MutationFunction<
@@ -5294,6 +5283,7 @@ export const GetTypeCodesDocument = gql`
       name
       parentPath
       level
+      parentCode
     }
   }
 `
