@@ -1,4 +1,4 @@
-import { CardTitle, DataFetchWrapper, PaperPage, theme } from '@lcacollect/components'
+import { CardTitle, DataFetchWrapper, ErrorBoundary, PaperPage, theme } from '@lcacollect/components'
 import AddTaskIcon from '@mui/icons-material/AddTask'
 import { Box, Grid, IconButton, Paper, styled, Tooltip, alpha } from '@mui/material'
 import { tooltipClasses, TooltipProps } from '@mui/material/Tooltip'
@@ -138,7 +138,7 @@ export const BuildingComponentsPage = () => {
                 />
               </>
             ) : (
-              <>
+              <ErrorBoundary>
                 <SchemaElementsTable
                   categoriesId={categoriesId}
                   category={data.reportingSchemas[0].categories as GraphQlSchemaCategory[]}
@@ -151,7 +151,7 @@ export const BuildingComponentsPage = () => {
                   setIsAddTaskDialogOpen={setIsAddTaskDialogOpen}
                   refetchElements={refetchElements}
                 />
-              </>
+              </ErrorBoundary>
             )}
 
             <TaskDialog

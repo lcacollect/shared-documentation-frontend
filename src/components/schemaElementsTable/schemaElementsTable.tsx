@@ -340,10 +340,10 @@ export const SchemaElementsTable = (props: SchemaElementsTableProps) => {
       type: 'singleSelect',
       valueOptions: schemaCategories.map((child) => ({ value: child.id, label: child.name as string })),
       valueGetter: (param) => {
-        return param.value.id
+        return param.value?.id
       },
       valueFormatter: (params) => {
-        return rows.find((row) => row.id == params.id)?.schemaCategory.name
+        return rows.find((row) => row.id == params.id)?.schemaCategory?.name
       },
     },
     {

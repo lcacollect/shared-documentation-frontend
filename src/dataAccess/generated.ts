@@ -54,9 +54,9 @@ export type AssemblyLayerInput = {
   id?: InputMaybe<Scalars['String']>
   name?: InputMaybe<Scalars['String']>
   referenceServiceLife?: InputMaybe<Scalars['Int']>
+  transportConversionFactor?: InputMaybe<Scalars['Float']>
   transportDistance?: InputMaybe<Scalars['Float']>
-  transportType?: InputMaybe<TransportType>
-  transportUnit?: InputMaybe<Scalars['String']>
+  transportEpdId?: InputMaybe<Scalars['String']>
 }
 
 export type AssemblyLayerUpdateInput = {
@@ -66,9 +66,9 @@ export type AssemblyLayerUpdateInput = {
   id: Scalars['String']
   name?: InputMaybe<Scalars['String']>
   referenceServiceLife?: InputMaybe<Scalars['Int']>
+  transportConversionFactor?: InputMaybe<Scalars['Float']>
   transportDistance?: InputMaybe<Scalars['Float']>
-  transportType?: InputMaybe<TransportType>
-  transportUnit?: InputMaybe<Scalars['String']>
+  transportEpdId?: InputMaybe<Scalars['String']>
 }
 
 export type AssemblyUpdateInput = {
@@ -104,6 +104,7 @@ export type CommitFilters = {
 export type EpdFilters = {
   category?: InputMaybe<FilterOptions>
   id?: InputMaybe<FilterOptions>
+  isTransport?: InputMaybe<FilterOptions>
   name?: InputMaybe<FilterOptions>
   owner?: InputMaybe<FilterOptions>
   region?: InputMaybe<FilterOptions>
@@ -114,6 +115,7 @@ export type EpdFilters = {
 
 export type EpdSort = {
   category?: InputMaybe<SortOptions>
+  isTransport?: InputMaybe<SortOptions>
   name?: InputMaybe<SortOptions>
   owner?: InputMaybe<SortOptions>
   region?: InputMaybe<SortOptions>
@@ -129,6 +131,7 @@ export type FilterOptions = {
   isAnyOf?: InputMaybe<Array<Scalars['String']>>
   isEmpty?: InputMaybe<Scalars['Boolean']>
   isNotEmpty?: InputMaybe<Scalars['Boolean']>
+  isTrue?: InputMaybe<Scalars['Boolean']>
   jsonContains?: InputMaybe<Scalars['String']>
   startsWith?: InputMaybe<Scalars['String']>
 }
@@ -142,7 +145,7 @@ export type GraphQlAddEpdInput = {
   gwp?: InputMaybe<Scalars['JSON']>
   id?: InputMaybe<Scalars['String']>
   location: Scalars['String']
-  metaFields?: InputMaybe<Scalars['JSON']>
+  metaData?: InputMaybe<Scalars['JSON']>
   name: Scalars['String']
   odp?: InputMaybe<Scalars['JSON']>
   penre?: InputMaybe<Scalars['JSON']>
@@ -195,9 +198,9 @@ export type GraphQlAssemblyLayer = {
   id?: Maybe<Scalars['String']>
   name?: Maybe<Scalars['String']>
   referenceServiceLife?: Maybe<Scalars['Int']>
+  transportConversionFactor: Scalars['Float']
   transportDistance?: Maybe<Scalars['Float']>
-  transportType?: Maybe<TransportType>
-  transportUnit?: Maybe<Scalars['String']>
+  transportEpd?: Maybe<GraphQlProjectEpd>
 }
 
 export enum GraphQlAssemblyUnit {
@@ -253,7 +256,9 @@ export type GraphQlepd = {
   ep?: Maybe<GraphQlImpactCategories>
   gwp?: Maybe<GraphQlImpactCategories>
   id: Scalars['String']
+  isTransport: Scalars['Boolean']
   location: Scalars['String']
+  metaFields?: Maybe<Scalars['JSON']>
   name: Scalars['String']
   odp?: Maybe<GraphQlImpactCategories>
   originId?: Maybe<Scalars['String']>
@@ -277,7 +282,9 @@ export type GraphQlepdBase = {
   ep?: Maybe<GraphQlImpactCategories>
   gwp?: Maybe<GraphQlImpactCategories>
   id: Scalars['String']
+  isTransport: Scalars['Boolean']
   location: Scalars['String']
+  metaFields?: Maybe<Scalars['JSON']>
   name: Scalars['String']
   odp?: Maybe<GraphQlImpactCategories>
   penre?: Maybe<GraphQlImpactCategories>
@@ -378,7 +385,9 @@ export type GraphQlProjectEpd = {
   ep?: Maybe<GraphQlImpactCategories>
   gwp?: Maybe<GraphQlImpactCategories>
   id: Scalars['String']
+  isTransport: Scalars['Boolean']
   location: Scalars['String']
+  metaFields?: Maybe<Scalars['JSON']>
   name: Scalars['String']
   odp?: Maybe<GraphQlImpactCategories>
   originId: Scalars['String']
@@ -574,6 +583,7 @@ export enum GraphQlUnit {
   M3 = 'M3',
   Pcs = 'PCS',
   Tones = 'TONES',
+  TonesKm = 'TONES_KM',
   Unknown = 'UNKNOWN',
 }
 
@@ -1127,6 +1137,7 @@ export enum ProjectDomain {
 export type ProjectEpdFilters = {
   category?: InputMaybe<FilterOptions>
   id?: InputMaybe<FilterOptions>
+  isTransport?: InputMaybe<FilterOptions>
   name?: InputMaybe<FilterOptions>
   owner?: InputMaybe<FilterOptions>
   projectId?: InputMaybe<FilterOptions>
@@ -1422,13 +1433,6 @@ export enum TaskStatus {
   Pending = 'PENDING',
 }
 
-export enum TransportType {
-  Plane = 'plane',
-  Ship = 'ship',
-  Train = 'train',
-  Truck = 'truck',
-}
-
 export enum Unit {
   Kg = 'KG',
   M = 'M',
@@ -1614,7 +1618,6 @@ export type ResolversTypes = {
   TaskFilters: TaskFilters
   TaskItemType: TaskItemType
   TaskStatus: TaskStatus
-  TransportType: TransportType
   Unit: Unit
   exportFormat: ExportFormat
   taskItem: TaskItem
@@ -1761,9 +1764,9 @@ export type GraphQlAssemblyLayerResolvers<
   id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
   name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
   referenceServiceLife?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>
+  transportConversionFactor?: Resolver<ResolversTypes['Float'], ParentType, ContextType>
   transportDistance?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>
-  transportType?: Resolver<Maybe<ResolversTypes['TransportType']>, ParentType, ContextType>
-  transportUnit?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+  transportEpd?: Resolver<Maybe<ResolversTypes['GraphQLProjectEPD']>, ParentType, ContextType>
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
@@ -1818,7 +1821,9 @@ export type GraphQlepdResolvers<
   ep?: Resolver<Maybe<ResolversTypes['GraphQLImpactCategories']>, ParentType, ContextType>
   gwp?: Resolver<Maybe<ResolversTypes['GraphQLImpactCategories']>, ParentType, ContextType>
   id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+  isTransport?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
   location?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+  metaFields?: Resolver<Maybe<ResolversTypes['JSON']>, ParentType, ContextType>
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
   odp?: Resolver<Maybe<ResolversTypes['GraphQLImpactCategories']>, ParentType, ContextType>
   originId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
@@ -1845,7 +1850,9 @@ export type GraphQlepdBaseResolvers<
   ep?: Resolver<Maybe<ResolversTypes['GraphQLImpactCategories']>, ParentType, ContextType>
   gwp?: Resolver<Maybe<ResolversTypes['GraphQLImpactCategories']>, ParentType, ContextType>
   id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+  isTransport?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
   location?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+  metaFields?: Resolver<Maybe<ResolversTypes['JSON']>, ParentType, ContextType>
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
   odp?: Resolver<Maybe<ResolversTypes['GraphQLImpactCategories']>, ParentType, ContextType>
   penre?: Resolver<Maybe<ResolversTypes['GraphQLImpactCategories']>, ParentType, ContextType>
@@ -1968,7 +1975,9 @@ export type GraphQlProjectEpdResolvers<
   ep?: Resolver<Maybe<ResolversTypes['GraphQLImpactCategories']>, ParentType, ContextType>
   gwp?: Resolver<Maybe<ResolversTypes['GraphQLImpactCategories']>, ParentType, ContextType>
   id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+  isTransport?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
   location?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+  metaFields?: Resolver<Maybe<ResolversTypes['JSON']>, ParentType, ContextType>
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
   odp?: Resolver<Maybe<ResolversTypes['GraphQLImpactCategories']>, ParentType, ContextType>
   originId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
@@ -5154,7 +5163,7 @@ export type AddSchemaElementFromSourceMutationOptions = Apollo.BaseMutationOptio
 >
 export const GetAssembliesDocument = gql`
   query getAssemblies($projectId: String!) {
-    assemblies {
+    projectAssemblies(projectId: $projectId) {
       id
       name
     }
