@@ -54,9 +54,9 @@ export type AssemblyLayerInput = {
   id?: InputMaybe<Scalars['String']>
   name?: InputMaybe<Scalars['String']>
   referenceServiceLife?: InputMaybe<Scalars['Int']>
+  transportConversionFactor?: InputMaybe<Scalars['Float']>
   transportDistance?: InputMaybe<Scalars['Float']>
-  transportType?: InputMaybe<TransportType>
-  transportUnit?: InputMaybe<Scalars['String']>
+  transportEpdId?: InputMaybe<Scalars['String']>
 }
 
 export type AssemblyLayerUpdateInput = {
@@ -66,9 +66,9 @@ export type AssemblyLayerUpdateInput = {
   id: Scalars['String']
   name?: InputMaybe<Scalars['String']>
   referenceServiceLife?: InputMaybe<Scalars['Int']>
+  transportConversionFactor?: InputMaybe<Scalars['Float']>
   transportDistance?: InputMaybe<Scalars['Float']>
-  transportType?: InputMaybe<TransportType>
-  transportUnit?: InputMaybe<Scalars['String']>
+  transportEpdId?: InputMaybe<Scalars['String']>
 }
 
 export type AssemblyUpdateInput = {
@@ -104,6 +104,7 @@ export type CommitFilters = {
 export type EpdFilters = {
   category?: InputMaybe<FilterOptions>
   id?: InputMaybe<FilterOptions>
+  isTransport?: InputMaybe<FilterOptions>
   name?: InputMaybe<FilterOptions>
   owner?: InputMaybe<FilterOptions>
   region?: InputMaybe<FilterOptions>
@@ -114,6 +115,7 @@ export type EpdFilters = {
 
 export type EpdSort = {
   category?: InputMaybe<SortOptions>
+  isTransport?: InputMaybe<SortOptions>
   name?: InputMaybe<SortOptions>
   owner?: InputMaybe<SortOptions>
   region?: InputMaybe<SortOptions>
@@ -129,6 +131,7 @@ export type FilterOptions = {
   isAnyOf?: InputMaybe<Array<Scalars['String']>>
   isEmpty?: InputMaybe<Scalars['Boolean']>
   isNotEmpty?: InputMaybe<Scalars['Boolean']>
+  isTrue?: InputMaybe<Scalars['Boolean']>
   jsonContains?: InputMaybe<Scalars['String']>
   startsWith?: InputMaybe<Scalars['String']>
 }
@@ -142,7 +145,7 @@ export type GraphQlAddEpdInput = {
   gwp?: InputMaybe<Scalars['JSON']>
   id?: InputMaybe<Scalars['String']>
   location: Scalars['String']
-  metaFields?: InputMaybe<Scalars['JSON']>
+  metaData?: InputMaybe<Scalars['JSON']>
   name: Scalars['String']
   odp?: InputMaybe<Scalars['JSON']>
   penre?: InputMaybe<Scalars['JSON']>
@@ -195,9 +198,9 @@ export type GraphQlAssemblyLayer = {
   id?: Maybe<Scalars['String']>
   name?: Maybe<Scalars['String']>
   referenceServiceLife?: Maybe<Scalars['Int']>
+  transportConversionFactor: Scalars['Float']
   transportDistance?: Maybe<Scalars['Float']>
-  transportType?: Maybe<TransportType>
-  transportUnit?: Maybe<Scalars['String']>
+  transportEpd?: Maybe<GraphQlProjectEpd>
 }
 
 export enum GraphQlAssemblyUnit {
@@ -253,7 +256,9 @@ export type GraphQlepd = {
   ep?: Maybe<GraphQlImpactCategories>
   gwp?: Maybe<GraphQlImpactCategories>
   id: Scalars['String']
+  isTransport: Scalars['Boolean']
   location: Scalars['String']
+  metaFields?: Maybe<Scalars['JSON']>
   name: Scalars['String']
   odp?: Maybe<GraphQlImpactCategories>
   originId?: Maybe<Scalars['String']>
@@ -277,7 +282,9 @@ export type GraphQlepdBase = {
   ep?: Maybe<GraphQlImpactCategories>
   gwp?: Maybe<GraphQlImpactCategories>
   id: Scalars['String']
+  isTransport: Scalars['Boolean']
   location: Scalars['String']
+  metaFields?: Maybe<Scalars['JSON']>
   name: Scalars['String']
   odp?: Maybe<GraphQlImpactCategories>
   penre?: Maybe<GraphQlImpactCategories>
@@ -378,7 +385,9 @@ export type GraphQlProjectEpd = {
   ep?: Maybe<GraphQlImpactCategories>
   gwp?: Maybe<GraphQlImpactCategories>
   id: Scalars['String']
+  isTransport: Scalars['Boolean']
   location: Scalars['String']
+  metaFields?: Maybe<Scalars['JSON']>
   name: Scalars['String']
   odp?: Maybe<GraphQlImpactCategories>
   originId: Scalars['String']
@@ -495,7 +504,7 @@ export type GraphQlSchemaTemplate = {
   __typename?: 'GraphQLSchemaTemplate'
   id: Scalars['String']
   name: Scalars['String']
-  schema?: Maybe<GraphQlReportingSchema>
+  schemas?: Maybe<Array<GraphQlReportingSchema>>
 }
 
 export type GraphQlSite = {
@@ -553,6 +562,16 @@ export type GraphQlTypeCodeElement = {
   id: Scalars['String']
   level: Scalars['Int']
   name: Scalars['String']
+  parentCode: Scalars['String']
+  parentPath: Scalars['String']
+}
+
+export type GraphQlTypeCodeElementInput = {
+  code: Scalars['String']
+  id?: InputMaybe<Scalars['String']>
+  level?: InputMaybe<Scalars['Int']>
+  name: Scalars['String']
+  parentPath: Scalars['String']
 }
 
 export enum GraphQlUnit {
@@ -564,6 +583,7 @@ export enum GraphQlUnit {
   M3 = 'M3',
   Pcs = 'PCS',
   Tones = 'TONES',
+  TonesKm = 'TONES_KM',
   Unknown = 'UNKNOWN',
 }
 
@@ -652,7 +672,7 @@ export type Mutation = {
   /** Add a new typeCodeElement */
   createTypeCodeElement: GraphQlTypeCodeElement
   /** Add a new typeCodeElement from csv file */
-  createTypeCodeElementFromSource: GraphQlTypeCodeElement
+  createTypeCodeElementFromSource: Scalars['String']
   /** Delete Assemblies */
   deleteAssemblies: Array<Scalars['ID']>
   /** Delete layers from an Assembly */
@@ -850,6 +870,7 @@ export type MutationAddSchemaElementFromSourceArgs = {
 
 export type MutationAddSchemaTemplateArgs = {
   name: Scalars['String']
+  typeCodes?: InputMaybe<Array<GraphQlTypeCodeElementInput>>
 }
 
 export type MutationAddSitesArgs = {
@@ -875,6 +896,7 @@ export type MutationCreateTypeCodeElementArgs = {
   code: Scalars['String']
   level: Scalars['Int']
   name: Scalars['String']
+  parentPath?: Scalars['String']
 }
 
 export type MutationCreateTypeCodeElementFromSourceArgs = {
@@ -1043,6 +1065,7 @@ export type MutationUpdateSchemaElementsArgs = {
 export type MutationUpdateSchemaTemplateArgs = {
   id: Scalars['String']
   name?: InputMaybe<Scalars['String']>
+  typeCodes?: InputMaybe<Array<GraphQlTypeCodeElementInput>>
 }
 
 export type MutationUpdateSitesArgs = {
@@ -1071,6 +1094,7 @@ export type MutationUpdateTypeCodeElementArgs = {
   id: Scalars['String']
   level?: InputMaybe<Scalars['Int']>
   name?: InputMaybe<Scalars['String']>
+  parentPath?: InputMaybe<Scalars['String']>
 }
 
 export type PageInfo = {
@@ -1113,6 +1137,7 @@ export enum ProjectDomain {
 export type ProjectEpdFilters = {
   category?: InputMaybe<FilterOptions>
   id?: InputMaybe<FilterOptions>
+  isTransport?: InputMaybe<FilterOptions>
   name?: InputMaybe<FilterOptions>
   owner?: InputMaybe<FilterOptions>
   projectId?: InputMaybe<FilterOptions>
@@ -1240,7 +1265,7 @@ export type QueryCommitsArgs = {
 
 export type QueryEpdsArgs = {
   after?: InputMaybe<Scalars['String']>
-  count?: Scalars['Int']
+  count?: InputMaybe<Scalars['Int']>
   filters?: InputMaybe<EpdFilters>
   sortBy?: InputMaybe<EpdSort>
 }
@@ -1408,13 +1433,6 @@ export enum TaskStatus {
   Pending = 'PENDING',
 }
 
-export enum TransportType {
-  Plane = 'plane',
-  Ship = 'ship',
-  Train = 'train',
-  Truck = 'truck',
-}
-
 export enum Unit {
   Kg = 'KG',
   M = 'M',
@@ -1569,6 +1587,7 @@ export type ResolversTypes = {
     }
   >
   GraphQLTypeCodeElement: ResolverTypeWrapper<GraphQlTypeCodeElement>
+  GraphQLTypeCodeElementInput: GraphQlTypeCodeElementInput
   GraphQLUnit: GraphQlUnit
   GraphQLUpdateSiteInput: GraphQlUpdateSiteInput
   GraphQLUserAccount: ResolverTypeWrapper<GraphQlUserAccount>
@@ -1599,7 +1618,6 @@ export type ResolversTypes = {
   TaskFilters: TaskFilters
   TaskItemType: TaskItemType
   TaskStatus: TaskStatus
-  TransportType: TransportType
   Unit: Unit
   exportFormat: ExportFormat
   taskItem: TaskItem
@@ -1665,6 +1683,7 @@ export type ResolversParentTypes = {
     item: ResolversParentTypes['GraphQLSchemaElementGraphQLSchemaCategory']
   }
   GraphQLTypeCodeElement: GraphQlTypeCodeElement
+  GraphQLTypeCodeElementInput: GraphQlTypeCodeElementInput
   GraphQLUpdateSiteInput: GraphQlUpdateSiteInput
   GraphQLUserAccount: GraphQlUserAccount
   JSON: Scalars['JSON']
@@ -1745,9 +1764,9 @@ export type GraphQlAssemblyLayerResolvers<
   id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
   name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
   referenceServiceLife?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>
+  transportConversionFactor?: Resolver<ResolversTypes['Float'], ParentType, ContextType>
   transportDistance?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>
-  transportType?: Resolver<Maybe<ResolversTypes['TransportType']>, ParentType, ContextType>
-  transportUnit?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+  transportEpd?: Resolver<Maybe<ResolversTypes['GraphQLProjectEPD']>, ParentType, ContextType>
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
@@ -1802,7 +1821,9 @@ export type GraphQlepdResolvers<
   ep?: Resolver<Maybe<ResolversTypes['GraphQLImpactCategories']>, ParentType, ContextType>
   gwp?: Resolver<Maybe<ResolversTypes['GraphQLImpactCategories']>, ParentType, ContextType>
   id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+  isTransport?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
   location?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+  metaFields?: Resolver<Maybe<ResolversTypes['JSON']>, ParentType, ContextType>
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
   odp?: Resolver<Maybe<ResolversTypes['GraphQLImpactCategories']>, ParentType, ContextType>
   originId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
@@ -1829,7 +1850,9 @@ export type GraphQlepdBaseResolvers<
   ep?: Resolver<Maybe<ResolversTypes['GraphQLImpactCategories']>, ParentType, ContextType>
   gwp?: Resolver<Maybe<ResolversTypes['GraphQLImpactCategories']>, ParentType, ContextType>
   id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+  isTransport?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
   location?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+  metaFields?: Resolver<Maybe<ResolversTypes['JSON']>, ParentType, ContextType>
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
   odp?: Resolver<Maybe<ResolversTypes['GraphQLImpactCategories']>, ParentType, ContextType>
   penre?: Resolver<Maybe<ResolversTypes['GraphQLImpactCategories']>, ParentType, ContextType>
@@ -1952,7 +1975,9 @@ export type GraphQlProjectEpdResolvers<
   ep?: Resolver<Maybe<ResolversTypes['GraphQLImpactCategories']>, ParentType, ContextType>
   gwp?: Resolver<Maybe<ResolversTypes['GraphQLImpactCategories']>, ParentType, ContextType>
   id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+  isTransport?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
   location?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+  metaFields?: Resolver<Maybe<ResolversTypes['JSON']>, ParentType, ContextType>
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
   odp?: Resolver<Maybe<ResolversTypes['GraphQLImpactCategories']>, ParentType, ContextType>
   originId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
@@ -2106,7 +2131,7 @@ export type GraphQlSchemaTemplateResolvers<
 > = {
   id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-  schema?: Resolver<Maybe<ResolversTypes['GraphQLReportingSchema']>, ParentType, ContextType>
+  schemas?: Resolver<Maybe<Array<ResolversTypes['GraphQLReportingSchema']>>, ParentType, ContextType>
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
@@ -2179,6 +2204,8 @@ export type GraphQlTypeCodeElementResolvers<
   id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
   level?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+  parentCode?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+  parentPath?: Resolver<ResolversTypes['String'], ParentType, ContextType>
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
@@ -2342,7 +2369,7 @@ export type MutationResolvers<
     ResolversTypes['GraphQLSchemaTemplate'],
     ParentType,
     ContextType,
-    RequireFields<MutationAddSchemaTemplateArgs, 'name'>
+    RequireFields<MutationAddSchemaTemplateArgs, 'name' | 'typeCodes'>
   >
   addSites?: Resolver<
     Array<ResolversTypes['GraphQLSite']>,
@@ -2369,10 +2396,10 @@ export type MutationResolvers<
     ResolversTypes['GraphQLTypeCodeElement'],
     ParentType,
     ContextType,
-    RequireFields<MutationCreateTypeCodeElementArgs, 'code' | 'level' | 'name'>
+    RequireFields<MutationCreateTypeCodeElementArgs, 'code' | 'level' | 'name' | 'parentPath'>
   >
   createTypeCodeElementFromSource?: Resolver<
-    ResolversTypes['GraphQLTypeCodeElement'],
+    ResolversTypes['String'],
     ParentType,
     ContextType,
     RequireFields<MutationCreateTypeCodeElementFromSourceArgs, 'file'>
@@ -2579,7 +2606,7 @@ export type MutationResolvers<
     ResolversTypes['GraphQLSchemaTemplate'],
     ParentType,
     ContextType,
-    RequireFields<MutationUpdateSchemaTemplateArgs, 'id' | 'name'>
+    RequireFields<MutationUpdateSchemaTemplateArgs, 'id' | 'name' | 'typeCodes'>
   >
   updateSites?: Resolver<
     Array<ResolversTypes['GraphQLSite']>,
@@ -2606,7 +2633,7 @@ export type MutationResolvers<
     ResolversTypes['GraphQLTypeCodeElement'],
     ParentType,
     ContextType,
-    RequireFields<MutationUpdateTypeCodeElementArgs, 'code' | 'id' | 'level' | 'name'>
+    RequireFields<MutationUpdateTypeCodeElementArgs, 'code' | 'id' | 'level' | 'name' | 'parentPath'>
   >
 }
 
@@ -2751,7 +2778,7 @@ export type QueryResolvers<
     Array<ResolversTypes['GraphQLTypeCodeElement']>,
     ParentType,
     ContextType,
-    Partial<QueryTypeCodeElementsArgs>
+    RequireFields<QueryTypeCodeElementsArgs, 'code' | 'id' | 'name'>
   >
 }
 
@@ -2808,7 +2835,18 @@ export type GetSchemaTemplatesQuery = {
     __typename?: 'GraphQLSchemaTemplate'
     id: string
     name: string
-    schema?: { __typename?: 'GraphQLReportingSchema'; name: string; id: string; templateId?: string | null } | null
+    schemas?: Array<{
+      __typename?: 'GraphQLReportingSchema'
+      name: string
+      id: string
+      categories?: Array<{
+        __typename?: 'GraphQLSchemaCategory'
+        id: string
+        name: string
+        path: string
+        depth: number
+      }> | null
+    }> | null
   }>
 }
 
@@ -2820,6 +2858,7 @@ export type DeleteSchemaTemplateMutation = { __typename?: 'Mutation'; deleteSche
 
 export type AddSchemaTemplateMutationVariables = Exact<{
   name: Scalars['String']
+  typeCodes?: InputMaybe<Array<GraphQlTypeCodeElementInput> | GraphQlTypeCodeElementInput>
 }>
 
 export type AddSchemaTemplateMutation = {
@@ -2828,13 +2867,25 @@ export type AddSchemaTemplateMutation = {
     __typename?: 'GraphQLSchemaTemplate'
     id: string
     name: string
-    schema?: { __typename?: 'GraphQLReportingSchema'; id: string; name: string; templateId?: string | null } | null
+    schemas?: Array<{
+      __typename?: 'GraphQLReportingSchema'
+      id: string
+      name: string
+      categories?: Array<{
+        __typename?: 'GraphQLSchemaCategory'
+        id: string
+        name: string
+        path: string
+        depth: number
+      }> | null
+    }> | null
   }
 }
 
 export type UpdateSchemaTemplateMutationVariables = Exact<{
   id: Scalars['String']
   name: Scalars['String']
+  typeCodes?: InputMaybe<Array<GraphQlTypeCodeElementInput> | GraphQlTypeCodeElementInput>
 }>
 
 export type UpdateSchemaTemplateMutation = {
@@ -2843,7 +2894,18 @@ export type UpdateSchemaTemplateMutation = {
     __typename?: 'GraphQLSchemaTemplate'
     id: string
     name: string
-    schema?: { __typename?: 'GraphQLReportingSchema'; id: string; name: string; templateId?: string | null } | null
+    schemas?: Array<{
+      __typename?: 'GraphQLReportingSchema'
+      id: string
+      name: string
+      categories?: Array<{
+        __typename?: 'GraphQLSchemaCategory'
+        id: string
+        name: string
+        path: string
+        depth: number
+      }> | null
+    }> | null
   }
 }
 
@@ -3317,9 +3379,21 @@ export type UploadTypeCodeElementsMutationVariables = Exact<{
   file: Scalars['String']
 }>
 
-export type UploadTypeCodeElementsMutation = {
-  __typename?: 'Mutation'
-  createTypeCodeElementFromSource: { __typename?: 'GraphQLTypeCodeElement'; name: string; code: string; level: number }
+export type UploadTypeCodeElementsMutation = { __typename?: 'Mutation'; createTypeCodeElementFromSource: string }
+
+export type GetTypeCodesQueryVariables = Exact<{ [key: string]: never }>
+
+export type GetTypeCodesQuery = {
+  __typename?: 'Query'
+  typeCodeElements: Array<{
+    __typename?: 'GraphQLTypeCodeElement'
+    id: string
+    code: string
+    name: string
+    parentPath: string
+    level: number
+    parentCode: string
+  }>
 }
 
 export const GetSchemaTemplatesDocument = gql`
@@ -3327,10 +3401,15 @@ export const GetSchemaTemplatesDocument = gql`
     schemaTemplates {
       id
       name
-      schema {
+      schemas {
         name
         id
-        templateId
+        categories {
+          id
+          name
+          path
+          depth
+        }
       }
     }
   }
@@ -3415,14 +3494,19 @@ export type DeleteSchemaTemplateMutationOptions = Apollo.BaseMutationOptions<
   DeleteSchemaTemplateMutationVariables
 >
 export const AddSchemaTemplateDocument = gql`
-  mutation addSchemaTemplate($name: String!) {
-    addSchemaTemplate(name: $name) {
+  mutation addSchemaTemplate($name: String!, $typeCodes: [GraphQLTypeCodeElementInput!] = null) {
+    addSchemaTemplate(name: $name, typeCodes: $typeCodes) {
       id
       name
-      schema {
+      schemas {
         id
         name
-        templateId
+        categories {
+          id
+          name
+          path
+          depth
+        }
       }
     }
   }
@@ -3446,6 +3530,7 @@ export type AddSchemaTemplateMutationFn = Apollo.MutationFunction<
  * const [addSchemaTemplateMutation, { data, loading, error }] = useAddSchemaTemplateMutation({
  *   variables: {
  *      name: // value for 'name'
+ *      typeCodes: // value for 'typeCodes'
  *   },
  * });
  */
@@ -3465,14 +3550,19 @@ export type AddSchemaTemplateMutationOptions = Apollo.BaseMutationOptions<
   AddSchemaTemplateMutationVariables
 >
 export const UpdateSchemaTemplateDocument = gql`
-  mutation updateSchemaTemplate($id: String!, $name: String!) {
-    updateSchemaTemplate(id: $id, name: $name) {
+  mutation updateSchemaTemplate($id: String!, $name: String!, $typeCodes: [GraphQLTypeCodeElementInput!] = null) {
+    updateSchemaTemplate(id: $id, name: $name, typeCodes: $typeCodes) {
       id
       name
-      schema {
+      schemas {
         id
         name
-        templateId
+        categories {
+          id
+          name
+          path
+          depth
+        }
       }
     }
   }
@@ -3497,6 +3587,7 @@ export type UpdateSchemaTemplateMutationFn = Apollo.MutationFunction<
  *   variables: {
  *      id: // value for 'id'
  *      name: // value for 'name'
+ *      typeCodes: // value for 'typeCodes'
  *   },
  * });
  */
@@ -5153,11 +5244,7 @@ export type GetSingleProjectLazyQueryHookResult = ReturnType<typeof useGetSingle
 export type GetSingleProjectQueryResult = Apollo.QueryResult<GetSingleProjectQuery, GetSingleProjectQueryVariables>
 export const UploadTypeCodeElementsDocument = gql`
   mutation uploadTypeCodeElements($file: String!) {
-    createTypeCodeElementFromSource(file: $file) {
-      name
-      code
-      level
-    }
+    createTypeCodeElementFromSource(file: $file)
   }
 `
 export type UploadTypeCodeElementsMutationFn = Apollo.MutationFunction<
@@ -5197,3 +5284,46 @@ export type UploadTypeCodeElementsMutationOptions = Apollo.BaseMutationOptions<
   UploadTypeCodeElementsMutation,
   UploadTypeCodeElementsMutationVariables
 >
+export const GetTypeCodesDocument = gql`
+  query getTypeCodes {
+    typeCodeElements {
+      id
+      code
+      name
+      parentPath
+      level
+      parentCode
+    }
+  }
+`
+
+/**
+ * __useGetTypeCodesQuery__
+ *
+ * To run a query within a React component, call `useGetTypeCodesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetTypeCodesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetTypeCodesQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetTypeCodesQuery(
+  baseOptions?: Apollo.QueryHookOptions<GetTypeCodesQuery, GetTypeCodesQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useQuery<GetTypeCodesQuery, GetTypeCodesQueryVariables>(GetTypeCodesDocument, options)
+}
+export function useGetTypeCodesLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<GetTypeCodesQuery, GetTypeCodesQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useLazyQuery<GetTypeCodesQuery, GetTypeCodesQueryVariables>(GetTypeCodesDocument, options)
+}
+export type GetTypeCodesQueryHookResult = ReturnType<typeof useGetTypeCodesQuery>
+export type GetTypeCodesLazyQueryHookResult = ReturnType<typeof useGetTypeCodesLazyQuery>
+export type GetTypeCodesQueryResult = Apollo.QueryResult<GetTypeCodesQuery, GetTypeCodesQueryVariables>

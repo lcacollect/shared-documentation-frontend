@@ -6,26 +6,39 @@ import {
   GridActionsCellItem,
   GridColumns,
   GridRowId,
-  GridRowParams,
+  GridRowModel,
   GridValueGetterParams,
 } from '@mui/x-data-grid-pro'
-import { Dispatch, SetStateAction, useMemo, useState } from 'react'
-import { GraphQlReportingSchema, GraphQlSchemaTemplate, useDeleteSchemaTemplateMutation } from '../../dataAccess'
+import { Dispatch, SetStateAction, useState, useEffect } from 'react'
+import { GraphQlSchemaTemplate, useDeleteSchemaTemplateMutation, GetSchemaTemplatesDocument } from '../../dataAccess'
 import { AddTypecodeDialog } from '../addTypecodeDialog'
 import { CreateTemplateDialog } from '../createTemplateDialog'
 import { NoRowsOverlay } from '@lcacollect/components'
 
-type SimplifiedSchema = Omit<GraphQlReportingSchema, 'projectId'>
+interface Categories {
+  id: string
+  name: string
+  path: string
+  depth: number
+}
 
-export interface SchemaTemplate extends Omit<GraphQlSchemaTemplate, 'schema'> {
-  schema?: SimplifiedSchema | null | undefined
+interface ReportingSchema {
+  id: string
+  name: string
+  categories: Categories[]
+}
+
+export interface SchemaTemplate {
+  id: string
+  name: string
+  schemas: ReportingSchema[] | undefined
 }
 
 interface SchemaTemplatesTableProps {
-  schemaTemplates: SchemaTemplate[] | null | undefined
+  schemaTemplates: GraphQlSchemaTemplate[]
   loading: boolean
-  openCreateTemplateDialogId: string
-  setOpenCreateTemplateDialogId: Dispatch<SetStateAction<string>>
+  openCreateTemplateDialog: boolean
+  setOpenCreateTemplateDialog: Dispatch<SetStateAction<boolean>>
   openAddTypecodeDialog: boolean
   setOpenAddTypecodeDialog: Dispatch<SetStateAction<boolean>>
 }
@@ -34,23 +47,27 @@ export const SchemaTemplatesTable = (props: SchemaTemplatesTableProps) => {
   const {
     schemaTemplates,
     loading,
-    openCreateTemplateDialogId,
-    setOpenCreateTemplateDialogId,
+    openCreateTemplateDialog,
+    setOpenCreateTemplateDialog,
     openAddTypecodeDialog,
     setOpenAddTypecodeDialog,
   } = props
-  const [deleteSchemaTemplate] = useDeleteSchemaTemplateMutation()
+  const [deleteSchemaTemplate] = useDeleteSchemaTemplateMutation({
+    refetchQueries: [{ query: GetSchemaTemplatesDocument }],
+  })
   const [snackbar, setSnackbar] = useState<Pick<AlertProps, 'children' | 'severity'> | null>(null)
-  const [editRow, setEditRow] = useState<SchemaTemplate | null | undefined>()
+  const [editTemplate, setEditTemplate] = useState<SchemaTemplate | null | undefined>()
+  const [rows, setRows] = useState<GridRowModel<SchemaTemplate[]>>([])
 
-  const rows = useMemo(() => schemaTemplates, [schemaTemplates])
-
-  const handleRowClick = (params: GridRowParams<GraphQlSchemaTemplate>) => {
-    setOpenCreateTemplateDialogId(params.row.id)
-  }
+  useEffect(() => {
+    if (schemaTemplates) {
+      setRows(schemaTemplates as SchemaTemplate[])
+    }
+  }, [schemaTemplates])
 
   const handleCreateTemplateDialogClose = () => {
-    setOpenCreateTemplateDialogId('')
+    setEditTemplate(null)
+    setOpenCreateTemplateDialog(false)
   }
 
   const handleAddTypecodeDialogClose = () => {
@@ -59,24 +76,24 @@ export const SchemaTemplatesTable = (props: SchemaTemplatesTableProps) => {
 
   const handleDeleteClick = async (id: GridRowId) => {
     setSnackbar({ children: 'Deleting template...', severity: 'info' })
-    return
-    // const { errors } = await deleteSchemaTemplate({
-    //   variables: { id: id as string },
-    //   refetchQueries: [GetSchemaTemplatesDocument],
-    // })
-    // if (errors) {
-    //   errors.forEach((error) => console.error(error))
-    //   setSnackbar({ children: errors[0].message, severity: 'error' })
-    // }
+    const { errors } = await deleteSchemaTemplate({
+      variables: { id: id as string },
+    })
+    if (errors) {
+      errors.forEach((error) => console.error(error))
+      setSnackbar({ children: errors[0].message, severity: 'error' })
+    } else {
+      setSnackbar({ children: 'Template deleted!', severity: 'success' })
+    }
   }
 
   const handleEditClick = (id: GridRowId) => () => {
-    setOpenCreateTemplateDialogId(id.toString())
-    setEditRow(schemaTemplates?.find((template) => template.id === id))
+    setEditTemplate(schemaTemplates?.find((template) => template.id === id) as unknown as SchemaTemplate)
+    setOpenCreateTemplateDialog(true)
   }
 
   const getTypecode = (cell: GridValueGetterParams) => {
-    return cell.row.schema.name
+    return cell.row.schemas[0]?.name
   }
 
   const columns: GridColumns = [
@@ -123,13 +140,12 @@ export const SchemaTemplatesTable = (props: SchemaTemplatesTableProps) => {
   ]
 
   return (
-    <div style={{ height: 600, width: '100%' }} data-testid='tasks-table'>
+    <div style={{ height: 600, width: '100%' }} data-testid='templates-table'>
       <DataGridPro
-        aria-label='tasks-table'
+        aria-label='templates-table'
         loading={loading}
-        rows={rows || []}
+        rows={rows}
         columns={columns}
-        onRowClick={handleRowClick}
         components={{ LoadingOverlay: LinearProgress, NoRowsOverlay: NoRowsOverlay }}
         componentsProps={{
           noRowsOverlay: { text: 'No templates added' },
@@ -143,14 +159,12 @@ export const SchemaTemplatesTable = (props: SchemaTemplatesTableProps) => {
         }}
       />
       <CreateTemplateDialog
-        open={!!rows && !!openCreateTemplateDialogId}
-        templateId={openCreateTemplateDialogId}
+        open={openCreateTemplateDialog}
         handleClose={handleCreateTemplateDialogClose}
-        editRow={editRow}
-        setEditRow={setEditRow}
-        loading={loading}
+        editTemplate={editTemplate}
+        setEditTemplate={setEditTemplate}
       />
-      <AddTypecodeDialog open={!!rows && !!openAddTypecodeDialog} handleClose={handleAddTypecodeDialogClose} />
+      <AddTypecodeDialog open={openAddTypecodeDialog} handleClose={handleAddTypecodeDialogClose} />
       {!!snackbar && (
         <Snackbar
           open

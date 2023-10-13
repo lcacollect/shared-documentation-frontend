@@ -13,7 +13,7 @@ import {
 } from '@mui/material'
 import React, { useState } from 'react'
 import { FileField } from '../sourceDialog/sourceForm'
-import { ProjectSourceType, useUploadTypeCodeElementsMutation } from '../../dataAccess'
+import { ProjectSourceType, useUploadTypeCodeElementsMutation, GetTypeCodesDocument } from '../../dataAccess'
 
 export const AssigneeTypeMap = {
   GraphQLProjectMember: 'PROJECT_MEMBER',
@@ -31,7 +31,9 @@ export const AddTypecodeDialog = ({ open, handleClose }: AddTypecodeProps) => {
   const [file, setFile] = useState<File>()
   const [snackbar, setSnackbar] = useState<Pick<AlertProps, 'children' | 'severity'> | null>(null)
 
-  const [uploadTypeCodeElements] = useUploadTypeCodeElementsMutation()
+  const [uploadTypeCodeElements] = useUploadTypeCodeElementsMutation({
+    refetchQueries: [{ query: GetTypeCodesDocument }],
+  })
 
   const resetValue = () => {
     setName(undefined)
@@ -95,10 +97,11 @@ export const AddTypecodeDialog = ({ open, handleClose }: AddTypecodeProps) => {
 
   const downloadTemplate = () => {
     const rows = [
-      ['Code', 'Name', 'Level'],
-      ['1', 'Bygningsbasis', 1],
-      ['10x', 'TerrĆ¦n', 3],
-      ['121', 'Liniefundamenter', 3],
+      ['Code', 'Name', 'Level', 'parentPath'],
+      ['1', 'Bygningsbasis', 1, '/'],
+      ['10x', 'TerrĆ¦n', 2, '/1'],
+      ['121', 'Liniefundamenter', 3, '/1/10x'],
+      /* Level and parentPath must be relative */
     ]
 
     const csvContent = 'data:text/csv;charset=utf-8,' + rows.map((e) => e.join(',')).join('\n')
@@ -140,13 +143,13 @@ export const AddTypecodeDialog = ({ open, handleClose }: AddTypecodeProps) => {
           </Grid>
         </DialogContent>
         <DialogActions sx={{ padding: '0 1rem 1rem 0' }}>
-          <LcaButton onClick={downloadTemplate} data-testid='downloadTemplate' sx={{ 'margin-right': 'auto' }}>
+          <LcaButton onClick={downloadTemplate} data-testid='downloadTemplate' sx={{ marginRight: 'auto' }}>
             <Typography>Download template</Typography>
           </LcaButton>
           <LcaButton onClick={handleCancel}>
             <Typography>Cancel</Typography>
           </LcaButton>
-          <LcaButton onClick={() => (name && file ? handleAdd() : handleFormIncomplete())}>
+          <LcaButton disabled={!file || !name} onClick={() => (name && file ? handleAdd() : handleFormIncomplete())}>
             <Typography>Add</Typography>
           </LcaButton>
         </DialogActions>

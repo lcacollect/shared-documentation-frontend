@@ -2,6 +2,7 @@ import React, { Dispatch, SetStateAction, useState } from 'react'
 import { NestedCategory, SchemaElement, SchemaElementsTable, Task } from '../../components'
 import { GraphQlSchemaCategory } from '../../dataAccess'
 import { BCAccordion, BCAccordionDetails, BCAccordionSummary } from './BCAccordion'
+import { ErrorBoundary } from '@lcacollect/components'
 
 interface CategoriesAccordionProps {
   projElements: SchemaElement[]
@@ -77,18 +78,20 @@ export const CategoriesAccordion = (props: CategoriesAccordionProps) => {
             ))
           : null}
         {category.depth === 1 ? (
-          <SchemaElementsTable
-            categoriesId={categoriesId}
-            category={category}
-            tasks={elementTasks}
-            elements={categoryElements}
-            isAddingTasks={isAddingTasks}
-            refToAddTaskTo={refToAddTaskTo}
-            setRefToAddTaskTo={setRefToAddTaskTo}
-            setSelectedTask={setSelectedTask}
-            setIsAddTaskDialogOpen={setIsAddTaskDialogOpen}
-            refetchElements={refetchElements}
-          />
+          <ErrorBoundary>
+            <SchemaElementsTable
+              categoriesId={categoriesId}
+              category={category}
+              tasks={elementTasks}
+              elements={categoryElements}
+              isAddingTasks={isAddingTasks}
+              refToAddTaskTo={refToAddTaskTo}
+              setRefToAddTaskTo={setRefToAddTaskTo}
+              setSelectedTask={setSelectedTask}
+              setIsAddTaskDialogOpen={setIsAddTaskDialogOpen}
+              refetchElements={refetchElements}
+            />
+          </ErrorBoundary>
         ) : null}
       </BCAccordionDetails>
     </BCAccordion>

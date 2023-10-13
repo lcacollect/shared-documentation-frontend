@@ -15,14 +15,27 @@ input SchemaCategoryFilters {
   #path: FilterOptionInput = null
 }
 
+input GraphQLTypeCodeElementInput {
+  id: String!
+  name: String!
+  code: String!
+  level: Int
+  parentPath: String
+}
+
 query getSchemaTemplates {
   schemaTemplates {
     id
     name
-    schema {
+    schemas {
       name
       id
-      templateId
+      categories {
+        id
+        name
+        path
+        depth
+      }
     }
   }
 }
@@ -31,26 +44,36 @@ mutation deleteSchemaTemplate($id: String!) {
   deleteSchemaTemplate(id: $id)
 }
 
-mutation addSchemaTemplate($name: String!) {
-  addSchemaTemplate(name: $name) {
+mutation addSchemaTemplate($name: String!, $typeCodes: [GraphQLTypeCodeElementInput!] = null) {
+  addSchemaTemplate(name: $name, typeCodes: $typeCodes) {
     id
     name
-    schema {
+    schemas {
       id
       name
-      templateId
+      categories {
+        id
+        name
+        path
+        depth
+      }
     }
   }
 }
 
-mutation updateSchemaTemplate($id: String!, $name: String!) {
-  updateSchemaTemplate(id: $id, name: $name) {
+mutation updateSchemaTemplate($id: String!, $name: String!, $typeCodes: [GraphQLTypeCodeElementInput!] = null) {
+  updateSchemaTemplate(id: $id, name: $name, typeCodes: $typeCodes) {
     id
     name
-    schema {
+    schemas {
       id
       name
-      templateId
+      categories {
+        id
+        name
+        path
+        depth
+      }
     }
   }
 }
@@ -516,9 +539,16 @@ query getSingleProject($id: String!) {
 }
 
 mutation uploadTypeCodeElements($file: String!) {
-  createTypeCodeElementFromSource(file: $file) {
-    name
+  createTypeCodeElementFromSource(file: $file)
+}
+
+query getTypeCodes {
+  typeCodeElements {
+    id
     code
+    name
+    parentPath
     level
+    parentCode
   }
 }

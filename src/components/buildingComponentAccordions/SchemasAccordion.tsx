@@ -4,6 +4,7 @@ import { BCAccordion, BCAccordionDetails } from './BCAccordion'
 import { CategoriesAccordion } from './CategoriesAccordion'
 import { SchemaElement } from '../schemaElementsTable'
 import { Task } from '../tasksTable'
+import { ErrorBoundary } from '@lcacollect/components'
 
 interface SchemasAccordionProps {
   categoriesId: string[]
@@ -46,20 +47,21 @@ export const SchemasAccordion = (props: SchemasAccordionProps) => {
     <BCAccordion expanded={true} level={0}>
       <BCAccordionDetails>
         {Object.values(categoriesByPath).map((category: NestedCategory, index: number) => (
-          <CategoriesAccordion
-            level={0}
-            key={index}
-            category={category}
-            projElements={projElements}
-            projTasks={projTasks}
-            categoriesId={categoriesId}
-            isAddingTasks={isAddingTasks}
-            refToAddTaskTo={refToAddTaskTo}
-            setRefToAddTaskTo={setRefToAddTaskTo}
-            setSelectedTask={setSelectedTask}
-            setIsAddTaskDialogOpen={setIsAddTaskDialogOpen}
-            refetchElements={refetchElements}
-          />
+          <ErrorBoundary key={index}>
+            <CategoriesAccordion
+              level={0}
+              category={category}
+              projElements={projElements}
+              projTasks={projTasks}
+              categoriesId={categoriesId}
+              isAddingTasks={isAddingTasks}
+              refToAddTaskTo={refToAddTaskTo}
+              setRefToAddTaskTo={setRefToAddTaskTo}
+              setSelectedTask={setSelectedTask}
+              setIsAddTaskDialogOpen={setIsAddTaskDialogOpen}
+              refetchElements={refetchElements}
+            />
+          </ErrorBoundary>
         ))}
       </BCAccordionDetails>
     </BCAccordion>
