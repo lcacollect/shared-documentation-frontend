@@ -538,8 +538,8 @@ query getSingleProject($id: String!) {
   }
 }
 
-mutation uploadTypeCodeElements($file: String!) {
-  createTypeCodeElementFromSource(file: $file)
+mutation uploadTypeCodeElements($file: String!, $name: String!) {
+  createTypeCodeElementFromSource(file: $file, name: $name)
 }
 
 query getTypeCodes {

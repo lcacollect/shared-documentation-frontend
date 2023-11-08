@@ -27,7 +27,7 @@ type AddTypecodeProps = {
 }
 
 export const AddTypecodeDialog = ({ open, handleClose }: AddTypecodeProps) => {
-  const [name, setName] = useState<string>()
+  const [name, setName] = useState<string>('')
   const [file, setFile] = useState<File>()
   const [snackbar, setSnackbar] = useState<Pick<AlertProps, 'children' | 'severity'> | null>(null)
 
@@ -36,7 +36,7 @@ export const AddTypecodeDialog = ({ open, handleClose }: AddTypecodeProps) => {
   })
 
   const resetValue = () => {
-    setName(undefined)
+    setName('')
     setFile(undefined)
   }
 
@@ -64,7 +64,7 @@ export const AddTypecodeDialog = ({ open, handleClose }: AddTypecodeProps) => {
       setSnackbar({ children: 'Adding typecode...', severity: 'info' })
 
       await uploadTypeCodeElements({
-        variables: { file: encodedFile },
+        variables: { file: encodedFile, name },
       })
         .then((data) => {
           if (data.errors) {
