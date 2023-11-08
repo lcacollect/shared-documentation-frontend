@@ -29,12 +29,7 @@ import { TaskComments } from '../comments'
 import { Task } from '../tasksTable'
 import { IAssignee, TaskDialogMemberRow } from './taskDialogMemberRow'
 import { TaskStatusRow } from './taskStatus'
-
-export const AssigneeTypeMap = {
-  GraphQLProjectMember: 'PROJECT_MEMBER',
-  GraphQLProjectGroup: 'PROJECT_GROUP',
-  User: 'USER',
-}
+import { AssigneeTypeMap } from '../../components'
 
 type TaskDialogProps = {
   open: boolean

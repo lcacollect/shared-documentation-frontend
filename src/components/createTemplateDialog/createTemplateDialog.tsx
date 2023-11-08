@@ -26,12 +26,6 @@ import {
 import { SchemaTemplate } from '../schemaTemplatesTable'
 import { TypecodeSelectionTable } from '../typecodeSelectionTable'
 
-export const AssigneeTypeMap = {
-  GraphQLProjectMember: 'PROJECT_MEMBER',
-  GraphQLProjectGroup: 'PROJECT_GROUP',
-  User: 'USER',
-}
-
 type CreateTemplateDialogProps = {
   open: boolean
   handleClose: () => void

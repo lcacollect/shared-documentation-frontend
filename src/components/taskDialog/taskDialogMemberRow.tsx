@@ -10,7 +10,7 @@ import {
 } from '../../dataAccess'
 import { SimplifiedProjectMember, Task } from '../tasksTable'
 import { useParams } from 'react-router-dom'
-import { AssigneeTypeMap } from './taskDialog'
+import { AssigneeTypeMap } from '../../components'
 
 interface TaskDialogMemberRowProps {
   task?: Task
