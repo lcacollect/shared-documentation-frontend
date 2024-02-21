@@ -527,6 +527,7 @@ query getAssemblies($projectId: String!) {
   projectAssemblies(projectId: $projectId) {
     id
     name
+    unit
   }
 }
 
