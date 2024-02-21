@@ -219,7 +219,7 @@ export type GraphQlAssemblyLayerInput = {
   epd: GraphQlProjectEpdInput
   id: Scalars['String']
   name: Scalars['String']
-  referenceServiceLife: Scalars['Int']
+  referenceServiceLife?: InputMaybe<Scalars['Int']>
   transportConversionFactor?: InputMaybe<Scalars['Float']>
   transportDistance?: InputMaybe<Scalars['Float']>
   transportEpd?: InputMaybe<GraphQlProjectEpdInput>
@@ -3484,7 +3484,12 @@ export type GetAssembliesQueryVariables = Exact<{
 
 export type GetAssembliesQuery = {
   __typename?: 'Query'
-  projectAssemblies: Array<{ __typename?: 'GraphQLProjectAssembly'; id: string; name: string }>
+  projectAssemblies: Array<{
+    __typename?: 'GraphQLProjectAssembly'
+    id: string
+    name: string
+    unit: GraphQlAssemblyUnit
+  }>
 }
 
 export type GetSingleProjectQueryVariables = Exact<{
@@ -5288,6 +5293,7 @@ export const GetAssembliesDocument = gql`
     projectAssemblies(projectId: $projectId) {
       id
       name
+      unit
     }
   }
 `

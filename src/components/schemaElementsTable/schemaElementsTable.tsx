@@ -9,11 +9,12 @@ import EditIcon from '@mui/icons-material/Edit'
 import SaveIcon from '@mui/icons-material/Save'
 import Tooltip from '@mui/material/Tooltip'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import { Alert, AlertProps, IconButton, LinearProgress, Radio, Snackbar } from '@mui/material'
+import { Alert, AlertProps, Autocomplete, IconButton, LinearProgress, Radio, Snackbar, TextField } from '@mui/material'
 import {
   DataGridPro,
   GridActionsCellItem,
   GridColumns,
+  GridEditSingleSelectCellProps,
   GridEventListener,
   GridRowId,
   GridRowModel,
@@ -27,8 +28,9 @@ import {
   GridRenderCellParams,
   MuiEvent,
   GRID_DETAIL_PANEL_TOGGLE_COL_DEF,
+  useGridApiContext,
 } from '@mui/x-data-grid-pro'
-import { ChangeEvent, Dispatch, SetStateAction, SyntheticEvent, useCallback, useEffect, useState } from 'react'
+import { ChangeEvent, Dispatch, SetStateAction, SyntheticEvent, useCallback, useEffect, useMemo, useState } from 'react'
 import {
   GetSchemaElementsDocument,
   GraphQlSchemaCategory,
@@ -126,7 +128,11 @@ export const SchemaElementsTable = (props: SchemaElementsTableProps) => {
     variables: { projectId: projectId as string },
     skip: !projectId,
   })
-  const assemblies = assemblyData?.projectAssemblies
+
+  const assemblies = useMemo(
+    () => assemblyData?.projectAssemblies.sort((a, b) => a.name.localeCompare(b.name)) || [],
+    [assemblyData],
+  )
 
   const { data: sourceData } = useGetProjectSourceDataQuery({
     variables: { projectId: projectId as string },
@@ -230,7 +236,7 @@ export const SchemaElementsTable = (props: SchemaElementsTableProps) => {
       variables: {
         schemaCategoryId: newRow.schemaCategory as unknown as string,
         name: newRow.name,
-        quantity: newRow.quantity,
+        quantity: newRow.quantity <= 0 ? 0 : newRow.quantity,
         unit: newRow.unit,
         description: newRow.description as string,
         assemblyId: newRow.assemblyId,
@@ -254,6 +260,10 @@ export const SchemaElementsTable = (props: SchemaElementsTableProps) => {
     const changeObject = getDifference(oldRow, newRow)
     if (typeof changeObject.schemaCategory !== 'string') {
       delete changeObject.schemaCategory
+    }
+
+    if (changeObject.quantity) {
+      changeObject.quantity = changeObject.quantity <= 0 ? 0 : changeObject.quantity
     }
     const { errors, data } = await updateSchemaElementsMutation({
       variables: { elements: [{ ...changeObject, id: oldRow.id }] },
@@ -330,6 +340,54 @@ export const SchemaElementsTable = (props: SchemaElementsTableProps) => {
     [Unit.Pcs]: 'pcs',
   }
 
+  const CustomTypeEditComponent = (props: GridEditSingleSelectCellProps) => {
+    const [search, setSearch] = useState(props.valueLabel || '')
+    const apiRef = useGridApiContext()
+
+    const handleValueChange = async (
+      event: MuiEvent<SyntheticEvent>,
+      value: {
+        value: string
+        label: string
+      } | null,
+    ) => {
+      const assembly = assemblies?.find((assembly) => assembly.id === value?.value)
+
+      await apiRef.current.setEditCellValue({
+        id: props.id,
+        field: 'assemblyId',
+        value: assembly?.id,
+      })
+      await apiRef.current.setEditCellValue({
+        id: props.id,
+        field: 'unit',
+        value: assembly?.unit.toUpperCase(),
+      })
+    }
+
+    const assemblyName = useMemo(
+      () => assemblies?.find((assembly) => assembly.id === props.value)?.name || '',
+      [props.value],
+    )
+
+    return (
+      <Autocomplete
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        value={assemblyName}
+        inputValue={search}
+        onInputChange={(event, newInputValue) => {
+          setSearch(newInputValue)
+        }}
+        id='EPD box'
+        options={assemblies?.map((assembly) => ({ value: assembly.id, label: assembly.name })) || []}
+        fullWidth
+        onChange={handleValueChange}
+        renderInput={(params) => <TextField {...params} sx={{ marginTop: 1 }} />}
+      />
+    )
+  }
+
   const columns: GridColumns = [
     { field: 'id', headerName: 'ID', flex: 0.5, editable: false },
     {
@@ -365,7 +423,6 @@ export const SchemaElementsTable = (props: SchemaElementsTableProps) => {
       flex: 1.25,
       editable: true,
       type: 'number',
-      valueParser: (value) => (value <= 0 ? 0 : Number(value)),
     },
     {
       field: 'unit',
@@ -389,29 +446,40 @@ export const SchemaElementsTable = (props: SchemaElementsTableProps) => {
       headerName: 'Assembly',
       flex: 2.0,
       editable: true,
-      type: 'singleSelect',
-      valueOptions: assemblies?.map((assembly) => ({ value: assembly.id, label: assembly.name })),
+      // type: 'singleSelect',
+      // valueOptions: assemblies?.map((assembly) => ({ value: assembly.id, label: assembly.name })),
+      renderEditCell: (params) => (
+        <CustomTypeEditComponent
+          {...params}
+          valueLabel={assemblies?.find((assembly) => assembly.id == params.value)?.name}
+        />
+      ),
       valueFormatter: (params) => {
         return assemblies?.find((assembly) => assembly.id === params.value)?.name
       },
     },
     {
       ...GRID_DETAIL_PANEL_TOGGLE_COL_DEF,
-      renderCell: (params) => <CustomDetailPanelToggle id={params.row.assemblyId} value={params.value} />,
+      renderCell: (params) => {
+        const isInEditMode = rowModesModel[params.row.id]?.mode === GridRowModes.Edit
+        const disabled = isInEditMode ? '' : params.row.assemblyId
+        return <CustomDetailPanelToggle id={disabled} value={params.value} />
+      },
     },
     {
       field: 'result',
       headerName: 'Result',
       flex: 1.5,
       type: 'number',
+      description: 'kgCO₂Eq',
       valueFormatter: (params: GridValueFormatterParams<{ [key: string]: { [key: string]: number } }>) => {
         return `${
           params.value?.gwp
             ? Object.values(params.value.gwp)
                 .reduce((sum, current) => sum + current, 0)
                 .toFixed(2)
-            : 0
-        } kgCO₂Eq`
+            : 'Not Counted' // (0).toFixed(2)
+        }` // kgCO₂Eq
       },
     },
     {
