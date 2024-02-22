@@ -1,4 +1,4 @@
-import { CardTitle, GraphQlSchemaCategory, LcaButton } from '@lcacollect/components'
+import { CardTitle, LcaButton } from '@lcacollect/components'
 import {
   Alert,
   AlertProps,
@@ -12,7 +12,7 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material'
-import { ProjectSource } from 'components'
+import { ProjectSource, UnionCategory } from 'components'
 import React, { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import {
   GetProjectSourcesDocument,
@@ -256,7 +256,7 @@ export const SourceDialog: React.FC<SelectionDialogProps> = (props) => {
         open={openElementsFromSourceDialog}
         handleClose={() => setOpenElementsFromSourceDialog(false)}
         addSource={() => undefined}
-        category={(getSchemCategories() as unknown as GraphQlSchemaCategory[]) || []}
+        category={(getSchemCategories() as unknown as UnionCategory) || []}
         unitOptions={unitOptions}
         handleRowUpdateFromSource={() => undefined}
       />

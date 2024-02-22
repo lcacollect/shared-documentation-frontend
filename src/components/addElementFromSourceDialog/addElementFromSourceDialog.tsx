@@ -34,10 +34,12 @@ import { UnitOptions } from '../schemaElementsTable'
 import { SourceData } from '../sourceInterpretationDialog/types'
 import AddIcon from '@mui/icons-material/Add'
 
+export type UnionCategory = NestedCategory | GraphQlSchemaCategory[]
+
 type AddElementsFromSourceProps = {
   open: boolean
   handleClose: () => void
-  category: NestedCategory | GraphQlSchemaCategory[]
+  category: UnionCategory
   unitOptions: UnitOptions
   addSource: () => void
   handleRowUpdateFromSource: () => void

@@ -129,10 +129,9 @@ export const SchemaElementsTable = (props: SchemaElementsTableProps) => {
     skip: !projectId,
   })
 
-  const assemblies = useMemo(
-    () => assemblyData?.projectAssemblies.sort((a, b) => a.name.localeCompare(b.name)) || [],
-    [assemblyData],
-  )
+  const assemblies = assemblyData ? [...assemblyData.projectAssemblies] : []
+
+  const sortedAssemblies = useMemo(() => assemblies.sort((a, b) => a.name.localeCompare(b.name)), [assemblies])
 
   const { data: sourceData } = useGetProjectSourceDataQuery({
     variables: { projectId: projectId as string },
@@ -351,7 +350,7 @@ export const SchemaElementsTable = (props: SchemaElementsTableProps) => {
         label: string
       } | null,
     ) => {
-      const assembly = assemblies?.find((assembly) => assembly.id === value?.value)
+      const assembly = sortedAssemblies.find((assembly) => assembly.id === value?.value)
 
       await apiRef.current.setEditCellValue({
         id: props.id,
@@ -366,7 +365,7 @@ export const SchemaElementsTable = (props: SchemaElementsTableProps) => {
     }
 
     const assemblyName = useMemo(
-      () => assemblies?.find((assembly) => assembly.id === props.value)?.name || '',
+      () => sortedAssemblies.find((assembly) => assembly.id === props.value)?.name || '',
       [props.value],
     )
 
@@ -380,7 +379,7 @@ export const SchemaElementsTable = (props: SchemaElementsTableProps) => {
           setSearch(newInputValue)
         }}
         id='EPD box'
-        options={assemblies?.map((assembly) => ({ value: assembly.id, label: assembly.name })) || []}
+        options={sortedAssemblies.map((assembly) => ({ value: assembly.id, label: assembly.name })) || []}
         fullWidth
         onChange={handleValueChange}
         renderInput={(params) => <TextField {...params} sx={{ marginTop: 1 }} />}
@@ -447,11 +446,11 @@ export const SchemaElementsTable = (props: SchemaElementsTableProps) => {
       flex: 2.0,
       editable: true,
       // type: 'singleSelect',
-      // valueOptions: assemblies?.map((assembly) => ({ value: assembly.id, label: assembly.name })),
+      // valueOptions: sorted_assemblies.map((assembly) => ({ value: assembly.id, label: assembly.name })),
       renderEditCell: (params) => (
         <CustomTypeEditComponent
           {...params}
-          valueLabel={assemblies?.find((assembly) => assembly.id == params.value)?.name}
+          valueLabel={sortedAssemblies.find((assembly) => assembly.id == params.value)?.name}
         />
       ),
       valueFormatter: (params) => {
@@ -493,7 +492,13 @@ export const SchemaElementsTable = (props: SchemaElementsTableProps) => {
 
         if (isInEditMode) {
           return [
-            <GridActionsCellItem key={0} icon={<SaveIcon />} label='Save' onClick={handleSaveClick(id)} />,
+            <GridActionsCellItem
+              key={0}
+              icon={<SaveIcon />}
+              label='Save'
+              onClick={handleSaveClick(id)}
+              placeholder={''}
+            />,
             <GridActionsCellItem
               key={1}
               icon={<CancelIcon />}
@@ -501,6 +506,7 @@ export const SchemaElementsTable = (props: SchemaElementsTableProps) => {
               className='textPrimary'
               onClick={handleCancelClick(id)}
               color='inherit'
+              placeholder={''}
             />,
           ]
         }
@@ -513,6 +519,7 @@ export const SchemaElementsTable = (props: SchemaElementsTableProps) => {
             className='textPrimary'
             onClick={handleEditClick(id)}
             color='inherit'
+            placeholder={''}
           />,
           <GridActionsCellItem
             key={3}
@@ -520,6 +527,7 @@ export const SchemaElementsTable = (props: SchemaElementsTableProps) => {
             label='Delete'
             onClick={handleDeleteClick(id)}
             color='inherit'
+            placeholder={''}
           />,
         ]
       },
@@ -544,6 +552,7 @@ export const SchemaElementsTable = (props: SchemaElementsTableProps) => {
               />
             }
             showInMenu={false}
+            placeholder={''}
           />,
         ]
       },
@@ -672,8 +681,9 @@ const ElementToolbar = ({ handleAddRow, handleOpenMultipleElementsDialog }: Elem
           color,
           fontWeight,
         }}
+        placeholder={''}
       />
-      <GridToolbarFilterButton sx={{ color, fontWeight }} />
+      <GridToolbarFilterButton sx={{ color, fontWeight }} placeholder={''} />
       <Tooltip title='Add new building component'>
         <IconButton aria-label='addSource' onClick={handleAddRow} sx={{ color }}>
           <AddCircleOutlineOutlinedIcon />
