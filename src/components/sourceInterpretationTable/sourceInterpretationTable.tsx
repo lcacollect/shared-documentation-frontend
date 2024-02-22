@@ -100,6 +100,7 @@ export const SourceInterpretationTable = () => {
             className='textPrimary'
             onClick={handleEditClick(id)}
             color='inherit'
+            placeholder={''}
           />,
         ]
       },

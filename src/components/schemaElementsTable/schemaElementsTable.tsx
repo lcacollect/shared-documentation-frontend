@@ -492,7 +492,13 @@ export const SchemaElementsTable = (props: SchemaElementsTableProps) => {
 
         if (isInEditMode) {
           return [
-            <GridActionsCellItem key={0} icon={<SaveIcon />} label='Save' onClick={handleSaveClick(id)} />,
+            <GridActionsCellItem
+              key={0}
+              icon={<SaveIcon />}
+              label='Save'
+              onClick={handleSaveClick(id)}
+              placeholder={''}
+            />,
             <GridActionsCellItem
               key={1}
               icon={<CancelIcon />}
@@ -500,6 +506,7 @@ export const SchemaElementsTable = (props: SchemaElementsTableProps) => {
               className='textPrimary'
               onClick={handleCancelClick(id)}
               color='inherit'
+              placeholder={''}
             />,
           ]
         }
@@ -674,8 +681,9 @@ const ElementToolbar = ({ handleAddRow, handleOpenMultipleElementsDialog }: Elem
           color,
           fontWeight,
         }}
+        placeholder={''}
       />
-      <GridToolbarFilterButton sx={{ color, fontWeight }} />
+      <GridToolbarFilterButton sx={{ color, fontWeight }} placeholder={''} />
       <Tooltip title='Add new building component'>
         <IconButton aria-label='addSource' onClick={handleAddRow} sx={{ color }}>
           <AddCircleOutlineOutlinedIcon />

@@ -11,10 +11,10 @@ import {
   useGetProjectSchemasWithCategoriesLazyQuery,
   useGetProjectSourcesQuery,
 } from '../../dataAccess'
-import { DataFetchWrapper, GraphQlSchemaCategory, NoRowsOverlay } from '@lcacollect/components'
+import { DataFetchWrapper, NoRowsOverlay } from '@lcacollect/components'
 import { useParams } from 'react-router-dom'
 import ControlPointDuplicateOutlinedIcon from '@mui/icons-material/ControlPointDuplicateOutlined'
-import { AddElementsFromSourceDialog } from '../addElementFromSourceDialog'
+import { AddElementsFromSourceDialog, UnionCategory } from '../addElementFromSourceDialog'
 import { UnitOptions } from '../schemaElementsTable'
 
 export interface ProjectSource extends Omit<GraphQlProjectSource, 'projectId' | 'authorId' | 'author'> {
@@ -79,6 +79,7 @@ export const SourceTable = () => {
             label='Delete'
             onClick={() => handleDeleteClick(id)}
             color='inherit'
+            placeholder={''}
           />,
           <GridActionsCellItem
             key={1}
@@ -89,6 +90,7 @@ export const SourceTable = () => {
               setOpenElementsFromSourceDialog(true)
             }}
             color='inherit'
+            placeholder={''}
           />,
         ]
       },
@@ -128,7 +130,7 @@ export const SourceTable = () => {
           open={openElementsFromSourceDialog}
           handleClose={() => setOpenElementsFromSourceDialog(false)}
           addSource={() => undefined}
-          category={(getSchemCategories() as unknown as GraphQlSchemaCategory[]) || []}
+          category={(getSchemCategories() as unknown as UnionCategory) || []}
           unitOptions={unitOptions}
           handleRowUpdateFromSource={() => undefined}
         />

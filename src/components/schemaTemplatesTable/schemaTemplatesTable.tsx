@@ -126,6 +126,7 @@ export const SchemaTemplatesTable = (props: SchemaTemplatesTableProps) => {
             className='textPrimary'
             onClick={handleEditClick(id)}
             color='inherit'
+            placeholder={''}
           />,
           <GridActionsCellItem
             key={1}
@@ -133,6 +134,7 @@ export const SchemaTemplatesTable = (props: SchemaTemplatesTableProps) => {
             label='Delete'
             onClick={() => handleDeleteClick(id)}
             color='inherit'
+            placeholder={''}
           />,
         ]
       },
