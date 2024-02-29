@@ -166,7 +166,6 @@ export const SchemaElementsTable = (props: SchemaElementsTableProps) => {
       return
     }
     setRows((oldRows) => [
-      ...oldRows,
       {
         id: '',
         name: '',
@@ -174,12 +173,13 @@ export const SchemaElementsTable = (props: SchemaElementsTableProps) => {
         schemaCategory: schemaCategories.find((child) => child.name.includes('x')),
         description: '',
         source: null,
-        quantity: 0,
+        quantity: 1,
       } as SchemaElement,
+      ...oldRows,
     ])
     setRowModesModel((oldModel) => ({
-      ...oldModel,
       '': { mode: GridRowModes.Edit, fieldToFocus: 'name' },
+      ...oldModel,
     }))
   }
 
@@ -387,6 +387,18 @@ export const SchemaElementsTable = (props: SchemaElementsTableProps) => {
     )
   }
 
+  type resultType = { [key: string]: { [key: string]: number } }
+
+  const sumResult = (value: resultType) => {
+    return `${
+      value?.gwp
+        ? Object.values(value.gwp)
+            .reduce((sum, current) => sum + current, 0)
+            .toFixed(2)
+        : (0).toFixed(2)
+    }` // kgCO₂Eq
+  }
+
   const columns: GridColumns = [
     { field: 'id', headerName: 'ID', flex: 0.5, editable: false },
     {
@@ -469,16 +481,11 @@ export const SchemaElementsTable = (props: SchemaElementsTableProps) => {
       field: 'result',
       headerName: 'Result',
       flex: 1.5,
-      type: 'number',
+      // type: 'number',
       description: 'kgCO₂Eq',
-      valueFormatter: (params: GridValueFormatterParams<{ [key: string]: { [key: string]: number } }>) => {
-        return `${
-          params.value?.gwp
-            ? Object.values(params.value.gwp)
-                .reduce((sum, current) => sum + current, 0)
-                .toFixed(2)
-            : 'Not Counted' // (0).toFixed(2)
-        }` // kgCO₂Eq
+      valueFormatter: (params) => sumResult(params?.value),
+      sortComparator: (v1: resultType, v2: resultType) => {
+        return Number(sumResult(v1)) - Number(sumResult(v2))
       },
     },
     {
