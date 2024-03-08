@@ -19,7 +19,6 @@ export const BCAccordion: React.FC<BCAccordion> = (props) => {
 
   return (
     <MuiAccordion
-      TransitionProps={{ unmountOnExit: true }}
       disableGutters
       elevation={0}
       square
@@ -64,7 +63,7 @@ export const BCAccordionSummary = (props: BCAccordionSummaryProps) => {
     setSelectedTask,
     setIsAddTaskDialogOpen,
   } = props
-  const nameToShow = category.name || ''
+  const nameToShow = `${category.typeCodeElement?.code || ''} | ${category.typeCodeElement?.name || ''}`
 
   const handleChangeSelectedTask = () => {
     setRefToAddTaskTo(category)

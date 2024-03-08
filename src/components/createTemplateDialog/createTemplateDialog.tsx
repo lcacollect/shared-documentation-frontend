@@ -11,10 +11,12 @@ import {
   DialogTitle,
   Grid,
   Snackbar,
+  Tab,
+  Tabs,
   TextField,
   Typography,
 } from '@mui/material'
-import { Dispatch, SetStateAction, useState, useEffect } from 'react'
+import React, { Dispatch, SetStateAction, useState, useEffect, useMemo } from 'react'
 import {
   GetSchemaTemplatesDocument,
   GraphQlTypeCodeElement,
@@ -22,9 +24,11 @@ import {
   useAddSchemaTemplateMutation,
   useUpdateSchemaTemplateMutation,
   useGetTypeCodesQuery,
+  GraphQlTypeCode,
 } from '../../dataAccess'
 import { SchemaTemplate } from '../schemaTemplatesTable'
 import { TypecodeSelectionTable } from '../typecodeSelectionTable'
+import { useSettingsContext } from '@lcacollect/core'
 
 type CreateTemplateDialogProps = {
   open: boolean
@@ -39,18 +43,21 @@ export const CreateTemplateDialog = ({
   editTemplate,
   setEditTemplate,
 }: CreateTemplateDialogProps) => {
-  const [updateSchemaTemplate, { loading: updateTaskLoading }] = useUpdateSchemaTemplateMutation({
+  const [updateSchemaTemplate, { loading: updateTemplateLoading }] = useUpdateSchemaTemplateMutation({
     refetchQueries: [{ query: GetSchemaTemplatesDocument }],
   })
-  const [addSchemaTemplate, { loading: addTaskLoading }] = useAddSchemaTemplateMutation({
+  const [addSchemaTemplate, { loading: addTemplateLoading }] = useAddSchemaTemplateMutation({
     refetchQueries: [{ query: GetSchemaTemplatesDocument }],
   })
 
+  const { domainName } = useSettingsContext()
+
   const {
-    data: TypeCodeData,
-    error: TypeCodeError,
-    loading: TypeCodeLoading,
+    data: typeCodeData,
+    error: typeCodeError,
+    loading: typeCodeLoading,
   } = useGetTypeCodesQuery({
+    variables: { filters: { domain: { isAnyOf: ['default', domainName || ''] } } },
     skip: !open,
   })
 
@@ -60,17 +67,30 @@ export const CreateTemplateDialog = ({
   const [selectedTemplateRows, setSelectedTemplateRows] = useState<GraphQlTypeCodeElement[]>([])
   const [dataRows, setDataRows] = useState<GraphQlTypeCodeElement[]>([])
   const [templateRows, setTemplateRows] = useState<GraphQlTypeCodeElement[]>([])
+  const [selectedTypeCode, setSelectedTypeCode] = useState<number>(0)
+
+  const typeCodes: { [key: string]: GraphQlTypeCode } = useMemo(
+    () =>
+      typeCodeData?.typeCodes.reduce(
+        (acc, typeCode, index) => ({
+          ...acc,
+          [index]: typeCode,
+        }),
+        {},
+      ) || {},
+    [typeCodeData],
+  )
 
   useEffect(() => {
-    if (editTemplate && TypeCodeData) {
-      const editTypeCodes = TypeCodeData.typeCodeElements.filter((row) => {
-        if (editTemplate?.schemas && editTemplate?.schemas.length)
-          return !!editTemplate?.schemas[0].categories.find((category) => {
-            return row.name === category.name && row.parentPath === category.path
+    if (editTemplate && typeCodes[selectedTypeCode]) {
+      const editTypeCodes = typeCodes[selectedTypeCode]?.elements?.filter((row) => {
+        if (editTemplate?.original)
+          return !!editTemplate?.original.categories.find((category) => {
+            return row.id === category.typeCodeElement.id
           })
       })
 
-      const notAddedTypeCodes: GraphQlTypeCodeElement[] = TypeCodeData.typeCodeElements.filter((row) => {
+      const notAddedTypeCodes: GraphQlTypeCodeElement[] = typeCodes[selectedTypeCode]?.elements?.filter((row) => {
         return !editTypeCodes.find(({ id }) => {
           return row.id === id
         })
@@ -79,10 +99,20 @@ export const CreateTemplateDialog = ({
       setTemplateRows(editTypeCodes)
       setDataRows(notAddedTypeCodes)
       setName(editTemplate.name)
-    } else if (TypeCodeData && TypeCodeData.typeCodeElements.length) {
-      setDataRows(TypeCodeData.typeCodeElements)
+    } else if (typeCodes && typeCodes[selectedTypeCode]?.elements?.length) {
+      const notAddedTypeCodes: GraphQlTypeCodeElement[] = typeCodes[selectedTypeCode]?.elements?.filter((row) => {
+        let result = true
+        if (templateRows) {
+          templateRows.find(({ id }) => {
+            result = !(row.id === id)
+            return row.id === id
+          })
+        }
+        return result
+      })
+      setDataRows(notAddedTypeCodes)
     }
-  }, [TypeCodeData, editTemplate])
+  }, [typeCodeData, editTemplate, selectedTypeCode])
 
   const handleChangeSelectedRow = (row: GraphQlTypeCodeElement) => {
     const selectedRow = selectedRows.find((selectRow) => selectRow.id === row.id)
@@ -97,7 +127,7 @@ export const CreateTemplateDialog = ({
     if (selectedRows.length) {
       setSelectedRows([])
     } else {
-      if (TypeCodeData) setSelectedRows(dataRows)
+      if (typeCodeData) setSelectedRows(dataRows)
     }
   }
 
@@ -149,9 +179,6 @@ export const CreateTemplateDialog = ({
     const typeCodes = templateRows.map((row) => {
       return {
         id: row.id,
-        level: row.level,
-        code: row.code,
-        name: row.name,
         parentPath: row.parentPath,
       }
     }) as GraphQlTypeCodeElementInput[]
@@ -162,6 +189,7 @@ export const CreateTemplateDialog = ({
           id: editTemplate.id,
           name: name as string,
           typeCodes: typeCodes,
+          domain: domainName,
         },
       })
       error = errors
@@ -170,6 +198,7 @@ export const CreateTemplateDialog = ({
         variables: {
           name: name as string,
           typeCodes: typeCodes,
+          domain: domainName,
         },
       })
       error = errors
@@ -193,8 +222,9 @@ export const CreateTemplateDialog = ({
     setName('')
     setSelectedRows([])
     setSelectedTemplateRows([])
-    if (TypeCodeData && TypeCodeData.typeCodeElements.length) {
-      setDataRows(TypeCodeData?.typeCodeElements)
+
+    if (typeCodes && typeCodes[selectedTypeCode]?.elements?.length) {
+      setDataRows(typeCodes[selectedTypeCode]?.elements)
     }
     setTemplateRows([])
     setEditTemplate(null)
@@ -203,6 +233,11 @@ export const CreateTemplateDialog = ({
   const handleCancel = () => {
     resetValue()
     handleClose()
+  }
+
+  const handleTabsChange = (event: React.SyntheticEvent, newValue: number) => {
+    setSelectedTypeCode(newValue)
+    // remove template tabs from data tabs
   }
 
   return (
@@ -228,14 +263,21 @@ export const CreateTemplateDialog = ({
           </Grid>
           <Grid container spacing={2} justifyContent='center' alignItems='center'>
             <Grid item sx={{ width: '45%' }}>
-              <Typography fontWeight='bold'>Typecode</Typography>
-              <DataFetchWrapper loading={TypeCodeLoading} error={TypeCodeError}>
+              <DataFetchWrapper loading={typeCodeLoading} error={typeCodeError}>
+                <Typography fontWeight='bold'>Typecode</Typography>
+                {Object.keys(typeCodes).length && (
+                  <Tabs value={selectedTypeCode} onChange={handleTabsChange} variant='scrollable' scrollButtons='auto'>
+                    {Object.keys(typeCodes)?.map((typeCodeIndex, index) => (
+                      <Tab label={typeCodes[typeCodeIndex].name} key={index} component={LcaButton} />
+                    ))}
+                  </Tabs>
+                )}
                 <TypecodeSelectionTable
                   selectedRows={selectedRows}
                   handleChangeSelectedRow={handleChangeSelectedRow}
                   handleChangeAllSelectedRows={handleChangeAllSelectedRows}
                   typeCodeData={dataRows}
-                  typeCodeLoading={TypeCodeLoading}
+                  typeCodeLoading={typeCodeLoading}
                 />
               </DataFetchWrapper>
             </Grid>
@@ -263,13 +305,13 @@ export const CreateTemplateDialog = ({
             </Grid>
             <Grid item sx={{ width: '45%' }}>
               <Typography fontWeight='bold'>Template</Typography>
-              <DataFetchWrapper loading={TypeCodeLoading} error={TypeCodeError}>
+              <DataFetchWrapper loading={typeCodeLoading} error={typeCodeError}>
                 <TypecodeSelectionTable
                   selectedRows={selectedTemplateRows}
                   handleChangeSelectedRow={handleChangeSelectedTemplateRow}
                   handleChangeAllSelectedRows={handleChangeAllSelectedTemplateRows}
                   typeCodeData={templateRows}
-                  typeCodeLoading={TypeCodeLoading}
+                  typeCodeLoading={typeCodeLoading}
                 />
               </DataFetchWrapper>
             </Grid>
@@ -279,8 +321,8 @@ export const CreateTemplateDialog = ({
           <LcaButton onClick={handleCancel}>
             <Typography>Cancel</Typography>
           </LcaButton>
-          <LcaButton onClick={handleSchemaTemplate} disabled={addTaskLoading || updateTaskLoading || !name}>
-            {addTaskLoading || updateTaskLoading ? <CircularProgress size='small' /> : null}
+          <LcaButton onClick={handleSchemaTemplate} disabled={addTemplateLoading || updateTemplateLoading || !name}>
+            {addTemplateLoading || updateTemplateLoading ? <CircularProgress size='small' /> : null}
             <Typography>Done</Typography>
           </LcaButton>
         </DialogActions>

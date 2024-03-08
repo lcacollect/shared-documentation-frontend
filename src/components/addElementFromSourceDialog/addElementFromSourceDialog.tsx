@@ -142,7 +142,9 @@ export const AddElementsFromSourceDialog = ({
     } else if (!schemaCategoryId && hasTypeCodes) {
       const categories = categoryData?.reportingSchemas[0] ? categoryData?.reportingSchemas[0].categories : null
       schemaCategoryIds = selectedInterpretationRows.map(
-        (row) => categories?.find((category) => category.name.startsWith(row['Type Code'] as string))?.id as string,
+        (row) =>
+          categories?.find((category) => category.typeCodeElement?.name.startsWith(row['Type Code'] as string))
+            ?.id as string,
       )
       if (!schemaCategoryIds.every((row) => row)) {
         setSnackbar({ children: 'Some Type Codes are invalid. Please correct', severity: 'error' })
@@ -217,7 +219,7 @@ export const AddElementsFromSourceDialog = ({
     if (Array.isArray(category)) {
       return category.map((child) => (
         <MenuItem value={child.id} key={child.id}>
-          {child.name}
+          {child.typeCodeElement?.name}
         </MenuItem>
       ))
     }
@@ -301,7 +303,7 @@ export const AddElementsFromSourceDialog = ({
                         <TextField
                           fullWidth
                           label='Category Name'
-                          value={category.name}
+                          value={category.typeCodeElement?.name}
                           variant='standard'
                           inputProps={{ style: { fontSize: 20 } }}
                         />

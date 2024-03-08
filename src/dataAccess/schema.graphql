@@ -8,11 +8,15 @@ input FilterOptionInput {
   isAnyOf: [String]
 }
 
+input TypeCodeFilters {
+  name: FilterOptions = null
+  id: FilterOptions = null
+  domain: FilterOptions = null
+}
+
 input SchemaCategoryFilters {
   id: FilterOptionInput = null
-  name: FilterOptionInput = null
   description: FilterOptionInput = null
-  #path: FilterOptionInput = null
 }
 
 input GraphQLTypeCodeElementInput {
@@ -27,14 +31,19 @@ query getSchemaTemplates {
   schemaTemplates {
     id
     name
-    schemas {
+    domain
+    original {
       name
       id
       categories {
         id
-        name
-        path
-        depth
+        typeCodeElement {
+          id
+          code
+          name
+          level
+          parentPath
+        }
       }
     }
   }
@@ -44,35 +53,46 @@ mutation deleteSchemaTemplate($id: String!) {
   deleteSchemaTemplate(id: $id)
 }
 
-mutation addSchemaTemplate($name: String!, $typeCodes: [GraphQLTypeCodeElementInput!] = null) {
-  addSchemaTemplate(name: $name, typeCodes: $typeCodes) {
+mutation addSchemaTemplate($name: String!, $domain: String = null, $typeCodes: [GraphQLTypeCodeElementInput!] = null) {
+  addSchemaTemplate(name: $name, domain: $domain, typeCodes: $typeCodes) {
     id
     name
-    schemas {
+    original {
       id
       name
       categories {
         id
-        name
-        path
-        depth
+        typeCodeElement {
+          code
+          name
+          level
+          parentPath
+        }
       }
     }
   }
 }
 
-mutation updateSchemaTemplate($id: String!, $name: String!, $typeCodes: [GraphQLTypeCodeElementInput!] = null) {
-  updateSchemaTemplate(id: $id, name: $name, typeCodes: $typeCodes) {
+mutation updateSchemaTemplate(
+  $id: String!
+  $name: String!
+  $domain: String = null
+  $typeCodes: [GraphQLTypeCodeElementInput!] = null
+) {
+  updateSchemaTemplate(id: $id, name: $name, domain: $domain, typeCodes: $typeCodes) {
     id
     name
-    schemas {
+    original {
       id
       name
       categories {
         id
-        name
-        path
-        depth
+        typeCodeElement {
+          code
+          name
+          level
+          parentPath
+        }
       }
     }
   }
@@ -91,9 +111,13 @@ query getProjectSchemasWithCategories($projectId: String!) {
     name
     categories {
       id
-      name
-      path
-      depth
+      typeCodeElement {
+        id
+        code
+        name
+        level
+        parentPath
+      }
     }
   }
 }
@@ -101,8 +125,13 @@ query getProjectSchemasWithCategories($projectId: String!) {
 query getSchemaCategories($reportingSchemaId: String!, $filters: SchemaCategoryFilters = null) {
   schemaCategories(reportingSchemaId: $reportingSchemaId, filters: $filters) {
     id
-    name
-    depth
+    typeCodeElement {
+      id
+      code
+      name
+      level
+      parentPath
+    }
   }
 }
 
@@ -138,8 +167,13 @@ query getSchemaElements($schemaCategoryIds: [String!]!) {
     }
     schemaCategory {
       id
-      name
-      path
+      typeCodeElement {
+        id
+        code
+        name
+        level
+        parentPath
+      }
     }
     source {
       name
@@ -180,7 +214,6 @@ mutation addSchemaElement(
     description
     schemaCategory {
       id
-      name
     }
   }
 }
@@ -194,10 +227,14 @@ query getSingleSchemaElement($schemaCategoryIds: [String!]!, $schemaElementId: S
     description
     schemaCategory {
       id
-      name
       description
       reportingSchemaId
-      path
+      typeCodeElement {
+        code
+        name
+        level
+        parentPath
+      }
     }
   }
 }
@@ -207,7 +244,6 @@ mutation updateSchemaElements($elements: [SchemaElementUpdateInput!]!) {
     id
     schemaCategory {
       id
-      name
     }
   }
 }
@@ -293,7 +329,6 @@ query getTasks($reportingSchemaId: String!) {
       ... on GraphQLSchemaCategory {
         __typename
         id
-        name
       }
       ... on GraphQLSchemaElement {
         __typename
@@ -330,7 +365,6 @@ query getTasksForTasksPage($reportingSchemaId: String!) {
       ... on GraphQLSchemaCategory {
         __typename
         id
-        name
       }
       ... on GraphQLSchemaElement {
         __typename
@@ -422,7 +456,6 @@ query getSingleTask($reportingSchemaId: String!, $taskId: String!) {
       ... on GraphQLSchemaCategory {
         __typename
         id
-        name
       }
       ... on GraphQLSchemaElement {
         __typename
@@ -539,17 +572,21 @@ query getSingleProject($id: String!) {
   }
 }
 
-mutation uploadTypeCodeElements($file: String!, $name: String!) {
-  createTypeCodeElementFromSource(file: $file, name: $name)
+mutation uploadTypeCodeElements($file: String!, $name: String!, $domain: String = null) {
+  createTypeCodeElementFromSource(file: $file, name: $name, domain: $domain)
 }
 
-query getTypeCodes {
-  typeCodeElements {
+query getTypeCodes($filters: TypeCodeFilters = null) {
+  typeCodes(filters: $filters) {
     id
-    code
     name
-    parentPath
-    level
-    parentCode
+    elements {
+      id
+      name
+      code
+      parentPath
+      level
+      parentCode
+    }
   }
 }

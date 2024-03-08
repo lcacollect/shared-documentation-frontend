@@ -1,25 +1,25 @@
 import DeleteIcon from '@mui/icons-material/DeleteOutlined'
 import EditIcon from '@mui/icons-material/Edit'
 import { Alert, AlertProps, LinearProgress, Snackbar } from '@mui/material'
-import {
-  DataGridPro,
-  GridActionsCellItem,
-  GridColumns,
-  GridRowId,
-  GridRowModel,
-  GridValueGetterParams,
-} from '@mui/x-data-grid-pro'
+import { DataGridPro, GridActionsCellItem, GridColumns, GridRowId, GridRowModel } from '@mui/x-data-grid-pro'
 import { Dispatch, SetStateAction, useState, useEffect } from 'react'
 import { GraphQlSchemaTemplate, useDeleteSchemaTemplateMutation, GetSchemaTemplatesDocument } from '../../dataAccess'
 import { AddTypecodeDialog } from '../addTypecodeDialog'
 import { CreateTemplateDialog } from '../createTemplateDialog'
 import { NoRowsOverlay } from '@lcacollect/components'
+import { useSettingsContext } from '@lcacollect/core'
+
+interface TypeCodeElement {
+  id: string
+  code: string
+  name: string
+  level: number
+  parentPath: string
+}
 
 interface Categories {
   id: string
-  name: string
-  path: string
-  depth: number
+  typeCodeElement: TypeCodeElement
 }
 
 interface ReportingSchema {
@@ -31,7 +31,7 @@ interface ReportingSchema {
 export interface SchemaTemplate {
   id: string
   name: string
-  schemas: ReportingSchema[] | undefined
+  original: ReportingSchema | undefined
 }
 
 interface SchemaTemplatesTableProps {
@@ -65,6 +65,8 @@ export const SchemaTemplatesTable = (props: SchemaTemplatesTableProps) => {
     }
   }, [schemaTemplates])
 
+  const { domainName } = useSettingsContext()
+
   const handleCreateTemplateDialogClose = () => {
     setEditTemplate(null)
     setOpenCreateTemplateDialog(false)
@@ -92,9 +94,9 @@ export const SchemaTemplatesTable = (props: SchemaTemplatesTableProps) => {
     setOpenCreateTemplateDialog(true)
   }
 
-  const getTypecode = (cell: GridValueGetterParams) => {
-    return cell.row.schemas[0]?.name
-  }
+  // const getTypecode = (cell: GridValueGetterParams) => {
+  //   return cell.row.original.name
+  // }
 
   const columns: GridColumns = [
     { field: 'id', headerName: 'ID', flex: 0.5 },
@@ -105,12 +107,18 @@ export const SchemaTemplatesTable = (props: SchemaTemplatesTableProps) => {
       flex: 2,
     },
     {
-      field: 'typecode',
+      field: 'domain',
       align: 'left',
-      headerName: 'Typecode',
-      valueGetter: getTypecode,
+      headerName: 'Domain',
       flex: 1.25,
     },
+    // {
+    //   field: 'typecode',
+    //   align: 'left',
+    //   headerName: 'Typecode',
+    //   valueGetter: getTypecode,
+    //   flex: 1.25,
+    // },
     {
       field: 'actions',
       type: 'actions',
@@ -166,7 +174,11 @@ export const SchemaTemplatesTable = (props: SchemaTemplatesTableProps) => {
         editTemplate={editTemplate}
         setEditTemplate={setEditTemplate}
       />
-      <AddTypecodeDialog open={openAddTypecodeDialog} handleClose={handleAddTypecodeDialogClose} />
+      <AddTypecodeDialog
+        open={openAddTypecodeDialog}
+        handleClose={handleAddTypecodeDialogClose}
+        domain={domainName || ''}
+      />
       {!!snackbar && (
         <Snackbar
           open

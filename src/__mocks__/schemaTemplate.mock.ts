@@ -5,6 +5,7 @@ import { GetTypeCodesDocument } from '../dataAccess'
 export const TypeCodes: MockedResponse = {
   request: {
     query: GetTypeCodesDocument,
+    variables: { filters: { domain: { isAnyOf: ['default', ''] } } },
   },
   result: typeCodes,
 }

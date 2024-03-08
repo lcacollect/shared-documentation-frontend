@@ -39,10 +39,14 @@ export const CategoriesAccordion = (props: CategoriesAccordionProps) => {
   )
 
   const elementTasks =
-    category.depth == 1 ? projTasks.filter((task) => task.item.__typename === 'GraphQLSchemaElement') : []
+    category.typeCodeElement?.level == 2
+      ? projTasks.filter((task) => task.item.__typename === 'GraphQLSchemaElement')
+      : []
   const categoryElements =
-    category.depth == 1
-      ? projElements.filter((element) => Object.keys(category.children).includes(element.schemaCategory.id))
+    category.typeCodeElement?.level == 2
+      ? projElements.filter((element) =>
+          Object.keys(category.children).includes(element.schemaCategory.typeCodeElement?.id || ''),
+        )
       : []
 
   const textSize = level === 0 ? 'medium' : 'small'
@@ -59,7 +63,7 @@ export const CategoriesAccordion = (props: CategoriesAccordionProps) => {
         setIsAddTaskDialogOpen={setIsAddTaskDialogOpen}
       />
       <BCAccordionDetails level={level}>
-        {category.depth === 0
+        {category.typeCodeElement?.level === 1
           ? Object.values(category.children)?.map((child: NestedCategory, index: number) => (
               <CategoriesAccordion
                 key={index}
@@ -77,7 +81,7 @@ export const CategoriesAccordion = (props: CategoriesAccordionProps) => {
               />
             ))
           : null}
-        {category.depth === 1 ? (
+        {category.typeCodeElement?.level === 2 ? (
           <ErrorBoundary>
             <SchemaElementsTable
               categoriesId={categoriesId}

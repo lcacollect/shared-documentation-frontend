@@ -193,7 +193,7 @@ export const SourceDialog: React.FC<SelectionDialogProps> = (props) => {
 
   const getSchemCategories = () => {
     const categories = categoriesData?.reportingSchemas[0]?.categories
-    return categories?.filter((child) => child.depth === 2)
+    return categories?.filter((child) => child.typeCodeElement?.level === 3)
   }
 
   return (
