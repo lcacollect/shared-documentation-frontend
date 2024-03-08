@@ -98,7 +98,6 @@ export const CreateTemplateDialog = ({
 
       setTemplateRows(editTypeCodes)
       setDataRows(notAddedTypeCodes)
-      setName(editTemplate.name)
     } else if (typeCodes && typeCodes[selectedTypeCode]?.elements?.length) {
       const notAddedTypeCodes: GraphQlTypeCodeElement[] = typeCodes[selectedTypeCode]?.elements?.filter((row) => {
         let result = true
@@ -112,6 +111,8 @@ export const CreateTemplateDialog = ({
       })
       setDataRows(notAddedTypeCodes)
     }
+
+    setName(editTemplate?.name || '')
   }, [typeCodeData, editTemplate, selectedTypeCode])
 
   const handleChangeSelectedRow = (row: GraphQlTypeCodeElement) => {
