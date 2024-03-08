@@ -176,6 +176,7 @@ export const ElementsFromSourceShowSelectedTable = ({
           sourceInterpretationRows={rows}
           selectedSource={selectedSource}
           setRows={setRows}
+          variant={'outlined'}
         />
       ),
     },

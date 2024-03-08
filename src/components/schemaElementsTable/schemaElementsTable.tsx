@@ -466,6 +466,7 @@ export const SchemaElementsTable = (props: SchemaElementsTableProps) => {
         <CustomTypeEditComponent
           {...params}
           valueLabel={sortedAssemblies.find((assembly) => assembly.id == params.value)?.name}
+          variant='outlined'
         />
       ),
       valueFormatter: (params) => {
