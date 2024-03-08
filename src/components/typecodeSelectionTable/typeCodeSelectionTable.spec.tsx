@@ -17,7 +17,7 @@ describe('TypeCodeSelectionTable', () => {
           handleChangeAllSelectedRows={() => {
             ;('')
           }}
-          typeCodeData={data.data.typeCodeElements as GraphQlTypeCodeElement[]}
+          typeCodeData={data.data.typeCodes[0].elements as GraphQlTypeCodeElement[]}
           typeCodeLoading={false}
         />
       </MockedProvider>,
