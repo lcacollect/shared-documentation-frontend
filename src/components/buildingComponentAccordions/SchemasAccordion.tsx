@@ -33,7 +33,7 @@ export const SchemasAccordion = (props: SchemasAccordionProps) => {
     refetchElements,
   } = props
 
-  if (!schema.categories || !schema.categories.find((cat) => cat.path)) {
+  if (!schema.categories || !schema.categories.find((cat) => cat.typeCodeElement?.parentPath)) {
     return (
       <BCAccordion expanded={true} level={0}>
         <BCAccordionDetails>No categories found</BCAccordionDetails>
@@ -79,24 +79,24 @@ const sortCategoriesByPath = (categories: GraphQlSchemaCategory[] | undefined | 
   }
 
   categories
-    .filter((category) => category.depth === 0)
-    .sort((prev, next) => (prev.name < next.name ? -1 : 1))
-    .forEach((category) => (groupedData[category.id] = { ...category, children: {} }))
+    .filter((category) => category.typeCodeElement?.level === 1)
+    .sort((prev, next) => Number(prev.typeCodeElement?.code || 0) - Number(next.typeCodeElement?.code || 0))
+    .forEach((category) => (groupedData[category.typeCodeElement?.id || 0] = { ...category, children: {} }))
   categories
-    .filter((category) => category.depth === 1)
-    .sort((prev, next) => (prev.name < next.name ? -1 : 1))
+    .filter((category) => category.typeCodeElement?.level === 2)
+    .sort((prev, next) => Number(prev.typeCodeElement?.code || 0) - Number(next.typeCodeElement?.code || 0))
     .forEach((category) => {
-      const key = category.path.substring(1)
-      groupedData[key].children[category.id] = { ...category, children: {} }
+      const key = category.typeCodeElement?.parentPath.substring(1) || 0
+      groupedData[key].children[category.typeCodeElement?.id || 0] = { ...category, children: {} }
     })
   categories
-    .filter((category) => category.depth === 2)
-    .sort((prev, next) => (prev.name < next.name ? -1 : 1))
+    .filter((category) => category.typeCodeElement?.level === 3)
+    .sort((prev, next) => Number(prev.typeCodeElement?.code || 0) - Number(next.typeCodeElement?.code || 0))
     .forEach((category) => {
-      const keys = category.path.substring(1).split('/')
+      const keys = category.typeCodeElement?.parentPath.substring(1).split('/')
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      groupedData[keys[0]].children[keys[1]].children[category.id] = category
+      groupedData[keys[0]].children[keys[1]].children[category.typeCodeElement?.id || 0] = category
     })
   return groupedData
 }

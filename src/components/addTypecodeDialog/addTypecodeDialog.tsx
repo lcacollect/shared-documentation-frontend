@@ -14,6 +14,7 @@ import {
 import React, { useState } from 'react'
 import { FileField } from '../sourceDialog/sourceForm'
 import { ProjectSourceType, useUploadTypeCodeElementsMutation, GetTypeCodesDocument } from '../../dataAccess'
+import { useSettingsContext } from '@lcacollect/core'
 
 export const AssigneeTypeMap = {
   GraphQLProjectMember: 'PROJECT_MEMBER',
@@ -24,15 +25,20 @@ export const AssigneeTypeMap = {
 type AddTypecodeProps = {
   open: boolean
   handleClose: () => void
+  domain: string | undefined
 }
 
-export const AddTypecodeDialog = ({ open, handleClose }: AddTypecodeProps) => {
+export const AddTypecodeDialog = ({ open, handleClose, domain }: AddTypecodeProps) => {
   const [name, setName] = useState<string>('')
   const [file, setFile] = useState<File>()
   const [snackbar, setSnackbar] = useState<Pick<AlertProps, 'children' | 'severity'> | null>(null)
 
+  const { domainName } = useSettingsContext()
+
   const [uploadTypeCodeElements] = useUploadTypeCodeElementsMutation({
-    refetchQueries: [{ query: GetTypeCodesDocument }],
+    refetchQueries: [
+      { query: GetTypeCodesDocument, variables: { filters: { domain: { isAnyOf: ['default', domainName] } } } },
+    ],
   })
 
   const resetValue = () => {
@@ -64,7 +70,7 @@ export const AddTypecodeDialog = ({ open, handleClose }: AddTypecodeProps) => {
       setSnackbar({ children: 'Adding typecode...', severity: 'info' })
 
       await uploadTypeCodeElements({
-        variables: { file: encodedFile, name },
+        variables: { file: encodedFile, name, domain },
       })
         .then((data) => {
           if (data.errors) {

@@ -3957,14 +3957,6 @@
             "deprecationReason": null
           },
           {
-            "name": "depth",
-            "description": null,
-            "args": [],
-            "type": { "kind": "NON_NULL", "name": null, "ofType": { "kind": "SCALAR", "name": "Int", "ofType": null } },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "description",
             "description": null,
             "args": [],
@@ -3997,30 +3989,6 @@
             "deprecationReason": null
           },
           {
-            "name": "name",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": { "kind": "SCALAR", "name": "String", "ofType": null }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "path",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": { "kind": "SCALAR", "name": "String", "ofType": null }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "reportingSchema",
             "description": null,
             "args": [],
@@ -4034,6 +4002,22 @@
           },
           {
             "name": "reportingSchemaId",
+            "description": null,
+            "args": [],
+            "type": { "kind": "SCALAR", "name": "String", "ofType": null },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "typeCodeElement",
+            "description": null,
+            "args": [],
+            "type": { "kind": "OBJECT", "name": "GraphQLTypeCodeElement", "ofType": null },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "typeCodeElementId",
             "description": null,
             "args": [],
             "type": { "kind": "SCALAR", "name": "String", "ofType": null },
@@ -4251,6 +4235,14 @@
         "description": null,
         "fields": [
           {
+            "name": "domain",
+            "description": null,
+            "args": [],
+            "type": { "kind": "SCALAR", "name": "String", "ofType": null },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "id",
             "description": null,
             "args": [],
@@ -4275,18 +4267,10 @@
             "deprecationReason": null
           },
           {
-            "name": "schemas",
+            "name": "original",
             "description": null,
             "args": [],
-            "type": {
-              "kind": "LIST",
-              "name": null,
-              "ofType": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": { "kind": "OBJECT", "name": "GraphQLReportingSchema", "ofType": null }
-              }
-            },
+            "type": { "kind": "OBJECT", "name": "GraphQLReportingSchema", "ofType": null },
             "isDeprecated": false,
             "deprecationReason": null
           }
@@ -4889,35 +4873,7 @@
         "fields": null,
         "inputFields": [
           {
-            "name": "code",
-            "description": null,
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": { "kind": "SCALAR", "name": "String", "ofType": null }
-            },
-            "defaultValue": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "id",
-            "description": null,
-            "type": { "kind": "SCALAR", "name": "String", "ofType": null },
-            "defaultValue": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "level",
-            "description": null,
-            "type": { "kind": "SCALAR", "name": "Int", "ofType": null },
-            "defaultValue": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "name",
             "description": null,
             "type": {
               "kind": "NON_NULL",
@@ -6103,23 +6059,19 @@
                 "deprecationReason": null
               },
               {
-                "name": "name",
-                "description": null,
-                "type": { "kind": "SCALAR", "name": "String", "ofType": null },
-                "defaultValue": "null",
-                "isDeprecated": false,
-                "deprecationReason": null
-              },
-              {
-                "name": "path",
-                "description": null,
-                "type": { "kind": "SCALAR", "name": "String", "ofType": null },
-                "defaultValue": "null",
-                "isDeprecated": false,
-                "deprecationReason": null
-              },
-              {
                 "name": "reportingSchemaId",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": { "kind": "SCALAR", "name": "String", "ofType": null }
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              },
+              {
+                "name": "typeCodeElementId",
                 "description": null,
                 "type": {
                   "kind": "NON_NULL",
@@ -6329,6 +6281,14 @@
             "name": "addSchemaTemplate",
             "description": "Add a Schema Template",
             "args": [
+              {
+                "name": "domain",
+                "description": null,
+                "type": { "kind": "SCALAR", "name": "String", "ofType": null },
+                "defaultValue": "null",
+                "isDeprecated": false,
+                "deprecationReason": null
+              },
               {
                 "name": "name",
                 "description": null,
@@ -6647,6 +6607,14 @@
             "name": "createTypeCodeElementFromSource",
             "description": "Add a new typeCodeElement from csv file",
             "args": [
+              {
+                "name": "domain",
+                "description": null,
+                "type": { "kind": "SCALAR", "name": "String", "ofType": null },
+                "defaultValue": "null",
+                "isDeprecated": false,
+                "deprecationReason": null
+              },
               {
                 "name": "file",
                 "description": null,
@@ -7891,18 +7859,10 @@
                 "deprecationReason": null
               },
               {
-                "name": "name",
+                "name": "typeCodeElementId",
                 "description": null,
                 "type": { "kind": "SCALAR", "name": "String", "ofType": null },
-                "defaultValue": "null",
-                "isDeprecated": false,
-                "deprecationReason": null
-              },
-              {
-                "name": "path",
-                "description": null,
-                "type": { "kind": "SCALAR", "name": "String", "ofType": null },
-                "defaultValue": "null",
+                "defaultValue": null,
                 "isDeprecated": false,
                 "deprecationReason": null
               }
@@ -7960,6 +7920,14 @@
             "name": "updateSchemaTemplate",
             "description": "Update a Schema Template",
             "args": [
+              {
+                "name": "domain",
+                "description": null,
+                "type": { "kind": "SCALAR", "name": "String", "ofType": null },
+                "defaultValue": "null",
+                "isDeprecated": false,
+                "deprecationReason": null
+              },
               {
                 "name": "id",
                 "description": null,
@@ -8564,6 +8532,14 @@
         "description": null,
         "fields": null,
         "inputFields": [
+          {
+            "name": "domain",
+            "description": null,
+            "type": { "kind": "INPUT_OBJECT", "name": "FilterOptions", "ofType": null },
+            "defaultValue": "null",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
           {
             "name": "id",
             "description": null,
@@ -9726,14 +9702,6 @@
             "defaultValue": "null",
             "isDeprecated": false,
             "deprecationReason": null
-          },
-          {
-            "name": "name",
-            "description": null,
-            "type": { "kind": "INPUT_OBJECT", "name": "FilterOptions", "ofType": null },
-            "defaultValue": "null",
-            "isDeprecated": false,
-            "deprecationReason": null
           }
         ],
         "interfaces": null,
@@ -9892,6 +9860,14 @@
         "description": null,
         "fields": null,
         "inputFields": [
+          {
+            "name": "domain",
+            "description": null,
+            "type": { "kind": "INPUT_OBJECT", "name": "FilterOptions", "ofType": null },
+            "defaultValue": "null",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
           {
             "name": "id",
             "description": null,
@@ -10205,6 +10181,14 @@
         "description": null,
         "fields": null,
         "inputFields": [
+          {
+            "name": "domain",
+            "description": null,
+            "type": { "kind": "INPUT_OBJECT", "name": "FilterOptions", "ofType": null },
+            "defaultValue": "null",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
           {
             "name": "id",
             "description": null,

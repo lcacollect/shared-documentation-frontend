@@ -106,7 +106,7 @@ export const SchemaElementsTable = (props: SchemaElementsTableProps) => {
 
   const getSchemaCategories = () => {
     if (Array.isArray(category)) {
-      return category.filter((child) => child.depth === 2)
+      return category.filter((child) => child.typeCodeElement?.level === 3)
     } else {
       return Object.values(category.children)
     }
@@ -170,7 +170,7 @@ export const SchemaElementsTable = (props: SchemaElementsTableProps) => {
         id: '',
         name: '',
         unit: Unit.M,
-        schemaCategory: schemaCategories.find((child) => child.name.includes('x')),
+        schemaCategory: schemaCategories.find((child) => child.typeCodeElement?.name.includes('x')),
         description: '',
         source: null,
         quantity: 1,
@@ -407,12 +407,15 @@ export const SchemaElementsTable = (props: SchemaElementsTableProps) => {
       flex: 1,
       editable: true,
       type: 'singleSelect',
-      valueOptions: schemaCategories.map((child) => ({ value: child.id, label: child.name as string })),
+      valueOptions: schemaCategories.map((child) => ({
+        value: child.id,
+        label: child.typeCodeElement?.name as string,
+      })),
       valueGetter: (param) => {
         return param.value?.id
       },
       valueFormatter: (params) => {
-        return rows.find((row) => row.id == params.id)?.schemaCategory?.name
+        return rows.find((row) => row.id == params.id)?.schemaCategory?.typeCodeElement?.name
       },
     },
     {
@@ -595,7 +598,7 @@ export const SchemaElementsTable = (props: SchemaElementsTableProps) => {
       field: 'classification',
       headerName: 'Class',
       flex: 1,
-      valueFormatter: () => category.name,
+      valueFormatter: () => category.typeCodeElement?.name,
     })
   }
 
