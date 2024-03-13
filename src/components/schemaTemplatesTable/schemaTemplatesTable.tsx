@@ -126,6 +126,8 @@ export const SchemaTemplatesTable = (props: SchemaTemplatesTableProps) => {
       flex: 1,
       cellClassName: 'actions',
       getActions: ({ id }: { id: GridRowId }) => {
+        const template = schemaTemplates?.find((template) => template.id === id)
+        const disabled = template?.domain !== domainName
         return [
           <GridActionsCellItem
             key={0}
@@ -133,6 +135,7 @@ export const SchemaTemplatesTable = (props: SchemaTemplatesTableProps) => {
             label='Edit'
             className='textPrimary'
             onClick={handleEditClick(id)}
+            disabled={disabled}
             color='inherit'
             placeholder={''}
           />,
@@ -141,6 +144,7 @@ export const SchemaTemplatesTable = (props: SchemaTemplatesTableProps) => {
             icon={<DeleteIcon />}
             label='Delete'
             onClick={() => handleDeleteClick(id)}
+            disabled={disabled}
             color='inherit'
             placeholder={''}
           />,

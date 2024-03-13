@@ -50,9 +50,10 @@ export const BuildingComponentsPage = () => {
   })
 
   const reportingSchemaExists = !!data?.reportingSchemas[0]
-  const reportingSchemaId = data?.reportingSchemas[0]?.id || ''
+  const reportingSchemaId = data?.reportingSchemas[data?.reportingSchemas.length - 1]?.id || ''
 
-  const categoriesId = data?.reportingSchemas[0]?.categories?.map((category) => category.id) || []
+  const categoriesId =
+    data?.reportingSchemas[data?.reportingSchemas.length - 1]?.categories?.map((category) => category.id) || []
 
   const { data: elements, refetch: refetchElements } = useGetSchemaElementsQuery({
     variables: { schemaCategoryIds: categoriesId },
@@ -125,7 +126,7 @@ export const BuildingComponentsPage = () => {
             {!isTableView ? (
               <>
                 <SchemasAccordion
-                  schema={data.reportingSchemas[0] as GraphQlReportingSchema}
+                  schema={data?.reportingSchemas[data?.reportingSchemas.length - 1] as GraphQlReportingSchema}
                   categoriesId={categoriesId}
                   projElements={allElements as unknown as SchemaElement[]}
                   projTasks={allTasks as unknown as Task[]}
@@ -141,7 +142,9 @@ export const BuildingComponentsPage = () => {
               <ErrorBoundary>
                 <SchemaElementsTable
                   categoriesId={categoriesId}
-                  category={data.reportingSchemas[0].categories as GraphQlSchemaCategory[]}
+                  category={
+                    data?.reportingSchemas[data?.reportingSchemas.length - 1].categories as GraphQlSchemaCategory[]
+                  }
                   tasks={allTasks as unknown as Task[]}
                   elements={allElements as unknown as SchemaElement[]}
                   isAddingTasks={isAddingTasks}
