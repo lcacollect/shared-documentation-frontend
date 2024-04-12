@@ -65,9 +65,6 @@ export const ImportExportPage = () => {
       case 'lcabyg':
         setExportFormat(ExportFormat.Lcabyg)
         break
-      case 'lcax':
-        setExportFormat(ExportFormat.Lcax)
-        break
       default:
         console.log('Unknown export format:', value, 'setting format to ExportFormat.Csv')
         setExportFormat(ExportFormat.Csv)

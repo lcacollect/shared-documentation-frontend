@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { SourceForm } from './sourceForm'
 import { ProjectSourceType } from '../../dataAccess'
+import React from 'react'
 
 describe('Source Form', () => {
   it('should render successfully', async () => {

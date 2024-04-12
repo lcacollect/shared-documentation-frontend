@@ -4,6 +4,7 @@ import { TypecodeSelectionTable } from '.'
 import { MockedProvider } from '@apollo/client/testing'
 import data from '../../__mocks__/typeCodes'
 import { GraphQlTypeCodeElement } from '../../dataAccess'
+import React from 'react'
 
 describe('TypeCodeSelectionTable', () => {
   it('should display typeCode table', async () => {

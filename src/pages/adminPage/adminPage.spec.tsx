@@ -2,6 +2,7 @@ import '@testing-library/jest-dom'
 import { MockedProvider } from '@apollo/client/testing'
 import { render, screen } from '@testing-library/react'
 import { AdminPage } from './adminPage'
+import React from 'react'
 
 describe('Admin Page', () => {
   it('should render successfully', async () => {

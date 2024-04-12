@@ -2,6 +2,7 @@ import '@testing-library/jest-dom'
 import { MockedProvider } from '@apollo/client/testing'
 import { render, screen } from '@testing-library/react'
 import { SchemaTemplatesTable } from './schemaTemplatesTable'
+import React from 'react'
 
 describe('SchemaTemplate', () => {
   it('should render successfully', async () => {

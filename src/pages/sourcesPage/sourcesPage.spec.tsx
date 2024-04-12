@@ -5,6 +5,7 @@ import { expect, describe, it } from 'vitest'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { sourcesPageMock } from '../../__mocks__'
 import { SourcesPage } from './sourcesPage'
+import React from 'react'
 
 describe('Project Source Page', () => {
   it('should render successfully', async () => {

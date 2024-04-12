@@ -5,6 +5,7 @@ import { SourceTable } from './sourceTable'
 import { MockedProvider } from '@apollo/client/testing'
 import { emptySourcesPageMock, sourcesPageMock } from '../../__mocks__'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
+import React from 'react'
 
 describe('Source Table', () => {
   it('should render no rows', async () => {

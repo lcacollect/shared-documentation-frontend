@@ -1,3 +1,5 @@
+import { SchemaTemplate } from '../components/schemaTemplatesTable'
+
 export default {
   schemaTemplates: [
     {
@@ -9,7 +11,13 @@ export default {
         projectId: 'aaa',
         categories: [],
       },
-    },
+      original: {
+        id: '1234',
+        name: 'reportinSchema',
+        projectId: 'aaa',
+        categories: [],
+      },
+    } as SchemaTemplate,
     {
       id: '3481d0bb-a0b5-49fa-bdea-27a4253cff0a2',
       name: 'template2',
@@ -19,6 +27,7 @@ export default {
         projectId: 'bbb',
         categories: [],
       },
-    },
+      original: undefined,
+    } as SchemaTemplate,
   ],
 }

@@ -4,6 +4,7 @@ import { render, screen } from '@testing-library/react'
 import { CreateTemplateDialog } from './createTemplateDialog'
 import { TypeCodes } from '../../__mocks__/schemaTemplate.mock'
 import data from '../../__mocks__/schemaTemplates'
+import React from 'react'
 
 describe('CreateTemplateDialog', () => {
   it('should render Create dialog', async () => {

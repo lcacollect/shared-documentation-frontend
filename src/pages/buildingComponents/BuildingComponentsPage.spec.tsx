@@ -4,6 +4,7 @@ import { render, screen } from '@testing-library/react'
 import { expect, describe, it } from 'vitest'
 import { projectSources } from '../../__mocks__'
 import { BuildingComponentsPage } from './BuildingComponentsPage'
+import React from 'react'
 
 describe('Building Components Page', () => {
   it('should render successfully', async () => {
